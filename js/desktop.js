@@ -16,7 +16,7 @@
           <button class="tb-start" aria-label="Iniciar"><span class="orb"></span><span>iniciar</span></button>
           <div class="tb-quick">${["kez", "peep", "chat"].map((id) => `<button data-app="${id}" title="${esc(ALU.APPS[id].titulo)}">${ALU.pix(ALU.APPS[id].icone)}</button>`).join("")}</div>
           <div class="tb-apps"></div>
-          <div class="tb-tray"><button class="tray-msg" title="MessagerTale">${ALU.pix("chat")}</button><span class="tb-clock"></span></div>
+          <div class="tb-tray"><button class="tray-lang" title="${ALU.lang === "en" ? "Mudar para português" : "Switch to English"}">${ALU.lang === "en" ? "EN" : "PT"}</button><button class="tray-msg" title="MessagerTale">${ALU.pix("chat")}</button><span class="tb-clock"></span></div>
         </nav>
       </div>`;
     const desk = root.querySelector(".desk"), winLayer = root.querySelector(".windows"), tbApps = root.querySelector(".tb-apps"),
@@ -46,6 +46,7 @@
     });
     root.querySelectorAll(".tb-quick [data-app]").forEach((b) => (b.onclick = () => abrir(b.dataset.app)));
     tray.onclick = () => abrir("chat");
+    root.querySelector(".tray-lang").onclick = () => ALU.setLang(ALU.lang === "en" ? "pt" : "en");
 
     // ---- janelas ----
     function abrir(id, arg) {
@@ -145,7 +146,7 @@
         <div class="la-side">${["pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", "ajustes"].map((id) => `<button data-app="${id}">${esc(ALU.APPS[id].titulo)}</button>`).join("")}</div>
       </div>
       <input class="la-search" placeholder="Iniciar pesquisa" aria-label="Pesquisar">
-      <div class="la-foot"><button data-act="reboot">↻ Reiniciar</button><button data-act="desligar">⏻ Desligar</button></div>`;
+      <div class="la-foot"><button data-act="lang">🌐 ${ALU.lang === "en" ? "Português" : "English"}</button><button data-act="reboot">↻ Reiniciar</button><button data-act="desligar">⏻ Desligar</button></div>`;
     const laList = launcher.querySelector(".la-list");
     const desenhar = (q = "") => {
       const f = todos.filter((id) => ALU.APPS[id].titulo.toLowerCase().includes(q.toLowerCase()));
@@ -158,6 +159,7 @@
     busca.addEventListener("input", (e) => desenhar(e.target.value));
     busca.addEventListener("keydown", (e) => { if (e.key === "Enter") { const b = laList.querySelector("button"); b && b.click(); } if (e.key === "Escape") launcher.hidden = true; });
     launcher.querySelector('[data-act="reboot"]').onclick = () => ALU.reboot();
+    launcher.querySelector('[data-act="lang"]').onclick = () => ALU.setLang(ALU.lang === "en" ? "pt" : "en");
     launcher.querySelector('[data-act="desligar"]').onclick = () => { launcher.hidden = true; ALU.desligar && ALU.desligar(); };
 
     // ---- menu de contexto ----
@@ -200,7 +202,7 @@
     setTimeout(() => chegou("oiii"), 6500);
     setTimeout(() => chegou("tá por aí? 👀"), 9000);
 
-    // ---- Bonzinho, o urso ----
+    // ---- Zizi, o mascote ----
     ALU.buddy && ALU.buddy(root.querySelector(".desk"));
   };
 })();

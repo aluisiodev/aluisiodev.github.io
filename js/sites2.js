@@ -1,4 +1,4 @@
-// Mais sites do Kez(i)avana: alulugle (busca e página inicial), musikzify, ebaa!, clima da selva de pedra,
+// Mais sites do Kez(i)avana: alulugle (busca e página inicial), musikzify, ebaa!, clima,
 // yakurt e Kezpédia.
 (function () {
   const ALU = window.ALU, esc = (s) => ALU.esc(s);
@@ -51,7 +51,8 @@
 
   // ======================= alulugle =======================
   const INDICE = () => [
-    { url: "ligadin.com/in/aluisio-alves", t: `${P.nome} | LigadIn`, d: "Perfil profissional, experiência e certificações.", k: "linkedin ligadin perfil curriculo certificado emprego vaga aluisio" },
+    { url: "ligadin.com/feed", t: "Feed | LigadIn", d: "Posts de gratidão corporativa, vagas sênior por R$ 1.200 e um gato muito produtivo.", k: "linkedin ligadin feed posts vagas gratidao linkedisney gato bombom demitido" },
+    { url: "ligadin.com/in/aluisio-alves", t: `${P.nome} | LigadIn`, d: "Perfil profissional, experiência e cursos.", k: "linkedin ligadin perfil curriculo certificado emprego vaga aluisio" },
     { url: "doghub.com/aluisiodev", t: "aluisiodev · DogHub", d: "Repositórios e código dos projetos.", k: "github doghub codigo repositorio projetos" },
     ...PROJ.map((p) => ({ url: "doghub.com/aluisiodev/" + repoDe(p), t: `${p.nome} · DogHub`, d: p.resumo, k: `${p.nome} ${p.id} ${p.stack.join(" ")} projeto` })),
     { url: "kezpedia.org/wiki/Aluisio", t: "Aluísio – Kezpédia, a enciclopédia da savana", d: "Desenvolvedor, criador do aluOS e domador de patos roxos.", k: "aluisio quem biografia wiki kezpedia" },
@@ -59,7 +60,7 @@
     { url: "kezpedia.org/wiki/Pato_roxo", t: "Pato roxo – Kezpédia", d: "Mascote do Peep Studio. Revisa PRs desde que evoluiu.", k: "pato roxo peep studio quack" },
     { url: "musikzify.com", t: "musikzify · a playlist do Aluísio", d: "Ouça uma prévia das músicas que tocam enquanto ele programa.", k: "musica spotify musikzify playlist radio ouvir som" },
     { url: "ebaa.com.br", t: "ebaa! · o fórum da savana", d: "Dúvidas, códigos que só funcionam às 3h da manhã e discussões sobre patos.", k: "forum ebaa duvida discussao comunidade" },
-    { url: "climaselva.com", t: "Clima da Selva de Pedra", d: "Previsão do tempo para a selva de pedra. Chance de garoa: sempre.", k: "clima tempo previsao chuva sol garoa selva pedra" },
+    { url: "climaselva.com", t: "Clima da Terra da Garoa", d: "Previsão do tempo para a Terra da Garoa e todas as capitais do Brasil.", k: "clima tempo previsao chuva sol garoa sao paulo estado capital" },
     { url: "yakurt.com/perfil/aluisio", t: `${P.nome} · yakurt`, d: "Recados, depoimentos e as comunidades mais importantes da sua vida.", k: "yakurt orkut rede social recado comunidade depoimento" },
     { url: "yakurt.com/comunidade/segunda", t: "Eu odeio segunda-feira · yakurt", d: "Comunidade com 1.204.333 membros que concordam com você.", k: "segunda feira gato odeio comunidade" },
     { url: "youinthescreenofcomputerorphone.com", t: "YouInTheScreenOfComputerOrPhone", d: "Vídeos. Muitos vídeos. Alguns de 10 horas.", k: "video youtube you assistir" },
@@ -122,30 +123,47 @@
   });
 
   // ======================= musikzify =======================
+  // A playlist "favs oat" do Aluísio. A prévia toca pelo player oficial do Spotify quando o navegador deixa
+  // (num site de verdade, como o GitHub Pages, deixa). Cada faixa também abre direto no Spotify.
   const PLAYLIST = "6kNcU6KqmK0X4zxYZCuhMq";
+  const FAIXAS = [["Sunflower", "Rex Orange County", "4:12"], ["Daylight", "Joji, Diplo", "2:43"], ["B", "Jaden", "3:06"], ["Piece of You (with Giveon)", "Joji, GIVĒON", "2:15"], ["Dreams of You", "Brennan Savage, Killstation", "2:48"], ["Die For You", "Joji", "3:31"], ["Preciso Me Encontrar", "Cartola", "2:58"], ["O Mundo É Um Moinho", "Cartola", "3:53"], ["Ew", "Joji", "3:27"], ["Like You Do", "Joji", "4:00"], ["haunt u", "Lil Peep", "1:58"], ["Dia Lindo", "Terno Rei", "1:50"], ["Yoko", "Terno Rei", "3:45"], ["Solidão", "Saudades Futebol Clube", "3:55"], ["Apocalypse", "Cigarettes After Sex", "4:50"], ["My Propeller", "Arctic Monkeys", "3:25"], ["Morioh Cho Radio", "Yung Buda, wxlf7", "4:43"], ["Let Down", "Radiohead", "4:59"], ["Lucky", "Radiohead", "4:18"], ["nunca mais vou ser clt", "Link do Zap", "3:00"], ["dando um jeito", "Link do Zap", "2:17"], ["Spanish Sahara", "Foals", "6:49"], ["Piloto", "Yung Buda", "3:34"], ["Isso é Sério", "Matuê, Brandão85", "4:45"], ["I'LL SEE YOU IN 40", "Joji", "4:13"], ["Well I Wonder - 2011 Remaster", "The Smiths", "3:59"], ["One For The Road", "Arctic Monkeys", "3:26"], ["nuts", "Lil Peep, rainy bear", "1:25"], ["505", "Arctic Monkeys", "4:13"], ["Aquelamusicaali", "Yung Buda", "2:49"], ["Dueto", "Yunk Vino, Vnoahh, Neckklace", "2:19"], ["Monstro", "Yung Buda", "3:49"], ["Subaru Azul", "Yung Buda, Zemaru, Psycho 13", "4:51"], ["BAILE 2002", "predo, DigiMushroom", "3:32"], ["Salão", "Japa", "2:04"], ["I've Been Waiting (w/ ILoveMakonnen & Fall Out Boy)", "Lil Peep, ILOVEMAKONNEN, Fall Out Boy", "3:53"], ["Máquina do Tempo", "Matuê", "3:50"], ["Lean Wit Me", "Juice WRLD", "2:55"], ["Who Shot Cupid?", "Juice WRLD", "3:34"], ["whoa (mind in awe)", "XXXTENTACION", "2:37"], ["Kyoto", "Japa", "3:06"], ["SLOW DANCING IN THE DARK", "Joji", "3:29"], ["Kurt", "Japa", "2:56"], ["Jogo Sujo", "Yunk Vino, Veigh, Nagalli, Trxntin, Labbel Rec", "3:45"], ["VVS", "Japa", "2:36"], ["Glimpse of Us", "Joji", "3:53"], ["Luxúria", "Xamã, Bagua Records, Neo Beats, Matuê", "3:05"], ["Self Control", "Frank Ocean", "4:09"], ["Tenho Medo (De Sentir Que Não Sinto Nada Por Ti)", "Insira Aqui", "2:47"], ["Jazz Clube", "glover.", "3:03"], ["Desastrado, Etc.", "glover.", "4:22"], ["Indo Embora Sem Avisar Ninguém", "glover.", "3:33"], ["Fast", "Juice WRLD", "3:28"], ["É Verdade Que Tu Rasgou Meu Accesscode Talker?", "Lunoaprendiz", "3:53"], ["TEETH!", "ElyOtto", "1:20"], ["Necronomicon", "Yung Buda, Lukanni", "3:25"], ["Luzes de Natal", "Terno Rei", "2:44"], ["Stereonatália", "Rugby Brasileiro", "2:56"], ["Radio/Video", "System Of A Down", "4:09"], ["Lost In Hollywood", "System Of A Down", "5:20"], ["Disenchanted", "My Chemical Romance", "4:55"], ["Sextape", "Deftones", "4:01"], ["LOVE YOU LESS", "Joji", "3:21"], ["Ventos do Norte (Terral)", "Bella e o Olmo da Bruxa", "3:15"]];
+  const buscaSpotify = (f) => "https://open.spotify.com/search/" + encodeURIComponent(f[0].replace(/\s*[-(].*$/, "") + " " + f[1].split(",")[0]);
+  const emPrevia = () => /claude|anthropic|usercontent/.test(location.hostname);
   ALU.kezSites.push({
-    re: /^musikzify\.com\/?$/, titulo: () => "musikzify · Playlist do Aluísio",
+    re: /^musikzify\.com\/?$/, titulo: () => "musikzify · favs oat",
     html: () => `
       <div class="mz">
         <aside class="mz-side"><div class="mz-logo">${icMz}<b>musikzify</b></div>
           <span>⌂ Início</span><span>🔍 Buscar</span><span>▤ Sua biblioteca</span>
-          <hr><span class="on">♫ Playlist do Aluísio</span><span>♫ Rádio da savana</span><span>♫ Quack-fi beats to code to</span></aside>
+          <hr><span class="on">♫ favs oat</span><span>♫ Rádio da savana</span><span>♫ Quack-fi beats to code to</span></aside>
         <section class="mz-main">
           <div class="mz-hero"><div class="mz-capa"><img src="${esc(P.foto)}" alt=""><i>♫</i></div>
-            <div><small>PLAYLIST PÚBLICA</small><h1>A trilha do quarto</h1><p>O que toca no monitor esquerdo enquanto eu programo. Arctic Monkeys, Radiohead, Joji e companhia.</p>
-            <p class="mz-quem"><img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b></p></div></div>
-          <p class="mz-dica">Escolha uma música na lista para ouvir a prévia. Para ouvir inteira, abra no Spotify de verdade.</p>
-          <div class="mz-player"><iframe title="Playlist do Aluísio no Spotify" src="https://open.spotify.com/embed/playlist/${PLAYLIST}?utm_source=generator&theme=0" width="100%" height="380" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            <div class="mz-off" hidden>O player não carregou aqui. <a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Abrir a playlist no Spotify ↗</a></div></div>
-          <div class="row"><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Sair da savana: ouvir no Spotify ↗</a></div>
+            <div><small>PLAYLIST PÚBLICA</small><h1>favs oat</h1><p>O que toca no monitor esquerdo enquanto eu programo. De Cartola a Joji, de Terno Rei a System Of A Down.</p>
+            <p class="mz-quem"><img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${FAIXAS.length} músicas</p></div></div>
+          <div class="mz-acoes"><button class="mz-play" aria-label="Tocar">▶</button><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Sair da savana: ouvir no Spotify ↗</a></div>
+          <div class="mz-player" hidden><iframe title="Prévia no Spotify" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
+          <p class="mz-aviso" hidden>Nesta prévia o navegador não deixa o player do Spotify aparecer. Clique numa música para ouvir no Spotify, ou abra o site publicado.</p>
+          <ol class="mz-lista">${FAIXAS.map((f, i) => `<li><button data-i="${i}"><span class="n">${i + 1}</span><span class="t"><b>${esc(f[0])}</b><small>${esc(f[1])}</small></span><span class="d">${f[2]}</span></button></li>`).join("")}</ol>
         </section>
       </div>`,
     init: (view) => {
-      const fr = view.querySelector("iframe"), off = view.querySelector(".mz-off");
-      let ok = false; fr.addEventListener("load", () => { ok = true; });
-      const t = setTimeout(() => { if (!ok) off.hidden = false; }, 8000);
+      const player = view.querySelector(".mz-player"), fr = player.querySelector("iframe"), aviso = view.querySelector(".mz-aviso");
+      const bloqueado = emPrevia();
+      const abrirPlayer = () => {
+        if (bloqueado) { aviso.hidden = false; return false; }
+        if (!fr.src) fr.src = `https://open.spotify.com/embed/playlist/${PLAYLIST}?utm_source=generator&theme=0`;
+        player.hidden = false; return true;
+      };
+      view.querySelector(".mz-play").onclick = () => { if (!abrirPlayer()) window.open(`https://open.spotify.com/playlist/${PLAYLIST}`, "_blank", "noopener"); };
+      view.querySelectorAll(".mz-lista button").forEach((b) => (b.onclick = () => {
+        const f = FAIXAS[+b.dataset.i];
+        view.querySelectorAll(".mz-lista button").forEach((x) => x.classList.toggle("on", x === b));
+        if (bloqueado) { aviso.hidden = false; window.open(buscaSpotify(f), "_blank", "noopener"); return; }
+        abrirPlayer();
+        ALU.urso && ALU.urso.falar && ALU.urso.falar(`Boa! ${f[0]} é das boas.`);
+      }));
+      if (!bloqueado) abrirPlayer(); else aviso.hidden = false;
       conq("musikzify", "Trilha sonora", "Abriu a playlist no musikzify.");
-      return () => clearTimeout(t);
     },
   });
 
@@ -155,9 +173,9 @@
       ["dev_noturno", "🦉", "Toda vez que eu chamo alguém pra ver o bug, ele some. Quando a pessoa vai embora, volta. Alguém?"],
       ["pato_roxo", "🦆", "quack. (tradução: explica o código linha por linha pra mim)"],
       ["dev_noturno", "🦉", "expliquei pro pato e achei o erro. era um ponto e vírgula. RESOLVIDO."]] },
-    { id: "urso", cat: "Geral da savana", t: "alguém mais tem um urso vermelho na área de trabalho??", autor: "visitante_2006", posts: [
-      ["visitante_2006", "👀", "apareceu um urso vermelho de barriga branca no meu desktop. ele é vírus???"],
-      ["Bonzinho", "🐻", "oi! não sou vírus, sou só um ursinho prestativo. prometo não instalar barra de ferramentas."],
+    { id: "urso", cat: "Geral da savana", t: "tem alguém de cabelo azul com uma espada na minha área de trabalho??", autor: "visitante_2006", posts: [
+      ["visitante_2006", "👀", "apareceu um mascote de cabelo azul e espada nas costas no meu desktop. é vírus???"],
+      ["Zizi", "⚔️", "oi! não sou vírus, sou Zizi, mascote do aluOS. prometo não instalar barra de ferramentas."],
       ["girafa_da_404", "🦒", "ele é gente boa. me ajudou a achar a página que eu perdi"]] },
     { id: "vim", cat: "Programação", t: "tutorial: como sair do vim", autor: "sudo_su", posts: [
       ["sudo_su", "💻", "entrei no vim em 2019. alguém sabe sair? minha família sente minha falta"],
@@ -169,7 +187,7 @@
       ["crying_lightning", "⚡", "Humbug é subestimado e eu vou morrer nessa colina"]] },
     { id: "fnaf", cat: "Jogos", t: "dicas para sobreviver ao turno da noite", autor: "seguranca_novato", posts: [
       ["seguranca_novato", "🔦", "primeiro dia de trabalho na pizzaria. alguma dica?"],
-      ["freddy_fazbear", "🐻", "har har har"],
+      ["urso_animatronico", "🐻", "har har har"],
       ["seguranca_novato", "🔦", "isso não ajudou em nada"]] },
     { id: "sekiro", cat: "Jogos", t: "zerei Sekiro e agora não sei o que fazer da vida", autor: "lobo_de_um_braco", posts: [
       ["lobo_de_um_braco", "🗡️", "200 horas. o Isshin me ensinou mais que a faculdade."],
@@ -208,23 +226,44 @@
     },
   });
 
-  // ======================= Clima da Selva de Pedra =======================
-  const CIDADE = { nome: "Selva de Pedra (São Paulo)", lat: -23.55, lon: -46.63 };
-  const COND = (c) => c === 0 ? ["☀️", "Céu limpo (raro, aproveite)"] : c <= 2 ? ["🌤️", "Sol entre prédios"] : c === 3 ? ["☁️", "Nublado, clássico"] : c <= 48 ? ["🌫️", "Neblina com fumaça de escapamento"]
-    : c <= 57 ? ["🌦️", "Garoa (a famosa)"] : c <= 67 ? ["🌧️", "Chuva: Marginal alagada em 3, 2, 1…"] : c <= 77 ? ["❄️", "Neve?! Impossível. Confira seu termômetro"] : c <= 82 ? ["🌧️", "Pancadas de chuva no fim da tarde"] : ["⛈️", "Tempestade. Fique em casa programando"];
+  // ======================= Clima da Terra da Garoa (e do Brasil todo) =======================
+  // [uf, apelido, capital, lat, lon, piada]
+  const CIDADES = [
+    ["SP", "Terra da Garoa", "São Paulo", -23.55, -46.63, "Chance de garoa: sempre"], ["RJ", "Cidade Maravilhosa", "Rio de Janeiro", -22.91, -43.17, "Sensação térmica: forno"],
+    ["MG", "Terra do Pão de Queijo", "Belo Horizonte", -19.92, -43.94, "Chance de café: 100%"], ["ES", "Terra da Moqueca", "Vitória", -20.32, -40.34, "Panela de barro: no fogo"],
+    ["PR", "Cidade Sorriso", "Curitiba", -25.43, -49.27, "4 estações num dia só"], ["SC", "Ilha da Magia", "Florianópolis", -27.6, -48.55, "Vento sul: chegando"],
+    ["RS", "Terra do Chimarrão", "Porto Alegre", -30.03, -51.23, "Cuia: sempre cheia"], ["MS", "Cidade Morena", "Campo Grande", -20.47, -54.62, "Tereré: gelado"],
+    ["MT", "Portal da Amazônia", "Cuiabá", -15.6, -56.1, "Calor: sim"], ["GO", "Terra do Pequi", "Goiânia", -16.68, -49.25, "Cuidado com o caroço"],
+    ["DF", "Capital do Brasil", "Brasília", -15.79, -47.88, "Umidade: deserto"], ["BA", "Terra da Felicidade", "Salvador", -12.97, -38.5, "Axé no ar: alto"],
+    ["SE", "Cidade da Qualidade de Vida", "Aracaju", -10.91, -37.07, "Caranguejo: liberado"], ["AL", "Paraíso das Águas", "Maceió", -9.67, -35.74, "Mar: verde-água"],
+    ["PE", "Veneza Brasileira", "Recife", -8.05, -34.88, "Frevo: provável"], ["PB", "Onde o Sol Nasce Primeiro", "João Pessoa", -7.12, -34.86, "Nascer do sol: antes de todo mundo"],
+    ["RN", "Cidade do Sol", "Natal", -5.79, -35.21, "Protetor solar: obrigatório"], ["CE", "Terra da Luz", "Fortaleza", -3.73, -38.52, "Vento: perfeito pra kite"],
+    ["PI", "Cidade Verde", "Teresina", -5.09, -42.8, "Calor: lendário"], ["MA", "Ilha do Amor", "São Luís", -2.53, -44.3, "Reggae: tocando"],
+    ["PA", "Cidade das Mangueiras", "Belém", -1.46, -48.49, "Chuva da tarde: pontual"], ["AP", "Meio do Mundo", "Macapá", 0.03, -51.07, "Hemisfério: os dois"],
+    ["AM", "Coração da Amazônia", "Manaus", -3.12, -60.02, "Umidade: floresta"], ["RR", "Terra de Makunaimã", "Boa Vista", 2.82, -60.67, "Sol: garantido"],
+    ["AC", "Terra do Acre (existe!)", "Rio Branco", -9.97, -67.81, "Existência confirmada"], ["RO", "Portal da Amazônia Ocidental", "Porto Velho", -8.76, -63.9, "Chuva: em breve"],
+    ["TO", "Capital Mais Nova", "Palmas", -10.18, -48.33, "Calor de planejamento"],
+  ];
+  const COND = (c) => c === 0 ? ["☀️", "Céu limpo (aproveite)"] : c <= 2 ? ["🌤️", "Sol entre nuvens"] : c === 3 ? ["☁️", "Nublado"] : c <= 48 ? ["🌫️", "Neblina"]
+    : c <= 57 ? ["🌦️", "Garoa"] : c <= 67 ? ["🌧️", "Chuva: leve o guarda-chuva"] : c <= 77 ? ["❄️", "Neve?! Confira seu termômetro"] : c <= 82 ? ["🌧️", "Pancadas de chuva"] : ["⛈️", "Tempestade. Fique em casa programando"];
   const DIAS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
   ALU.kezSites.push({
-    re: /^climaselva\.com\/?$/, titulo: () => "Clima da Selva de Pedra",
-    html: () => `
+    re: /^climaselva\.com(?:\/(\w\w))?\/?$/, titulo: (m) => { const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0]; return "Clima da " + c[1]; },
+    html: (m) => {
+      const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0];
+      return `
       <div class="cl">
-        <header class="cl-top">${icCl}<b>Clima da Selva de Pedra</b><span>previsões duvidosas desde 2004</span></header>
-        <div class="cl-agora"><div class="cl-ic">⏳</div><div><small>${esc(CIDADE.nome)} · agora</small><h1 class="cl-t">--°C</h1><p class="cl-c">Consultando os pombos…</p></div>
-          <ul class="cl-extra"><li>💧 Umidade: <b class="cl-u">--</b></li><li>💨 Vento: <b class="cl-v">--</b></li><li>🚗 Trânsito: <b>${["Marginal parada", "Paulista lenta", "Radial: boa sorte", "fluindo (mentira)"][new Date().getDay() % 4]}</b></li><li>🌦️ Chance de garoa: <b>sempre</b></li></ul></div>
+        <header class="cl-top">${icCl}<b>Clima da ${esc(c[1])}</b><label class="cl-sel">Estado: <select aria-label="Escolher estado">${CIDADES.map((x) => `<option value="${x[0]}" ${x === c ? "selected" : ""}>${x[0]} · ${esc(x[2])}</option>`).join("")}</select></label></header>
+        <div class="cl-agora"><div class="cl-ic">⏳</div><div><small>${esc(c[1])} (${esc(c[2])}, ${c[0]}) · agora</small><h1 class="cl-t">--°C</h1><p class="cl-c">Consultando os pombos…</p></div>
+          <ul class="cl-extra"><li>💧 Umidade: <b class="cl-u">--</b></li><li>💨 Vento: <b class="cl-v">--</b></li><li>✨ ${esc(c[5].split(":")[0])}:<b>${esc(c[5].split(":").slice(1).join(":") || "")}</b></li></ul></div>
         <div class="cl-semana"></div>
         <p class="cl-fonte muted"></p>
-      </div>`,
-    init: (view) => {
+      </div>`;
+    },
+    init: (view, ctx, m, ir) => {
       let vivo = true;
+      const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0];
+      view.querySelector(".cl-sel select").onchange = (e) => ir("climaselva.com/" + e.target.value.toLowerCase());
       const pintar = (d, real) => {
         if (!vivo) return;
         const [ic, txt] = COND(d.code);
@@ -234,7 +273,7 @@
         view.querySelector(".cl-fonte").textContent = real ? "Dados reais de Open-Meteo.com. As piadas são por nossa conta." : "Sem conexão com os satélites. Estes números foram chutados por um pombo experiente.";
       };
       const falso = () => { const h = new Date(); return { temp: 22, code: 51, umid: 81, vento: 9, dias: [0, 1, 2, 3, 4].map((i) => ({ dia: i ? DIAS[(h.getDay() + i) % 7] : "hoje", code: [51, 3, 61, 2, 80][i], max: [24, 26, 21, 27, 23][i], min: [16, 17, 15, 18, 16][i] })) }; };
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${CIDADE.lat}&longitude=${CIDADE.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FSao_Paulo&forecast_days=5`)
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c[3]}&longitude=${c[4]}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`)
         .then((r) => r.ok ? r.json() : Promise.reject())
         .then((j) => pintar({ temp: j.current.temperature_2m, code: j.current.weather_code, umid: j.current.relative_humidity_2m, vento: j.current.wind_speed_10m,
           dias: j.daily.time.map((t, i) => ({ dia: i ? DIAS[new Date(t + "T12:00").getDay()] : "hoje", code: j.daily.weather_code[i], max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i] })) }, true))
@@ -244,10 +283,11 @@
   });
 
   // ======================= yakurt =======================
-  const AMIGOS = [["pato_roxo", "🦆"], ["girafa_404", "🦒"], ["Bonzinho", "🐻"], ["Freddy F.", "🎩"], ["Lobo", "🐺"], ["Marshall", "🧛"], ["Sonic", "💨"], ["visitante", "🙂"], ["leão", "🦁"]];
+  const AMIGOS = [["pato_roxo", "🦆"], ["kez_e_olmo", "img:img/kez.jpg"], ["Zizi", "⚔️"], ["Gerente", "🎩"], ["Lobo", "🐺"], ["Marshall", "🧛"], ["Sonic", "💨"], ["visitante", "🙂"], ["leão", "🦁"]];
   const COMUNIDADES = [["segunda", "Eu odeio segunda-feira", GATO], ["csharp", "Eu amo C#", ALU.pix("csharp")], ["madrugada", "Programo de madrugada", "🌙"], ["abas", "Eu não fecho as abas do navegador", "🗂️"], ["sekiro", "Sekiro me humilhou", "🗡️"], ["aventura", "Hora de Aventura", "🍬"], ["pato", "Patos roxos existem", ALU.pix("peep")], ["cafe", "Café > sono", "☕"]];
   const recados = () => ls.get("alu.yakurt", []);
-  const RECADOS_BASE = [["pato_roxo", "🦆", "quack quack! passando pra deixar um recado 🦆✨"], ["girafa_404", "🦒", "oiii sumido!! bjs da girafa"], ["Bonzinho", "🐻", "lembrete: beber água e commitar com mensagem decente"]];
+  const avYk = (e) => (e.startsWith("img:") ? `<img src="${esc(e.slice(4))}" alt="">` : e);
+  const RECADOS_BASE = [["pato_roxo", "🦆", "quack quack! passando pra deixar um recado 🦆✨"], ["kez_e_olmo", "img:img/kez.jpg", "oiii!! passando pra deixar meu recado aqui 💙"], ["Zizi", "⚔️", "lembrete: beber água e commitar com mensagem decente"]];
   const topoYk = () => `<header class="yk-top"><b>yakurt</b><nav><button class="link" data-ir="yakurt.com/perfil/aluisio">Início</button> · <span>Recados</span> · <span>Comunidades</span></nav><small>visitante@kez.com · Sair</small></header>`;
   ALU.kezSites.push({
     re: /^yakurt\.com\/perfil\/aluisio\/?$/, titulo: () => `yakurt - ${P.nome}`,
@@ -265,16 +305,16 @@
               <div class="yk-recados"></div></div>
             <div class="yk-box"><h2>depoimentos</h2>
               <p><b>🦆 pato_roxo:</b> conheci o Aluísio quando ele ainda usava console.log pra tudo. hoje ele usa console.log pra tudo com mais confiança.</p>
-              <p><b>🐻 Bonzinho:</b> me deixou morar na área de trabalho dele. sem aluguel. recomendo.</p></div>
+              <p><b>⚔️ Zizi:</b> me deixou morar na área de trabalho dele. sem aluguel. recomendo.</p></div>
           </section>
           <aside class="yk-dir">
-            <div class="yk-box"><h3>amigos (${AMIGOS.length})</h3><div class="yk-grade">${AMIGOS.map(([n, e]) => `<span><i>${e}</i>${esc(n)}</span>`).join("")}</div></div>
+            <div class="yk-box"><h3>amigos (${AMIGOS.length})</h3><div class="yk-grade">${AMIGOS.map(([n, e]) => `<span><i>${avYk(e)}</i>${esc(n)}</span>`).join("")}</div></div>
             <div class="yk-box"><h3>comunidades (${COMUNIDADES.length})</h3><div class="yk-grade">${COMUNIDADES.map(([id, n, ic]) => `<button data-ir="yakurt.com/comunidade/${id}"><i>${ic}</i>${esc(n)}</button>`).join("")}</div></div>
           </aside>
         </div></div>`,
     init: (view) => {
       const lista = view.querySelector(".yk-recados"), n = view.querySelector(".yk-n");
-      const pintar = () => { const r = [...recados().map((t) => ["visitante", "🙂", t]), ...RECADOS_BASE]; n.textContent = r.length; lista.innerHTML = r.map(([a, e, t]) => `<div class="yk-recado"><i>${e}</i><div><b>${esc(a)}</b><p>${esc(t)}</p></div></div>`).join(""); };
+      const pintar = () => { const r = [...recados().map((t) => ["visitante", "🙂", t]), ...RECADOS_BASE]; n.textContent = r.length; lista.innerHTML = r.map(([a, e, t]) => `<div class="yk-recado"><i>${avYk(e)}</i><div><b>${esc(a)}</b><p>${esc(t)}</p></div></div>`).join(""); };
       view.querySelector(".yk-form").onsubmit = (e) => { e.preventDefault(); const ta = view.querySelector(".yk-form textarea"), v = ta.value.trim(); if (!v) return; ls.set("alu.yakurt", [v.slice(0, 300), ...recados()].slice(0, 30)); ta.value = ""; pintar(); conq("recado", "Deixou recado", "Escreveu um recado no yakurt."); };
       pintar();
     },
@@ -310,9 +350,9 @@
     Aluisio: { t: P.nome, ib: true, txt: () => `<p><b>${esc(P.nome)}</b> é um ${esc(P.cargo.toLowerCase())} brasileiro, criador do <a data-ir="kezpedia.org/wiki/aluOS">aluOS</a> e tutor de pelo menos um <a data-ir="kezpedia.org/wiki/Pato_roxo">pato roxo</a>.</p>
       <h2>Carreira</h2><p>${esc(P.bio.join(" "))}</p>
       <h2>Projetos notáveis</h2><ul>${PROJ.map((p) => `<li><a data-ir="doghub.com/aluisiodev/${repoDe(p)}">${esc(p.nome)}</a>: ${esc(p.resumo)}</li>`).join("")}</ul>
-      <h2>Vida pessoal</h2><p>Mora num quarto rosa com luz de fim de tarde, um violão azul-esverdeado e uma estante com mais ninjas do que livros. Ouve Arctic Monkeys enquanto programa.<sup>[carece de fontes]</sup></p>` },
+      <h2>Vida pessoal</h2><p>Ama a Kézia. Mora num quarto rosa com luz de fim de tarde, um violão azul-esverdeado e uma estante com mais ninjas do que livros. Ouve Arctic Monkeys enquanto programa.<sup>[carece de fontes]</sup></p>` },
     aluOS: { t: "aluOS", txt: () => `<p>O <b>aluOS</b> é um sistema operacional fictício que roda dentro de uma página web e serve de portfolio para <a data-ir="kezpedia.org/wiki/Aluisio">${esc(P.nome)}</a>. Foi inspirado nos computadores dos anos 2000 e em jogos de mensageiro antigo.</p>
-      <h2>Componentes</h2><ul><li><b>Kez(i)avana</b>: navegador da <a data-ir="kezpedia.org/wiki/Savana">savana</a>.</li><li><b>Peep Studio</b>: IDE que roda Python, JavaScript e C# de bolso.</li><li><b>MessagerTale</b>: mensageiro com um bot que aprende frases.</li><li><b>Bonzinho</b>: urso prestativo que mora na área de trabalho.</li></ul>
+      <h2>Componentes</h2><ul><li><b>Kez(i)avana</b>: navegador da <a data-ir="kezpedia.org/wiki/Savana">savana</a>.</li><li><b>Peep Studio</b>: IDE que roda Python, JavaScript e C# de bolso.</li><li><b>MessagerTale</b>: mensageiro com um bot que aprende frases.</li><li><b>Zizi</b>: mascote de cabelo azul que mora na área de trabalho.</li></ul>
       <h2>Curiosidades</h2><p>Existem conquistas escondidas pelo sistema. O número exato é segredo de Estado.<sup>[citação necessária]</sup></p>` },
     Pato_roxo: { t: "Pato roxo", txt: () => `<p>O <b>pato roxo</b> (<i>Anas peepstudiensis</i>) é o mascote do Peep Studio. Comunica-se exclusivamente por quacks.</p><h2>Evolução</h2><p>Relatos indicam que, após cinco execuções seguidas de código, o pato evolui e passa a revisar pull requests.</p>` },
     Savana: { t: "Savana", txt: () => `<p>A <b>savana</b> é o bioma onde fica a internet do aluOS. Habitada por girafas que guardam páginas 404, zebras e um leão que ruge quando alguém digita o próprio nome dela.</p>` },

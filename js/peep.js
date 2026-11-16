@@ -69,7 +69,7 @@ class Programa
       "public class Aluisio : Desenvolvedor", "{",
       `    public string Nome => ${q(P.nome)};`, `    public string Cargo => ${q(P.cargo)};`, `    public string Local => ${q(P.local)};`, "",
       "    public string[] Skills =>", `        [${window.SKILLS.map((s) => q(s.nome)).join(", ")}];`, "",
-      "    public string[] Certificacoes =>", "    [", ...window.CERTIFICADOS.map((c) => `        ${q(c.nome)},`), "    ];", "",
+      "    public string[] Cursos =>", "    [", ...window.CERTIFICADOS.map((c) => `        ${q(c.nome)},`), "    ];", "",
       "    public Projeto[] Projetos =>", "    [", ...PROJ.map((p) => `        new(${q(p.nome)}, ${q(p.stack[0])}),`), "    ];", "",
       "    public static void Main()", "    {", "        var eu = new Aluisio();",
       '        Console.WriteLine($"Olá! Eu sou o {eu.Nome}.");',

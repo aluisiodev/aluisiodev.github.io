@@ -100,9 +100,21 @@
       const f = document.createElement("span"); f.className = "pato-fx"; f.textContent = "quack!"; f.style.left = e.offsetX + "px"; f.style.top = e.offsetY + "px"; btn.appendChild(f); setTimeout(() => f.remove(), 700);
       if (st.q >= 100) conq("pato100", "Criador de patos", "Juntou 100 quacks no Pato Clicker.");
     };
-    const t = setInterval(() => { st.q += ps() / 4; pintar(); ls.set("alu.pato", st); }, 250);
-    pintar();
-    return () => { clearInterval(t); ls.set("alu.pato", st); };
+    // os patos trabalham mesmo com o site fechado: ao voltar, soma o tempo que passou (até 7 dias)
+    const agora = Date.now();
+    if (st.t && ps() > 0) {
+      const seg = Math.min(7 * 86400, Math.max(0, (agora - st.t) / 1000)), ganho = Math.floor(ps() * seg);
+      if (ganho > 0) {
+        st.q += ganho;
+        const h = seg >= 3600 ? Math.floor(seg / 3600) + "h " : "", m = Math.floor((seg % 3600) / 60);
+        area.querySelector(".pato-jogo > div").insertAdjacentHTML("beforeend", `<p class="pato-off">Enquanto você estava fora (${h}${m}min) seus patos fizeram <b>+${ganho.toLocaleString("pt-BR")}</b> quacks 🦆</p>`);
+      }
+    }
+    st.t = agora;
+    let ult = agora;
+    const t = setInterval(() => { const n = Date.now(); st.q += ps() * (n - ult) / 1000; ult = n; st.t = n; pintar(); ls.set("alu.pato", st); }, 250);
+    pintar(); ls.set("alu.pato", st);
+    return () => { clearInterval(t); st.t = Date.now(); ls.set("alu.pato", st); };
   }
 
   // ---------------- Memória ----------------

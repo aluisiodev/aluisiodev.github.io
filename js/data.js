@@ -27,12 +27,12 @@ window.SKILLS = [
   { id: "csharp", nome: "C#", icone: "csharp", texto: "Linguagem que uso no back-end com .NET e ASP.NET Core. Exemplo no portfolio: Contentstack Delivery App (Razor Pages, injeção de dependência, consumo de API)." },
 ];
 
-// Certificações (aparecem na pasta Skills e no perfil do LigadIn).
+// Cursos (aparecem na pasta Skills e no perfil do LigadIn).
 // TODO: confirme nome exato, nível e ano de cada uma.
 window.CERTIFICADOS = [
   { id: "efset", nome: "Certificado de proficiência em inglês B2", emissor: "EF SET", detalhe: "Proficiência em inglês, nível B2 (EF SET)." },
-  { id: "cisco", nome: "Certificação Cisco", emissor: "Cisco Networking Academy", detalhe: "Curso da Cisco Networking Academy." },
-  { id: "anthropic", nome: "Certificação Anthropic", emissor: "Anthropic", detalhe: "Curso da Anthropic sobre Claude e IA." },
+  { id: "cisco", nome: "Curso Cisco", emissor: "Cisco Networking Academy", detalhe: "Curso da Cisco Networking Academy." },
+  { id: "anthropic", nome: "Curso Anthropic", emissor: "Anthropic", detalhe: "Curso da Anthropic sobre Claude e IA." },
 ];
 
 // Quarto 360° ("Sobre mim"). A imagem é equirretangular (2:1).
@@ -43,7 +43,6 @@ window.QUARTO = {
   pontos: [
     { id: "spotify", u: 0.4655, v: 0.5105, titulo: "Monitor esquerdo · Spotify", texto: "A trilha sonora de tudo que eu programo. Essa é a minha playlist.", link: "https://open.spotify.com/playlist/6kNcU6KqmK0X4zxYZCuhMq?si=a1e287b503e148f4", linkTexto: "Ouvir no Spotify" },
     { id: "leetcode", u: 0.5345, v: 0.5105, titulo: "Monitor direito · LeetCode", texto: "Onde eu treino lógica e algoritmos, um problema por vez.", link: "https://leetcode.com/u/aluisios/", linkTexto: "Ver meu LeetCode" },
-    { id: "violao", u: 0.3961, v: 0.5611, titulo: "Violão", texto: "Meu violão azul-esverdeado. TODO: o que você gosta de tocar?" },
     { id: "luminaria", u: 0.621, v: 0.4608, titulo: "Luminária · achou!", texto: "Luminária de papel. Quase ninguém repara nela, mas é ela que deixa o quarto com essa cor à noite.", escondido: true },
     { id: "janela", u: 0.3078, v: 0.4527, titulo: "Janela · fim de tarde", texto: "O melhor horário do dia. Moro no Brasil e trabalho remoto." },
   ],
@@ -133,6 +132,10 @@ window.PROJETOS = [
 // csharpApi: URL compatível com a API do Piston para compilar C# de verdade. Vazio = tenta o Piston público e,
 //            se não der, usa o "C# de bolso" (tradução para JavaScript).
 window.ALU = window.ALU || {};
+// Seus posts do LinkedIn, para aparecerem no LigadIn (perfil e topo do feed).
+// Cole cada post como { quando: "2 sem", texto: "texto do post", reacoes: 42, comentarios: 3 }.
+window.POSTS_LIGADIN = [];
+
 window.ALU.CONFIG = {
   chatApi: "",
   csharpApi: "",

@@ -25,7 +25,7 @@
       frames: ["escolhe o bolo", "escolhe o sabor", "personaliza", "\"Oi, Ana! Vim pelo site...\"", "mensagem pronta no WhatsApp 💬"] },
   ];
   const COMENTARIOS = [
-    ["pato_roxo_oficial", "primeiro 🦆"], ["girafa_da_404", "eu moro na página de erro e aprovo"], ["freddy_fazbear", "har har har"],
+    ["pato_roxo_oficial", "primeiro 🦆"], ["girafa_da_404", "eu moro na página de erro e aprovo"], ["urso_animatronico", "har har har"],
     ["visitante_2006", "alguém em 2026?"], ["shinobi_sem_braço", "hesitation is defeat"], ["recrutador_curioso", "manda o currículo no imaíu"],
   ];
   function thumb(v) {
@@ -86,7 +86,7 @@
     { de: "LigadIn", assunto: "Você apareceu em 3 pesquisas esta semana (na savana)", quando: "ontem", corpo: "Quem pesquisou você:\n- uma girafa (recrutadora)\n- um pato roxo (dev sênior)\n- você mesmo, 14 vezes\n\nLigue-se. LigadIn." },
     { de: "Príncipe da Savana", assunto: "URGENTE: herança de 1.000.000 de bananas", quando: "seg", spam: true, corpo: "Prezado amigo,\n\nSou o príncipe da savana e preciso da sua ajuda para transferir 1.000.000 de bananas.\nEnvie apenas sua senha do MessagerTale.\n\n(isto é spam. não faça isso. nunca.)" },
     { de: "Peep Studio", assunto: "Seu pato compilou com sucesso", quando: "dom", corpo: "Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nquack." },
-    { de: "Freddy F.", assunto: "turno da noite: 12AM às 6AM", quando: "sáb", corpo: "Olá, olá!\n\nSó lembrando que as câmeras precisam ser checadas.\nE a porta. Cuide da porta.\n\nhar har har" },
+    { de: "Gerente da Pizzaria", assunto: "turno da noite: 12AM às 6AM", quando: "sáb", corpo: "Olá, olá!\n\nSó lembrando que as câmeras precisam ser checadas.\nE a porta. Cuide da porta.\n\nhar har har" },
   ];
   ALU.kezSites.push({
     re: /^(imaiu|imaíu)\.com\/?$/, titulo: () => "Caixa de entrada · imaíu",
@@ -106,7 +106,7 @@
         view.querySelectorAll(".im-item").forEach((x) => x.classList.remove("on")); b.classList.add("on"); b.classList.remove("nao-lido");
         ler.innerHTML = `<h2>${esc(e.assunto)}</h2><p class="muted">De: <b>${esc(e.de)}</b> · ${esc(e.quando)}</p><pre>${esc(e.corpo)}</pre>${e.spam ? '<p class="im-alerta">⚠️ O imaíu acha que isto é golpe.</p>' : ""}`;
         if (e.spam) conq("spam", "Quase caiu", "Abriu o e-mail do príncipe da savana.");
-        if (e.de.startsWith("Freddy")) conq("freddy", "Turno da noite II", "Leu o e-mail do Freddy.");
+        if (e.de.startsWith("Gerente")) conq("freddy", "Turno da noite II", "Leu o e-mail do gerente da pizzaria.");
       }));
       view.querySelector(".im-novo").onclick = () => {
         ler.innerHTML = `<h2>Nova mensagem</h2>
@@ -130,9 +130,12 @@
   // ======================= clicajogos =======================
   const JOGOS = [
     { id: "cobrinha", nome: "Cobrinha", desc: "Coma as frutinhas. Setas ou WASD.", cor: "#2fbf1f", emoji: "🐍" },
-    { id: "velha", nome: "Jogo da velha", desc: "Você é o X. O pato é o O.", cor: "#2f6bff", emoji: "❌" },
+    { id: "velha", nome: "Jogo da velha", desc: "Você é o X. Zizi é a espada (e provoca).", cor: "#2f6bff", emoji: "⚔️" },
     { id: "pato", nome: "Pato Clicker", desc: "Clique no pato. Compre melhorias. Domine o mundo.", cor: "#9b6bff", emoji: "🦆" },
     { id: "memoria", nome: "Memória da savana", desc: "Ache os pares de ícones do aluOS.", cor: "#e07b12", emoji: "🧠" },
+    { id: "voador", nome: "Pato Voador", desc: "Bata as asas entre os canos. Espaço ou toque.", cor: "#f2a25a", emoji: "🪽" },
+    { id: "plantao", nome: "Plantão Noturno", desc: "Vigie o Museu da Savana até as 6h. Os robôs andam à noite.", cor: "#3a2a5a", emoji: "🔦" },
+    { id: "ritmo", nome: "Batalha de Ritmo", desc: "Duelo musical contra Zizi. Setas no tempo certo.", cor: "#e0413a", emoji: "🎵" },
   ];
   ALU.kezSites.push({
     re: /^clicajogos\.com\/?$/, titulo: () => "clicajogos · jogos grátis!!",
@@ -140,7 +143,7 @@
     html: () => `
       <div class="cj">
         <header class="cj-top">${logoJogos}<b>clica<span>jogos</span></b><small>jogos grátis!! sem vírus!! (confia)</small></header>
-        <div class="cj-banner">★ NOVO ★ Pato Clicker chegou! ★ Recorde da semana na Cobrinha: ${(() => { try { return localStorage.getItem("alu.cobrinha") || 0; } catch { return 0; } })()} ★</div>
+        <div class="cj-banner">★ NOVO ★ Pato Voador, Plantão Noturno e Batalha de Ritmo! ★ Recorde da semana na Cobrinha: ${(() => { try { return localStorage.getItem("alu.cobrinha") || 0; } catch { return 0; } })()} ★</div>
         <div class="cj-grid">${JOGOS.map((j) => `<button class="cj-card" data-ir="clicajogos.com/${j.id}" style="--c:${j.cor}"><span>${j.emoji}</span><strong>${esc(j.nome)}</strong><small>${esc(j.desc)}</small></button>`).join("")}</div>
       </div>`,
   });

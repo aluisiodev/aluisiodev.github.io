@@ -7,10 +7,11 @@
     ["konami", "Código secreto"], ["quack", "Fala pato"], ["savana", "Rei da savana"], ["relogio", "Turno da noite"],
     ["lixeira", "Revirando o lixo"], ["terminal", "Hacker de verdade"], ["404", "Perdido na savana"], ["segredo", "Página secreta"],
     ["like10", "Fã número 1"], ["inscrito", "Inscrito na savana"], ["pato10h", "ASMR aquático"], ["spam", "Quase caiu"],
-    ["freddy", "Turno da noite II"], ["cobra15", "Cobra criada"], ["velha", "Mais esperto que o pato"], ["pato100", "Criador de patos"],
+    ["freddy", "Turno da noite II"], ["cobra15", "Cobra criada"], ["velha", "Mais esperto que Zizi"], ["pato100", "Criador de patos"],
     ["memoria", "Memória de elefante"], ["pato-evoluiu", "O pato evoluiu"], ["nudge", "Chamando atenção"], ["luminaria", "Iluminado"],
-    ["turista", "Turista do quarto"], ["desligar", "Pode desligar"], ["professor", "Professor de bot"], ["bonzinho", "Amigo urso"],
+    ["turista", "Turista do quarto"], ["desligar", "Pode desligar"], ["professor", "Professor de bot"], ["bonzinho", "Amizade com Zizi"],
     ["ebaa", "Membro do fórum"], ["recado", "Deixou recado"], ["segunda", "Odeio segunda-feira"], ["barrel", "Deu um giro"], ["musikzify", "Trilha sonora"],
+    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"],
   ];
   const ler = () => { try { return JSON.parse(localStorage.getItem("alu.conquistas")) || {}; } catch { return {}; } };
   const salvar = (o) => { try { localStorage.setItem("alu.conquistas", JSON.stringify(o)); } catch {} };

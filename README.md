@@ -12,7 +12,7 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 - **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub (os botões "Sair da savana" levam aos perfis reais), o buscador Alulugle (página inicial), o YouInTheScreenOfComputerOrPhone, o e-mail imaíu, o clicajogos (Cobrinha, Jogo da velha, Pato Clicker e Memória), o musikzify (playlist com prévia pelo player do Spotify), o fórum ebaa!, o Clima da Selva de Pedra (dados reais do Open-Meteo), a rede social yakurt e a Kezpédia.
 - **Peep Studio:** IDE de verdade. Na pasta `meus-codigos` dá pra criar arquivos `.py`, `.js` e `.cs` e executar no navegador: Python pelo Pyodide (em `js/vendor/pyodide`, código aberto), JavaScript num Web Worker e C# pela API do Piston, com um "C# de bolso" (tradução para JavaScript) quando o servidor não responde.
 - **MessagerTale:** além do roteiro, tem conversa livre com um bot no estilo SimSimi, que aprende frases (`ensina: frase = resposta`). Para usar uma IA de verdade, publique `worker/chat-worker.js` no Cloudflare e coloque a URL em `ALU.CONFIG.chatApi`.
-- **Bonzinho:** o urso vermelho que mora na área de trabalho, dá dicas e conta piadas.
+- **Zizi:** o mascote que mora na área de trabalho. Dá dicas, conta piadas e joga Jogo da velha provocando você.
 - **Segredos:** 22 conquistas escondidas pelo sistema. O Painel de controle mostra quantas você já achou.
 - **Peep Studio:** IDE do patinho roxo, com `Aluisio.cs` e um README de cada projeto. O botão ▶ Executar "roda" o código.
 - **Terminal**, **Painel de controle** (papel de parede e cor das janelas) e **Lixeira**.
@@ -54,7 +54,7 @@ js/jogos.js       joguinhos do clicajogos
 js/eggs.js        easter eggs e conquistas
 js/sites2.js      alulugle, musikzify, ebaa!, clima, yakurt e Kezpédia
 js/bot.js         bot do MessagerTale
-js/buddy.js       Bonzinho, o urso
+js/buddy.js       Zizi, o mascote
 js/peep*.js       Peep Studio, o executor (worker) e o C# de bolso
 worker/           Cloudflare Worker opcional para a IA do chat
 js/peep.js        IDE Peep Studio

@@ -91,7 +91,7 @@
       ...P.bio.flatMap((b) => [b, ""]),
       `Projetos que eu mais gosto:`, ...PROJ.map((p) => `  - ${p.nome}: ${p.resumo}`), ``,
       `Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`,
-      `Certificações: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, ``,
+      `Cursos: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, ``,
       `PS: tem uma foto do meu quarto aqui na pasta (quarto_360.png).`,
       `Dá pra girar e clicar nas coisas.`,
     ];
@@ -133,7 +133,7 @@
           <div class="props-top">${ALU.pix(a.icone)}<strong>${esc(it.nome)}</strong></div>
           <hr>
           <dl>
-            <dt>Tipo:</dt><dd>${cert ? "Certificação" : "Habilidade"}</dd>
+            <dt>Tipo:</dt><dd>${cert ? "Curso" : "Habilidade"}</dd>
             ${cert ? `<dt>Emissor:</dt><dd>${esc(it.emissor)}</dd>` : ""}
             <dt>Descrição:</dt><dd>${esc(cert ? it.detalhe : it.texto)}</dd>
           </dl>
@@ -174,6 +174,7 @@
           <div class="walls">${W.map((w, i) => `<button class="wall-opt" data-w="${i}"><span class="wall-prev ${w.cls}"></span><span>${esc(w.nome)}</span></button>`).join("")}</div></fieldset>
         <fieldset><legend>Cor das janelas</legend>
           <div class="accents">${ALU.CORES.map((c) => `<button class="acc" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join("")}</div></fieldset>
+        <fieldset><legend>Idioma</legend><button class="btn${ALU.lang === "pt" ? " real" : ""}" data-lang="pt">🇧🇷 Português</button> <button class="btn${ALU.lang === "en" ? " real" : ""}" data-lang="en">🇺🇸 English</button></fieldset>
         <fieldset><legend>Sistema</legend>
           <p class="muted">aluOS 2.0 · pixel por pixel, em HTML, CSS e JavaScript.</p>
           <button class="btn" data-act="reboot">Reiniciar</button> <button class="btn" data-act="desligar">Desligar</button></fieldset>
@@ -189,6 +190,7 @@
     el.querySelectorAll(".wall-opt").forEach((b) => (b.onclick = () => { ALU.setWall(+b.dataset.w); marcar(); }));
     el.querySelectorAll(".acc").forEach((b) => (b.onclick = () => { ALU.setAccent(b.dataset.c); marcar(); }));
     el.querySelector('[data-act="reboot"]').onclick = () => ALU.reboot();
+    el.querySelectorAll("[data-lang]").forEach((b) => (b.onclick = () => b.dataset.lang !== ALU.lang && ALU.setLang(b.dataset.lang)));
     marcar();
   }
 

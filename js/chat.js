@@ -1,7 +1,7 @@
 // MessagerTale: um messenger à moda antiga. Você escolhe o que responder,
 // a frase é "digitada" na caixa de texto e o Aluísio responde.
 (function () {
-  const ALU = window.ALU, esc = (s) => ALU.esc(s);
+  const ALU = window.ALU, esc = (s) => ALU.esc(s), T = (pt, en) => (ALU.lang === "en" ? en : pt);
 
   // ---------- sons (gerados, sem arquivos) ----------
   let actx = null, mudo = false;
@@ -25,38 +25,38 @@
     const P = window.PERFIL, PROJ = window.PROJETOS;
     const nos = {
       inicio: {
-        diz: [mobile ? "vi que você abriu meu celular 👀" : "vi que você entrou no meu desktop 👀", `aqui é o ${P.nome}. pode perguntar o que quiser`],
-        ops: [["oi! quem é você?", "sobre"], ["quero ver seus projetos", "projetos"], ["como eu falo com você?", "contato"]],
+        diz: [mobile ? T("vi que você abriu meu celular 👀", "i see you opened my phone 👀") : T("vi que você entrou no meu desktop 👀", "i see you got into my desktop 👀"), T(`aqui é o ${P.nome}. pode perguntar o que quiser`, `${P.nome} here. ask me anything`)],
+        ops: [[T("oi! quem é você?", "hi! who are you?"), "sobre"], [T("quero ver seus projetos", "i want to see your projects"), "projetos"], [T("como eu falo com você?", "how do i reach you?"), "contato"]],
       },
       sobre: {
-        diz: [...P.bio.map((b) => b.toLowerCase()), "e sim, eu fiz esse sistema inteiro só pra você ler isso aqui hehe"],
-        ops: [["mostra os projetos então", "projetos"], ["e suas skills?", "stack"], ["legal! como te acho?", "contato"]],
+        diz: [...P.bio.map((b) => b.toLowerCase()), T("e sim, eu fiz esse sistema inteiro só pra você ler isso aqui hehe", "and yes, i built this whole system just so you could read this hehe")],
+        ops: [[T("mostra os projetos então", "show me the projects then"), "projetos"], [T("e suas skills?", "what about your skills?"), "stack"], [T("legal! como te acho?", "cool! where can i find you?"), "contato"]],
       },
       projetos: {
-        diz: ["vou te mostrar os que eu mais gosto:", ...PROJ.map((p) => `• ${p.curto}: ${p.resumo.charAt(0).toLowerCase() + p.resumo.slice(1)}`), "qual te interessa?"],
-        ops: [...PROJ.map((p) => [`me conta do ${p.curto}`, "p:" + p.id]), ["depois eu vejo, valeu", "tchau"]],
+        diz: [T("vou te mostrar os que eu mais gosto:", "here are my favorites:"), ...PROJ.map((p) => `• ${p.curto}: ${p.resumo.charAt(0).toLowerCase() + p.resumo.slice(1)}`), T("qual te interessa?", "which one interests you?")],
+        ops: [...PROJ.map((p) => [T(`me conta do ${p.curto}`, `tell me about ${p.curto}`), "p:" + p.id]), [T("depois eu vejo, valeu", "i'll check later, thanks"), "tchau"]],
       },
       stack: {
-        diz: [`na pasta Skills tem: ${window.SKILLS.map((x) => x.nome).join(", ")}`, `e as certificações: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, "e eu vou adicionando mais coisa por lá :)"],
-        ops: [["e os projetos?", "projetos"], ["como te acho?", "contato"]],
+        diz: [T(`na pasta Skills tem: ${window.SKILLS.map((x) => x.nome).join(", ")}`, `in the Skills folder: ${window.SKILLS.map((x) => x.nome).join(", ")}`), T(`e os cursos que fiz: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, `and the courses i took: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`), T("e eu vou adicionando mais coisa por lá :)", "and i keep adding more stuff there :)")],
+        ops: [[T("e os projetos?", "and the projects?"), "projetos"], [T("como te acho?", "where can i find you?"), "contato"]],
       },
       contato: {
-        diz: [`meu DogHub: ${P.contatos.github.replace("https://github.com", "doghub.com")}`,
-          `no LigadIn: ${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`,
+        diz: [T("meu DogHub: ", "my DogHub: ") + `${P.contatos.github.replace("https://github.com", "doghub.com")}`,
+          T("no LigadIn: ", "on LigadIn: ") + `${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`,
           ...(P.contatos.email ? [`e-mail: ${P.contatos.email}`] : []),
-          "pode chamar que eu respondo :)"],
-        ops: [["abre o DogHub aí", "!doghub"], ["e o LigadIn?", "!ligadin"], ["quero ver os projetos", "projetos"], ["valeu, até mais!", "tchau"]],
+          T("pode chamar que eu respondo :)", "message me anytime, i'll answer :)")],
+        ops: [[T("abre o DogHub aí", "open DogHub"), "!doghub"], [T("e o LigadIn?", "and LigadIn?"), "!ligadin"], [T("quero ver os projetos", "i want to see the projects"), "projetos"], [T("valeu, até mais!", "thanks, see you!"), "tchau"]],
       },
       tchau: {
-        diz: ["valeu pela visita!!", "se quiser voltar, é só me chamar aqui de novo", "fui 👋"],
-        ops: [["espera, volta!", "inicio"]], ausente: true,
+        diz: [T("valeu pela visita!!", "thanks for visiting!!"), T("se quiser voltar, é só me chamar aqui de novo", "if you want to come back, just message me here again"), T("fui 👋", "bye 👋")],
+        ops: [[T("espera, volta!", "wait, come back!"), "inicio"]], ausente: true,
       },
     };
     PROJ.forEach((p, i) => {
       const outro = PROJ[(i + 1) % PROJ.length];
       nos["p:" + p.id] = {
-        diz: [p.descricao.split(". ")[0].toLowerCase() + ".", `o que eu mais curti: ${p.destaques[0].charAt(0).toLowerCase() + p.destaques[0].slice(1)}`, `fiz com ${p.stack.slice(0, 4).join(", ")}`],
-        ops: [["abre os detalhes", "!abrir:" + p.id], [`e o ${outro.curto}?`, "p:" + outro.id], ["mostra a lista de novo", "projetos"]],
+        diz: [p.descricao.split(". ")[0].toLowerCase() + ".", T("o que eu mais curti: ", "what i liked the most: ") + `${p.destaques[0].charAt(0).toLowerCase() + p.destaques[0].slice(1)}`, T("fiz com ", "built with ") + p.stack.slice(0, 4).join(", ")],
+        ops: [[T("abre os detalhes", "open the details"), "!abrir:" + p.id], [T(`e o ${outro.curto}?`, `and ${outro.curto}?`), "p:" + outro.id], [T("mostra a lista de novo", "show the list again"), "projetos"]],
       };
     });
     return nos;
@@ -68,10 +68,10 @@
     const eu = P.usuario, voce = "visitante";
     el.innerHTML = `
       <div class="chat">
-        <div class="menubar"><span>Arquivo</span><span>Editar</span><span>Inserir</span><span>Pessoas</span><button class="chat-som" aria-label="Som"></button></div>
+        <div class="menubar"><span>${T("Arquivo", "File")}</span><span>${T("Editar", "Edit")}</span><span>${T("Inserir", "Insert")}</span><span class="chat-pessoas-bt" role="button" tabindex="0">${T("Pessoas", "People")} ▾</span><button class="chat-som" aria-label="${T("Som", "Sound")}"></button></div>
         <div class="chat-top">
           <div class="chat-col">
-            <div class="chat-to">Para: <b>${eu}</b> <span class="buddy-status"><i class="dot"></i><span>online</span></span></div>
+            <div class="chat-to">${T("Para", "To")}: <b>${eu}</b> <span class="buddy-status"><i class="dot"></i><span>online</span></span></div>
             <div class="chat-log" aria-live="polite"></div>
             <div class="chat-typing"></div>
           </div>
@@ -80,11 +80,10 @@
         <div class="chat-ops"></div>
         <div class="chat-bottom">
           <div class="chat-col">
-            <div class="fmt"><b>A</b><b class="i">A</b><b class="u">A</b><span>☺</span><button class="chat-nudge" title="Chamar atenção">📳</button></div>
+            <div class="fmt"><b>A</b><b class="i">A</b><b class="u">A</b><span>☺</span><button class="chat-nudge" title="${T("Chamar atenção", "Nudge")}">📳</button></div>
             <div class="chat-input">
-              <div class="chat-box" aria-hidden="true"><span class="txt"></span><span class="caret"></span></div>
-              <input class="chat-real" hidden maxlength="300" placeholder="Escreva e aperte Enter…" aria-label="Sua mensagem">
-              <button class="chat-send" disabled>Enviar</button>
+              <input class="chat-real" maxlength="300" placeholder="${T("Escreva o que quiser ou escolha uma opção…", "Type anything or pick an option…")}" aria-label="${T("Sua mensagem", "Your message")}">
+              <button class="chat-send" disabled>${T("Enviar", "Send")}</button>
             </div>
           </div>
           <div class="dp eu">${ALU.pix("visitante")}</div>
@@ -106,6 +105,31 @@
       later(() => linha(eu, "opa, tô aqui! não precisa tremer a tela 😅"), 900);
       ALU.conquista && ALU.conquista("nudge", "Chamando atenção", "Tremeu a janela do MessagerTale.");
     };
+    // aba Pessoas: lista de contatos. Só o aluisio.dev conversa; os outros são contatos reais
+    // que aparecem como ausentes/offline e não respondem (ninguém fala em nome deles aqui).
+    const PESSOAS = [
+      [eu, "online", T("programando o aluOS", "coding aluOS"), ""],
+      ["Vitor Brauer", T("ausente", "away"), "♪", "VB"],
+      ['George "Joji" Miller', "offline", "", "GM"],
+    ];
+    const btP = el.querySelector(".chat-pessoas-bt");
+    const abrirPessoas = (e) => {
+      e && e.stopPropagation();
+      let pop = el.querySelector(".chat-pessoas");
+      if (pop) { pop.remove(); return; }
+      pop = document.createElement("div"); pop.className = "chat-pessoas";
+      pop.innerHTML = `<b class="cp-t">${T("Pessoas", "People")} (${PESSOAS.filter((x) => x[1] !== "offline").length}/${PESSOAS.length} online)</b>` + PESSOAS.map(([n, st, msg, ini], i) => `<button data-i="${i}" class="cp-${st === "away" ? "ausente" : st}"><span class="cp-av">${i === 0 ? `<img src="${esc(P.foto)}" alt="">` : esc(ini)}</span><span><b>${esc(n)}</b><small><i class="dot"></i>${st}${msg ? " · " + esc(msg) : ""}</small></span></button>`).join("");
+      el.querySelector(".chat").appendChild(pop);
+      pop.querySelectorAll("button").forEach((b) => (b.onclick = (ev) => {
+        ev.stopPropagation(); pop.remove();
+        const [n, st] = PESSOAS[+b.dataset.i];
+        if (+b.dataset.i === 0) { linha("", T("Você já está conversando com ", "You are already talking to ") + eu + ".", true); return; }
+        linha("", st === "offline" ? T(`${n} está offline. Mensagens não podem ser entregues agora.`, `${n} is offline. Messages can't be delivered right now.`) : T(`${n} está ausente e não pode responder agora.`, `${n} is away and can't answer right now.`), true);
+        ALU.bip && ALU.bip("in");
+      }));
+      setTimeout(() => document.addEventListener("click", function f() { pop.remove(); document.removeEventListener("click", f); }), 0);
+    };
+    btP.onclick = abrirPessoas; btP.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") abrirPessoas(e); };
     som.onclick = () => { mudo = !mudo; try { localStorage.setItem("alu.mudo", mudo ? "1" : "0"); } catch {} pintarSom(); };
 
     function linha(quem, texto, sistema, h) {
@@ -121,103 +145,84 @@
       status.querySelector("span").textContent = "online"; status.classList.remove("away");
       n.diz.forEach((frase) => {
         const espera = Math.min(2200, 350 + frase.length * 22);
-        later(() => { typing.textContent = `${eu} está digitando...`; }, t);
+        later(() => { typing.textContent = T(`${eu} está digitando...`, `${eu} is typing...`); }, t);
         t += espera;
         later(() => { typing.textContent = ""; linha(eu, frase); bip("in"); }, t);
         t += 250;
       });
       later(() => {
-        if (n.ausente) { status.querySelector("span").textContent = "ausente: fui tomar um café ☕"; status.classList.add("away"); linha("", `${eu} está ausente.`, true); }
+        if (n.ausente) { status.querySelector("span").textContent = T("ausente: fui tomar um café ☕", "away: went for a coffee ☕"); status.classList.add("away"); linha("", T(`${eu} está ausente.`, `${eu} is away.`), true); }
         mostrarOps(n.ops);
       }, t + 100);
     }
 
-    // a frase escolhida é digitada; qualquer tecla acelera, como numa conversa de verdade
-    let digitando = null;
+    // A caixa de texto é de verdade: dá pra escrever o que quiser (o bot responde)
+    // ou clicar numa opção, que é "digitada" sozinha e enviada.
+    const real = el.querySelector(".chat-real"), historico = [];
+    let digitando = null, pensando = false;
+    const atualizarEnviar = () => { send.disabled = !real.value.trim() || !!digitando; };
+    real.addEventListener("input", atualizarEnviar);
     function mostrarOps(ops) {
-      if (!livre) ops = [...ops, ["✎ quero escrever minha própria mensagem", "!livre"]];
       opsEl.innerHTML = ops.map(([txt], i) => `<button class="op" data-i="${i}"><b>${i + 1}</b> ${esc(txt)}</button>`).join("");
       opsEl.querySelectorAll(".op").forEach((b) => (b.onclick = () => escolher(ops[+b.dataset.i])));
       log.scrollTop = log.scrollHeight;
     }
     function escolher([txt, destino]) {
-      if (digitando) return;
-      if (destino === "!livre") return entrarLivre();
-      if (destino === "!menu") return sairLivre();
+      if (digitando || pensando) return;
       opsEl.innerHTML = "";
-      let i = 0;
-      digitando = { avancar: () => { if (i < txt.length) { i = Math.min(txt.length, i + 1 + Math.floor(Math.random() * 2)); box.textContent = txt.slice(0, i); bip("tec"); } if (i >= txt.length) pronto(); } };
-      const auto = setInterval(() => { if (!vivo) return clearInterval(auto); digitando && digitando.avancar(); }, 45);
-      function pronto() {
-        clearInterval(auto);
-        if (!digitando || digitando.ok) return; digitando.ok = true;
-        send.disabled = false; send.classList.add("pulse");
-        const enviar = () => {
-          send.onclick = null; send.disabled = true; send.classList.remove("pulse");
-          box.textContent = ""; digitando = null;
-          linha(voce, txt); bip("out");
-          if (destino === "!doghub" || destino === "!ligadin") { later(() => { ctx.abrir("kez", destino === "!doghub" ? "doghub.com/aluisiodev" : "ligadin.com/in/aluisio-alves"); falar("contato_ok"); }, 300); }
-          else if (destino.startsWith("!abrir:")) { const id = destino.slice(7); later(() => { ctx.abrir("proj:" + id); falar("abriu"); }, 300); }
-          else later(() => falar(destino), 300);
-        };
-        send.onclick = enviar;
-        digitando = { ok: true, avancar: enviar, enviar };
-        later(() => { if (digitando && digitando.enviar === enviar) enviar(); }, 900);
+      let i = 0; real.value = ""; real.readOnly = true;
+      const auto = setInterval(() => {
+        if (!vivo) return clearInterval(auto);
+        i = Math.min(txt.length, i + 1 + Math.floor(Math.random() * 2)); real.value = txt.slice(0, i); bip("tec");
+        if (i >= txt.length) { clearInterval(auto); later(enviar, 350); }
+      }, 45);
+      digitando = { pular: () => { i = txt.length - 1; } };
+      atualizarEnviar();
+      function enviar() {
+        real.value = ""; real.readOnly = false; digitando = null; atualizarEnviar();
+        linha(voce, txt); bip("out");
+        if (destino === "!doghub" || destino === "!ligadin") { later(() => { ctx.abrir("kez", destino === "!doghub" ? "doghub.com/aluisiodev" : "ligadin.com/in/aluisio-alves"); falar("contato_ok"); }, 300); }
+        else if (destino.startsWith("!abrir:")) { const id = destino.slice(7); later(() => { ctx.abrir("proj:" + id); falar("abriu"); }, 300); }
+        else later(() => falar(destino), 300);
       }
     }
-    // ---------- conversa livre (bot estilo SimSimi) ----------
-    let livre = false; const historico = [];
-    const real = el.querySelector(".chat-real"), caixa = el.querySelector(".chat-box");
-    function entrarLivre() {
-      livre = true; caixa.hidden = true; real.hidden = false; send.disabled = false; send.classList.remove("pulse");
-      opsEl.innerHTML = `<button class="op"><b>↩</b> voltar para as opções</button>`;
-      opsEl.querySelector(".op").onclick = sairLivre;
-      send.onclick = enviarLivre;
-      linha("", "Modo conversa livre: escreva o que quiser.", true);
-      later(() => { typing.textContent = `${eu} está digitando...`; }, 200);
-      later(() => { typing.textContent = ""; linha(eu, "manda aí! pode perguntar qualquer coisa (ou me ensinar: ensina: frase = resposta)"); bip("in"); }, 1100);
-      setTimeout(() => real.focus({ preventScroll: true }), 50);
-    }
-    function sairLivre() {
-      livre = false; real.hidden = true; caixa.hidden = false; send.disabled = true; send.onclick = null;
-      falar("menu");
-    }
-    let pensando = false;
     async function enviarLivre() {
       const txt = real.value.trim();
-      if (!txt || pensando) return;
-      real.value = ""; linha(voce, txt); bip("out");
+      if (!txt || pensando || digitando) return;
+      real.value = ""; atualizarEnviar(); linha(voce, txt); bip("out");
       historico.push({ de: "visitante", texto: txt });
       pensando = true;
-      later(() => { typing.textContent = `${eu} está digitando...`; }, 350);
-      const resp = await ALU.bot.responder(txt, historico);
+      later(() => { typing.textContent = T(`${eu} está digitando...`, `${eu} is typing...`); }, 350);
+      let resp;
+      try { resp = await ALU.bot.responder(txt, historico); } catch { resp = [T("opa, deu um erro aqui. tenta de novo?", "oops, something broke. try again?")]; }
       let t = 350;
       resp.forEach((frase, i) => {
         t += Math.min(1800, 450 + frase.length * 18);
-        later(() => { typing.textContent = i < resp.length - 1 ? `${eu} está digitando...` : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t);
+        later(() => { typing.textContent = i < resp.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t);
       });
-      later(() => { pensando = false; }, t);
+      later(() => { pensando = false; if (!opsEl.children.length) mostrarOps(NOS.menu.ops); }, t);
     }
-    real.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); enviarLivre(); } });
-    NOS.menu = { diz: ["beleza! escolhe aí:"], ops: [["quem é você?", "sobre"], ["quero ver seus projetos", "projetos"], ["como eu falo com você?", "contato"]] };
+    send.onclick = enviarLivre;
+    real.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); if (digitando) digitando.pular(); else enviarLivre(); } });
+    NOS.menu = { diz: [T("beleza! escolhe aí:", "alright! pick one:")], ops: [[T("quem é você?", "who are you?"), "sobre"], [T("quero ver seus projetos", "i want to see your projects"), "projetos"], [T("como eu falo com você?", "how do i reach you?"), "contato"]] };
 
-    NOS.contato_ok = { diz: ["abri no Kez(i)avana pra você 😉"], ops: [["quero ver os projetos", "projetos"], ["valeu, até mais!", "tchau"]] };
-    NOS.abriu = { diz: ["abri os detalhes pra você!", "quando terminar de ler, volta aqui"], ops: [["mostra outro projeto", "projetos"], ["como te acho?", "contato"], ["valeu, até mais!", "tchau"]] };
+    NOS.contato_ok = { diz: [T("abri no Kez(i)avana pra você 😉", "opened it in Kez(i)avana for you 😉")], ops: [[T("quero ver os projetos", "i want to see the projects"), "projetos"], [T("valeu, até mais!", "thanks, see you!"), "tchau"]] };
+    NOS.abriu = { diz: [T("abri os detalhes pra você!", "opened the details for you!"), T("quando terminar de ler, volta aqui", "come back here when you're done reading")], ops: [[T("mostra outro projeto", "show another project"), "projetos"], [T("como te acho?", "where can i find you?"), "contato"], [T("valeu, até mais!", "thanks, see you!"), "tchau"]] };
 
     function tecla(e) {
       if (!el.isConnected || e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.target.closest && e.target.closest("input,textarea")) return;
       const vis = el.closest(".win, .m-app");
       if (vis && (vis.hidden || (vis.classList.contains("win") && !vis.classList.contains("focus")))) return;
-      if (digitando) { e.preventDefault(); digitando.avancar(); return; }
+      if (digitando) { e.preventDefault(); digitando.pular(); return; }
       const n = parseInt(e.key, 10), b = opsEl.querySelector(`.op[data-i="${n - 1}"]`);
       if (b) { e.preventDefault(); b.click(); }
     }
     document.addEventListener("keydown", tecla);
-    el.querySelector(".chat-input").addEventListener("click", () => digitando && digitando.avancar());
+
 
     // as mensagens que chegaram pela notificação já aparecem na conversa
-    if (!(ALU.chatPre || []).length) NOS.inicio.diz.unshift("oiii");
+    if (!(ALU.chatPre || []).length) NOS.inicio.diz.unshift(T("oiii", "hiii"));
     (ALU.chatPre || []).forEach((m) => linha(eu, m.txt, false, m.hora));
     ALU.chatAberto = true;
     later(() => falar("inicio"), 700);

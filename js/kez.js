@@ -15,7 +15,7 @@
           <p class="kz-sub">o navegador que atravessa a savana da internet</p>
           <form class="kz-busca"><input placeholder="Buscar na savana… (tente: nexo, doghub, ligadin)" aria-label="Buscar"><button class="btn">Rugir</button></form>
           <div class="kz-atalhos">
-            <button data-ir="ligadin.com/in/aluisio-alves">${ALU.pix("ligadin")}<span>LigadIn</span></button>
+            <button data-ir="ligadin.com/feed">${ALU.pix("ligadin")}<span>LigadIn</span></button>
             <button data-ir="doghub.com/aluisiodev">${ALU.pix("doghub")}<span>DogHub</span></button>
             ${ALU.kezSites.filter((x) => x.atalho).map((x) => `<button data-ir="${x.atalho.url}">${x.atalho.icone}<span>${esc(x.atalho.nome)}</span></button>`).join("")}
             ${PROJ.map((p) => `<button data-ir="doghub.com/aluisiodev/${repoDe(p)}">${ALU.iconeHTML("proj:" + p.id)}<span>${esc(p.curto)}</span></button>`).join("")}
@@ -26,7 +26,7 @@
       re: /^ligadin\.com\/in\/aluisio-alves\/?$/, titulo: () => `${P.nome} | LigadIn`,
       html: () => `
         <div class="li-page">
-          <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav">Início · Rede · Vagas · Mensagens</span></header>
+          <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav"><button class="link" data-ir="ligadin.com/feed">Início</button> · Rede · Vagas · Mensagens · <b>Eu</b></span></header>
           <div class="li-card">
             <div class="li-capa"></div>
             <img class="li-foto" src="${esc(P.foto)}" alt="Foto de ${esc(P.nome)}">
@@ -36,8 +36,9 @@
             <div class="row">${real(P.contatos.linkedin, "Sair da savana: abrir perfil real")}<button class="btn sec" data-ir="chat">Mandar mensagem</button></div>
           </div>
           <div class="li-card"><h2>Sobre</h2>${P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
-          <div class="li-card" id="certs"><h2>Licenças e certificados</h2>
+          <div class="li-card" id="certs"><h2>Cursos</h2>
             ${window.CERTIFICADOS.map((c) => `<div class="li-item">${ALU.pix("cert")}<div><strong>${esc(c.nome)}</strong><small>${esc(c.emissor)}</small></div></div>`).join("")}</div>
+          ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>Atividade</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-item"><div><small>${esc(p.quando || "")}</small><p>${esc(p.texto).replace(/\n/g, "<br>")}</p></div></div>`).join("")}</div>` : ""}
           <div class="li-card"><h2>Competências</h2>${window.SKILLS.map((s) => `<div class="li-item">${ALU.pix(s.icone)}<div><strong>${esc(s.nome)}</strong></div></div>`).join("")}</div>
         </div>`,
     },

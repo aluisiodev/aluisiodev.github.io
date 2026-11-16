@@ -20,7 +20,7 @@
     [/idade|quantos anos/, () => ["idade é só um número… de commits 😅", "mas sou jovem o bastante pra achar que dá pra fazer um SO no navegador"]],
     [/projet|portfolio|o que (voce|vc) (fez|faz)|trabalhos/, () => ["meus favoritos:", ...PROJ.map((p) => `• ${p.curto}: ${p.resumo}`), "tem tudo na pasta Projetos da área de trabalho"]],
     ...PROJ.map((p) => [new RegExp(sem(p.curto) + "|" + p.id), () => [`${p.curto}! ${p.descricao.split(". ")[0].toLowerCase()}.`, `feito com ${p.stack.slice(0, 4).join(", ")}`]]),
-    [/skill|habilidade|stack|tecnologia|linguage|sabe programar/, () => [`na pasta Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `certificações: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`]],
+    [/skill|habilidade|stack|tecnologia|linguage|sabe programar/, () => [`na pasta Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `cursos: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`]],
     [/c#|csharp|dotnet|\.net/, () => ["C# é meu xodó", "inclusive dá pra rodar C# no Peep Studio, testa lá"]],
     [/python|javascript|\bjs\b/, () => ["abre o Peep Studio e cria um arquivo na pasta meus-codigos. roda de verdade!"]],
     [/contato|email|e-mail|falar com voce|linkedin|ligadin|github|doghub|achar voce/, () => [`DogHub: ${P.contatos.github.replace("https://github.com", "doghub.com")}`, `LigadIn: ${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`]],
@@ -30,7 +30,7 @@
     [/anime|manga|chainsaw|jujutsu|berserk|hora de aventura|adventure time/, () => [um(["Chainsaw Man, Jujutsu Kaisen e Berserk tão na estante", "Hora de Aventura é eterno. Marshall Lee na TV do quarto"])]],
     [/pato|quack|peep/, () => [um(["quack", "QUACK", "o pato roxo do Peep Studio manda um oi 🦆"])]],
     [/girafa|savana|leao|zebra/, () => [um(["🦒", "a savana agradece a visita", "já tentou digitar savana em algum lugar?"])]],
-    [/urso|bonzinho/, () => ["o Bonzinho é gente boa. não instala nada, só dá dica"]],
+    [/zizi|mascote/, () => ["Zizi é o mascote do aluOS. mora na área de trabalho e é invencível no jogo da velha (diz que é)"]],
     [/segredo|easter|conquista|dica/, () => [um(["tenta o terminal e digita algo que um hacker digitaria", "o relógio da barra de tarefas não gosta de ser cutucado", "a lixeira tem mais coisa do que parece", "tem uma luminária no quarto que quase ninguém acha"])]],
     [/piada|me faz rir|conta uma/, () => [um([["por que o programador foi ao médico?", "porque estava com um bug no sistema 🥁"], ["quantos devs são precisos pra trocar uma lâmpada?", "nenhum, é problema de hardware"], ["o que o pato disse pro dev?", "quack quack (tradução: você esqueceu o ponto e vírgula)"]])]],
     [/hora|que horas/, () => [`aqui são ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`]],
@@ -44,13 +44,38 @@
   ];
   const GENERICO = ["hmmm, conta mais", "interessante 👀", "não entendi muito bem, mas concordo", "quack?", "isso aí eu ainda não aprendi. me ensina? escreve: ensina: frase = resposta", "eita", "kkkk sério?"];
 
+  // regras em inglês (versão EN do site); o bot aprende frases nos dois idiomas
+  const REGRAS_EN = [
+    [/how are you|how( s| is)? it going|whats? s? up|sup\b/, () => [um(["doing great! coding, as always", "i'm good! and you?", "all good, listening to some Arctic Monkeys"])]],
+    [/(are you|you re|youre) (a )?(bot|robot|ai|real)/, () => ["i'm the pocket version of Aluísio 🤖", "the real one answers on LigadIn or DogHub. i stay here looking after the desktop"]],
+    [/who are you|your name/, () => [`i'm ${P.nome}!`, P.cargo.toLowerCase()]],
+    [/where.*(live|from)|city|country/, () => [`i live in ${P.local}`, "in a late-afternoon little room (you can see it in quarto_360 😉)"]],
+    [/project|portfolio|what (have )?you (do|built|made)|work/, () => ["my favorites:", ...PROJ.map((p) => `• ${p.curto}: ${p.resumo}`), "everything is in the Projects folder on the desktop"]],
+    ...PROJ.map((p) => [new RegExp(sem(p.curto) + "|" + p.id), () => [`${p.curto}! ${p.descricao.split(". ")[0].toLowerCase()}.`, `built with ${p.stack.slice(0, 4).join(", ")}`]]),
+    [/skill|stack|tech|language|program/, () => [`in the Skills folder: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `courses: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`]],
+    [/contact|email|linkedin|ligadin|github|doghub|reach you|find you/, () => [`DogHub: ${P.contatos.github.replace("https://github.com", "doghub.com")}`, `LigadIn: ${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`]],
+    [/job|hire|hiring|freelance|work (with|together)|opportunit/, () => ["oh nice!! 😄", "message me on LigadIn and i'll get back to you quickly"]],
+    [/music|band|listen|spotify|playlist/, () => [um(["Arctic Monkeys, Radiohead and Joji on repeat", "my playlist is on musikzify, in Kez(i)avana 🎧"])]],
+    [/game|play/, () => [um(["try clicajogos in Kez(i)avana, there's even a Duck Clicker", "challenge Zizi at tic-tac-toe. good luck"])]],
+    [/duck|quack|peep/, () => [um(["quack", "QUACK", "the purple duck from Peep Studio says hi 🦆"])]],
+    [/zizi|mascot/, () => ["Zizi is the aluOS mascot. lives on the desktop and is unbeatable at tic-tac-toe (says Zizi)"]],
+    [/secret|easter|achievement|hint|tip/, () => [um(["try the terminal and type something a hacker would type", "the taskbar clock doesn't like being poked", "the recycle bin holds more than it seems"])]],
+    [/joke|make me laugh/, () => [um([["why do programmers wear glasses?", "because they can't C# 🤓"], ["how many devs does it take to change a light bulb?", "none, that's a hardware problem"]])]],
+    [/thank|thx|ty\b/, () => [um(["you're welcome!!", "anytime", "no problem :)"])]],
+    [/bye|see you|later|cya/, () => [um(["thanks for visiting! 👋", "see you!!", "going for a coffee, come back anytime"])]],
+    [/(haha|lol|lmao|kkk)/, () => [um(["hahaha", "lol", "kkkkk (that's how we laugh in Brazil)"])]],
+    [/^(hi+|hello|hey|yo|good (morning|afternoon|evening)|howdy)\b/, () => [um(["hiii", "hey!", "hello hello"]), um(["how's it going?", "you arrived at the right time", "what's up?"])]],
+    [/\?$/, () => [um(["good question… i'll answer in the next commit", "hmm, i don't know that one. teach me? type: teach: question = answer", "ask alulugle 😅"])]],
+  ];
+  const GENERICO_EN = ["hmmm, tell me more", "interesting 👀", "didn't quite get it, but i agree", "quack?", "i haven't learned that yet. teach me? type: teach: phrase = answer", "whoa", "lol really?"];
+
   function regras(texto) {
-    const t = sem(texto), ens = ler();
-    const m = String(texto).match(/^\s*(?:ensina|aprende)\s*:\s*(.+?)\s*=\s*(.+)$/i);
-    if (m) { ens[sem(m[1])] = m[2].slice(0, 200); gravar(ens); ALU.conquista && ALU.conquista("professor", "Professor de bot", "Ensinou uma frase nova ao MessagerTale."); return ["anotado! 📝", `quando você disser "${m[1]}", eu respondo "${m[2].slice(0, 200)}"`]; }
+    const t = sem(texto), ens = ler(), EN = ALU.lang === "en";
+    const m = String(texto).match(/^\s*(?:ensina|aprende|teach|learn)\s*:\s*(.+?)\s*=\s*(.+)$/i);
+    if (m) { ens[sem(m[1])] = m[2].slice(0, 200); gravar(ens); ALU.conquista && ALU.conquista("professor", "Professor de bot", "Ensinou uma frase nova ao MessagerTale."); return EN ? ["noted! 📝", `when you say "${m[1]}", i'll answer "${m[2].slice(0, 200)}"`] : ["anotado! 📝", `quando você disser "${m[1]}", eu respondo "${m[2].slice(0, 200)}"`]; }
     if (ens[t]) return [ens[t]];
-    for (const [re, f] of REGRAS) if (re.test(t)) { const r = f(); return Array.isArray(r[0]) ? r[0] : r; }
-    return [um(GENERICO)];
+    for (const [re, f] of EN ? REGRAS_EN : REGRAS) if (re.test(t)) { const r = f(); return Array.isArray(r[0]) ? r[0] : r; }
+    return [um(EN ? GENERICO_EN : GENERICO)];
   }
 
   async function responder(texto, historico) {
@@ -58,7 +83,7 @@
     if (api) {
       try {
         const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 9000);
-        const r = await fetch(api, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagem: texto, historico: (historico || []).slice(-10) }) });
+        const r = await fetch(api, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagem: texto, historico: (historico || []).slice(-10), idioma: ALU.lang || "pt" }) });
         clearTimeout(t);
         if (r.ok) { const j = await r.json(); const linhas = String(j.resposta || "").split(/\n+/).map((x) => x.trim()).filter(Boolean); if (linhas.length) return linhas.slice(0, 4); }
       } catch {}
