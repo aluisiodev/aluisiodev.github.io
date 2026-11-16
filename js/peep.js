@@ -5,7 +5,32 @@
   const ALU = window.ALU, esc = (s) => ALU.esc(s);
   const P = window.PERFIL, PROJ = window.PROJETOS;
   const q = (s) => `"${s.replace(/"/g, '\\"')}"`;
-  const LS = "alu.peep.arquivos";
+  const LS = "alu.peep.arquivos", LS_LIVRO = "alu.peep.livro", LIVRO = "LivroDeVisitas.cs";
+  const T = (pt, en) => (ALU.lang === "en" ? en : pt);
+  // O único arquivo do repositório do Aluísio que o visitante pode editar: serve para se identificar, se quiser.
+  const MODELO_LIVRO = () => T(`// Livro de visitas do aluOS ✍️
+// Quer que o Aluísio saiba que você passou por aqui? Preencha e faça um commit (botão ⎇ Commit lá em cima).
+// Tudo é opcional e só vai se você fizer o commit. Ninguém é identificado sem querer.
+
+var visita = new Visita
+{
+    Nome    = "",   // seu nome ou apelido
+    Contato = "",   // LinkedIn, e-mail, site… (opcional)
+    Recado  = "",   // um recado para o Aluísio (opcional)
+};
+`, `// aluOS guestbook ✍️
+// Want Aluísio to know you stopped by? Fill this in and make a commit (⎇ Commit button at the top).
+// Everything is optional and only gets sent if you commit. Nobody is identified without wanting to.
+
+var visita = new Visita
+{
+    Nome    = "",   // your name or nickname
+    Contato = "",   // LinkedIn, e-mail, website… (optional)
+    Recado  = "",   // a message for Aluísio (optional)
+};
+`);
+  const campo = (txt, k) => ((txt.match(new RegExp(k + '\\s*=\\s*"((?:[^"\\\\]|\\\\.)*)"')) || [])[1] || "").trim();
+  ALU.lerLivro = (txt) => ({ nome: campo(txt, "Nome"), contato: campo(txt, "Contato"), recado: campo(txt, "Recado") });
 
   const LINGUAS = {
     py: { nome: "Python", rot: "PY", cor: "py" },
@@ -77,7 +102,7 @@ class Programa
       '        Console.WriteLine("Me chama no MessagerTale! :)");', "    }", "}",
     ].join("\n");
     const readme = [`# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]), "## Projetos", ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`)].join("\n");
-    const files = { "Aluisio.cs": cs, "README.md": readme };
+    const files = { "Aluisio.cs": cs, [LIVRO]: "", "README.md": readme };
     PROJ.forEach((p) => {
       files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", p.descricao, "", "## Destaques", ...p.destaques.map((d) => `- ${d}`), "", "## Stack", p.stack.join(" · "), "", `Repositório: ${p.repo}`].join("\n");
     });
@@ -130,13 +155,16 @@ class Programa
     let meus;
     try { meus = JSON.parse(localStorage.getItem(LS)); } catch {}
     if (!meus || typeof meus !== "object") meus = { ...EXEMPLOS };
-    const salvar = () => { try { localStorage.setItem(LS, JSON.stringify(meus)); } catch {} };
+    let livro = null;
+    try { livro = localStorage.getItem(LS_LIVRO); } catch {}
+    if (!livro) livro = MODELO_LIVRO();
+    const salvar = () => { try { localStorage.setItem(LS, JSON.stringify(meus)); localStorage.setItem(LS_LIVRO, livro); } catch {} };
     const caminho = (n) => "meus-codigos/" + n;
 
     el.innerHTML = `
       <div class="peep">
         <div class="menubar"><span>Arquivo</span><span>Editar</span><span>Exibir</span><span>Projeto</span><span>Depurar</span><span>Ajuda</span>
-          <button class="peep-stop" hidden>■ Parar</button><button class="peep-run">▶ Executar</button></div>
+          <button class="peep-commit" title="Commit e push do LivroDeVisitas.cs">⎇ Commit</button><button class="peep-stop" hidden>■ Parar</button><button class="peep-run">▶ Executar</button></div>
         <div class="peep-main">
           <aside class="peep-tree"></aside>
           <section class="peep-ed">
@@ -148,6 +176,9 @@ class Programa
             </div>
           </section>
         </div>
+        <div class="peep-modal" hidden><form class="pm-box"><b>⎇ Commit e push</b><small class="pm-quem"></small>
+          <label>${T("Mensagem do commit", "Commit message")}<input class="pm-msg" maxlength="100"></label>
+          <div class="pm-b"><button class="btn real">${T("Commit e push", "Commit & push")}</button><button type="button" class="btn sec pm-x">${T("Cancelar", "Cancel")}</button></div></form></div>
         <div class="peep-status"><span>${ALU.pix("peep")} Peep Studio</span><span class="ps-f"></span><span class="ps-l">UTF-8 · quack</span></div>
       </div>`;
     const $ = (s) => el.querySelector(s);
@@ -155,8 +186,8 @@ class Programa
       out = $(".po-txt"), stdinEl = $(".po-in textarea"), psf = $(".ps-f"), btnRun = $(".peep-run"), btnStop = $(".peep-stop");
     const abertos = []; let atual = null, rodando = false, timerParar = null, runs = 0;
 
-    const conteudo = (id) => (id.startsWith("meus-codigos/") ? meus[id.slice(13)] : RO[id]);
-    const editavel = (id) => id.startsWith("meus-codigos/");
+    const conteudo = (id) => (id === LIVRO ? livro : id.startsWith("meus-codigos/") ? meus[id.slice(13)] : RO[id]);
+    const editavel = (id) => id === LIVRO || id.startsWith("meus-codigos/");
 
     function pintarArvore() {
       const nomesRO = Object.keys(RO);
@@ -217,15 +248,21 @@ class Programa
       pintarCodigo(); pintarArvore();
       const ext = extDe(id), L = LINGUAS[ext];
       psf.textContent = id + " · " + (L ? L.nome : ext === "md" ? "Markdown" : ext.toUpperCase()) + (editavel(id) ? "" : " · só leitura");
-      btnRun.disabled = !(L || id === "Aluisio.cs") || rodando;
+      btnRun.disabled = !(L || id === "Aluisio.cs") || id === LIVRO || rodando;
       btnRun.title = btnRun.disabled ? "Nada para executar aqui" : "Executar (Ctrl+Enter)";
     }
 
     // ---------- edição ----------
     let tSalvar = null;
+    let avisouNome = false;
     ta.addEventListener("input", () => {
       if (!editavel(atual)) return;
-      meus[atual.slice(13)] = ta.value; pintarCodigo();
+      if (atual === LIVRO) {
+        livro = ta.value;
+        const n = ALU.lerLivro(livro).nome;
+        if (n && !avisouNome) { avisouNome = true; ALU.zizi && ALU.zizi.guia && setTimeout(() => ALU.zizi.guia("nome", n), 900); }
+      } else meus[atual.slice(13)] = ta.value;
+      pintarCodigo();
       clearTimeout(tSalvar); tSalvar = setTimeout(salvar, 400);
     });
     ta.addEventListener("scroll", () => { ta.scrollTop = 0; ta.scrollLeft = 0; });
@@ -306,6 +343,37 @@ class Programa
       w.postMessage({ lang: ext, codigo, stdin });
     }
     btnRun.onclick = executar;
+
+    // ---------- commit do livro de visitas ----------
+    const modal = $(".peep-modal"), pmMsg = $(".pm-msg");
+    $(".peep-commit").onclick = () => {
+      if (atual !== LIVRO) { abrir(LIVRO); escrever(T("Só o LivroDeVisitas.cs vai para o repositório do Aluísio. Abri ele pra você. ✍️\n", "Only LivroDeVisitas.cs goes to Aluísio's repository. I opened it for you. ✍️\n"), "info"); ALU.zizi && ALU.zizi.guia && ALU.zizi.guia("abrir"); return; }
+      const d = ALU.lerLivro(livro);
+      if (!d.nome) { out.textContent = ""; escrever(T("✖ Nada para commitar: o campo Nome está vazio.\n  Escreva seu nome entre as aspas em Nome = \"\" e tente de novo.\n", "✖ Nothing to commit: the Nome field is empty.\n  Type your name between the quotes in Nome = \"\" and try again.\n"), "erro"); ALU.zizi && ALU.zizi.guia && ALU.zizi.guia("vazio"); return; }
+      $(".pm-quem").textContent = T(`Assinando como ${d.nome}`, `Signing as ${d.nome}`) + (d.contato ? ` · ${d.contato}` : "");
+      pmMsg.value = T(`assina o livro de visitas: ${d.nome}`, `signs the guestbook: ${d.nome}`).slice(0, 100);
+      modal.hidden = false; pmMsg.focus(); pmMsg.select();
+    };
+    $(".pm-x").onclick = () => { modal.hidden = true; };
+    $(".pm-box").onsubmit = async (e) => {
+      e.preventDefault(); modal.hidden = true; salvar();
+      const d = ALU.lerLivro(livro), msgC = pmMsg.value.trim() || "assina o livro de visitas";
+      const hash = Math.random().toString(16).slice(2, 9), linhas = livro.split("\n").filter((l) => /=\s*"[^"]+"/.test(l)).length;
+      out.textContent = "";
+      const passos = [
+        ["$ git add LivroDeVisitas.cs\n", "info"], [`$ git commit -m "${msgC}"\n`, "info"],
+        [`[main ${hash}] ${msgC}\n 1 file changed, ${linhas} insertion${linhas === 1 ? "" : "s"}(+)\n`, "out"],
+        ["$ git push origin main\n", "info"], [T("Enviando para aluisiodev/livro-de-visitas…\n", "Pushing to aluisiodev/livro-de-visitas…\n"), "out"],
+      ];
+      passos.forEach(([t, k], i) => setTimeout(() => escrever(t, k), i * 350));
+      const ok = ALU.api ? await ALU.api.assinar({ ...d, commit: msgC }) : false;
+      setTimeout(() => {
+        escrever(ok ? T(`✔ push concluído. O Aluísio vai ver que ${d.nome} passou por aqui. Valeu! 💙\n`, `✔ push done. Aluísio will see that ${d.nome} stopped by. Thanks! 💙\n`)
+          : T(`✔ commit salvo neste navegador. (O envio para o Aluísio liga quando o servidor do aluOS estiver no ar.)\n`, `✔ commit saved in this browser. (Sending to Aluísio turns on once the aluOS server is live.)\n`), ok ? "info" : "aviso");
+        ALU.conquista && ALU.conquista("commit", T("Primeiro commit", "First commit"), T("Assinou o livro de visitas pelo Peep Studio.", "Signed the guestbook in Peep Studio."));
+        ALU.zizi && ALU.zizi.guia && ALU.zizi.guia("commitou", d.nome);
+      }, passos.length * 350 + 200);
+    };
 
     const obs = new MutationObserver(() => { if (!el.isConnected) { obs.disconnect(); salvar(); if (rodando && worker) { worker.terminate(); worker = null; } } });
     obs.observe(document.body, { childList: true, subtree: true });

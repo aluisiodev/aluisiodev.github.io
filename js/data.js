@@ -5,6 +5,8 @@
 // ============================================================
 window.PERFIL = {
   nome: "Aluísio",
+  nomeCompleto: "Aluísio Alves",     // aparece no LigadIn
+  headline: "Software Developer | C# / .NET | TypeScript & React | Redis | Docker | REST APIs",
   usuario: "aluisio.dev",            // nome no MessagerTale
   foto: "img/aluisio.png",          // foto do MessagerTale e dos perfis
   cargo: "Desenvolvedor de software", // TODO: ajuste (ex.: "Desenvolvedor full stack")
@@ -27,12 +29,20 @@ window.SKILLS = [
   { id: "csharp", nome: "C#", icone: "csharp", texto: "Linguagem que uso no back-end com .NET e ASP.NET Core. Exemplo no portfolio: Contentstack Delivery App (Razor Pages, injeção de dependência, consumo de API)." },
 ];
 
-// Cursos (aparecem na pasta Skills e no perfil do LigadIn).
-// TODO: confirme nome exato, nível e ano de cada uma.
+// Licenças e certificações (pasta Skills e perfil do LigadIn).
+// "curto" é o nome que aparece embaixo do ícone na pasta Skills.
 window.CERTIFICADOS = [
-  { id: "efset", nome: "Certificado de proficiência em inglês B2", emissor: "EF SET", detalhe: "Proficiência em inglês, nível B2 (EF SET)." },
-  { id: "cisco", nome: "Curso Cisco", emissor: "Cisco Networking Academy", detalhe: "Curso da Cisco Networking Academy." },
-  { id: "anthropic", nome: "Curso Anthropic", emissor: "Anthropic", detalhe: "Curso da Anthropic sobre Claude e IA." },
+  { id: "claude101", nome: "Claude Academy: Claude 101", curto: "Claude 101", emissor: "Anthropic", detalhe: "Curso Claude 101 da Claude Academy (Anthropic)." },
+  { id: "cyber", nome: "Introduction to Cybersecurity", curto: "Cybersecurity", emissor: "Cisco Networking Academy", detalhe: "Introdução à cibersegurança, pela Cisco Networking Academy." },
+  { id: "efset", nome: "Certificado oficial EF SET 55/100 (B2 Independente)", curto: "EF SET B2", emissor: "EF SET", detalhe: "Inglês nível B2 (Independente), nota 55/100 no EF SET." },
+  { id: "linux", nome: "Linux 100: Fundamentals", curto: "Linux 100", emissor: "", detalhe: "Fundamentos de Linux." }, // TODO: emissor
+  { id: "one", nome: "Formação Iniciante em Programação T6 - ONE", curto: "ONE T6", emissor: "Oracle Next Education (Alura)", detalhe: "Formação Iniciante em Programação, turma 6 do programa ONE." },
+];
+
+// Experiência (perfil do LigadIn).
+window.EXPERIENCIAS = [
+  { cargo: "Back-end Developer", empresa: "Intervalor", tipo: "Internship", periodo: "Oct 2025 - Aug 2026 · 11 mos" },
+  { cargo: "Telemarketing Operational Support", empresa: "LBV - Legião da Boa Vontade", tipo: "1 yr 5 mos", periodo: "Oct 2024 - Sep 2025 · 1 yr" },
 ];
 
 // Quarto 360° ("Sobre mim"). A imagem é equirretangular (2:1).
@@ -44,7 +54,6 @@ window.QUARTO = {
     { id: "spotify", u: 0.4655, v: 0.5105, titulo: "Monitor esquerdo · Spotify", texto: "A trilha sonora de tudo que eu programo. Essa é a minha playlist.", link: "https://open.spotify.com/playlist/6kNcU6KqmK0X4zxYZCuhMq?si=a1e287b503e148f4", linkTexto: "Ouvir no Spotify" },
     { id: "leetcode", u: 0.5345, v: 0.5105, titulo: "Monitor direito · LeetCode", texto: "Onde eu treino lógica e algoritmos, um problema por vez.", link: "https://leetcode.com/u/aluisios/", linkTexto: "Ver meu LeetCode" },
     { id: "luminaria", u: 0.621, v: 0.4608, titulo: "Luminária · achou!", texto: "Luminária de papel. Quase ninguém repara nela, mas é ela que deixa o quarto com essa cor à noite.", escondido: true },
-    { id: "janela", u: 0.3078, v: 0.4527, titulo: "Janela · fim de tarde", texto: "O melhor horário do dia. Moro no Brasil e trabalho remoto." },
   ],
 };
 
@@ -128,15 +137,34 @@ window.PROJETOS = [
 ];
 
 // Serviços opcionais. Deixe vazio para tudo funcionar só no navegador.
-// chatApi: URL de um Cloudflare Worker que responde { resposta } (veja worker/chat-worker.js).
 // csharpApi: URL compatível com a API do Piston para compilar C# de verdade. Vazio = tenta o Piston público e,
 //            se não der, usa o "C# de bolso" (tradução para JavaScript).
 window.ALU = window.ALU || {};
 // Seus posts do LinkedIn, para aparecerem no LigadIn (perfil e topo do feed).
 // Cole cada post como { quando: "2 sem", texto: "texto do post", reacoes: 42, comentarios: 3 }.
-window.POSTS_LIGADIN = [];
+// Post de outra pessoa com você marcado: adicione autor, titulo e colab.
+window.POSTS_LIGADIN = [
+  {
+    autor: "Kayky Crespo", colab: "Aluísio Alves", titulo: "Estudante de tecnologia · UNIP", quando: "set 2025", reacoes: 87, comentarios: 9,
+    texto: `🚀 Compartilhando conhecimento e promovendo a inovação na Jornada Tecnológica Integrada da UNIP!
 
+Nos dias 28, 29 e 30 de setembro, tive a oportunidade de atuar como instrutor na oficina “Programação e Eletrônica com Tinkercad”, durante a Jornada Tecnológica Integrada da UNIP, ao lado de Aluísio Alves, Erick Carvalho e Enzo Orlandi.
+
+🤖 A oficina teve uma abordagem totalmente prática, combinando explicações teóricas na lousa com demonstrações no Tinkercad e atividades individuais nos computadores. Dessa forma, os participantes puderam acompanhar os conceitos apresentados e aplicá-los na prática, explorando recursos de programação e eletrônica em um ambiente de simulação.
+
+💡 Participar dessa experiência foi uma oportunidade de desenvolver ainda mais minhas habilidades de comunicação, colaboração e compartilhamento de conhecimento técnico, além de contribuir para o aprendizado de outros estudantes e incentivar o interesse pela tecnologia.
+
+Agradeço à UNIP pela oportunidade, aos meus colegas pela parceria e a todos os participantes pelo envolvimento ao longo dos três dias de oficina. Ensinar também é uma forma de aprender, evoluir e transformar conhecimento em novas possibilidades!`,
+  },
+];
+
+// api: URL do servidor do aluOS (worker/aluos-worker.js). Liga o placar global, o ranking,
+//      o livro de visitas e o chat com IA. Vazio = tudo funciona, mas só no navegador de cada pessoa.
+// goatcounter: o código do seu site no GoatCounter (ex.: "aluisio" para aluisio.goatcounter.com).
+//      Crie a conta grátis em https://www.goatcounter.com/signup e cole o código aqui.
 window.ALU.CONFIG = {
-  chatApi: "",
+  api: "",
+  goatcounter: "",
+  chatApi: "",   // opcional: URL só do chat (se vazio e api estiver preenchida, usa api + "/chat")
   csharpApi: "",
 };

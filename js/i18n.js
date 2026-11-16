@@ -27,11 +27,13 @@
   const SK = { csharp: "The language I use on the back end with .NET and ASP.NET Core. Example in this portfolio: Contentstack Delivery App (Razor Pages, dependency injection, API consumption)." };
   (window.SKILLS || []).forEach((s) => { if (SK[s.id]) s.texto = SK[s.id]; });
   const CE = {
-    efset: ["English proficiency certificate, B2", "English proficiency, B2 level (EF SET)."],
-    cisco: ["Cisco course", "Course from Cisco Networking Academy."],
-    anthropic: ["Anthropic course", "Anthropic course about Claude and AI."],
+    claude101: [null, "Claude 101 course from Claude Academy (Anthropic)."],
+    cyber: [null, "Introduction to cybersecurity, by Cisco Networking Academy."],
+    efset: ["EF SET official certificate 55/100 (B2 Upper Intermediate)", "English level B2, score 55/100 on EF SET."],
+    linux: [null, "Linux fundamentals."],
+    one: ["Beginner Programming Program T6 - ONE", "Beginner Programming Program, class 6 of the ONE program (Oracle Next Education)."],
   };
-  (window.CERTIFICADOS || []).forEach((c) => { if (CE[c.id]) [c.nome, c.detalhe] = CE[c.id]; });
+  (window.CERTIFICADOS || []).forEach((c) => { const t = CE[c.id]; if (t) { if (t[0]) c.nome = t[0]; c.detalhe = t[1]; } });
   const QT = {
     spotify: ["Left monitor · Spotify", "The soundtrack of everything I code. This is my playlist.", "Listen on Spotify"],
     leetcode: ["Right monitor · LeetCode", "Where I practice logic and algorithms, one problem at a time.", "See my LeetCode"],
@@ -80,7 +82,7 @@
     "Nome do arquivo": "File name", "Linguagem": "Language", "Apagar": "Delete", "Editor de código": "Code editor", "Limpar saída": "Clear output", "ex.: Ana": "e.g. Ana",
     "Início": "Home", "· Rede · Vagas · Mensagens ·": "· Network · Jobs · Messaging ·", "Eu": "Me", "500+ conexões (na savana)": "500+ connections (in the savanna)",
     "Sair da savana: abrir perfil real ↗": "Leave the savanna: open real profile ↗", "Mandar mensagem": "Message", "Sobre": "About", "Cursos": "Courses",
-    "Competências": "Skills", "Atividade": "Activity", "Abrir Kez(i)avana": "Open Kez(i)avana", "Abrir Terminal": "Open Terminal", "Abrir no Peep Studio": "Open in Peep Studio",
+    "Competências": "Skills", "Licenças e certificações": "Licenses & certifications", "Experiência": "Experience", "Atividade": "Activity", "Abrir Kez(i)avana": "Open Kez(i)avana", "Abrir Terminal": "Open Terminal", "Abrir no Peep Studio": "Open in Peep Studio",
     "Abrir site": "Open site", "Ver no LigadIn": "See on LigadIn", "Ver no DogHub": "See on DogHub", "Abrir projeto": "Open project", "Ver código": "See code", "Descrição:": "Description:", "Destaques": "Highlights", "Stack": "Stack", "Emissor:": "Issuer:", "Tipo:": "Type:",
     "Geral": "General", "Organizar ícones": "Arrange icons", "Personalizar…": "Customize…", "Próximo papel de parede": "Next wallpaper", "em breve": "coming soon",
     "Agora é seguro desligar o computador.": "It's now safe to turn off your computer.", "(ou clique para ligar de novo)": "(or click to turn it back on)",

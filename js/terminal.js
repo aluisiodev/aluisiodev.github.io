@@ -24,7 +24,7 @@
         else if (window.ALU.APPS[a]) { print(`abrindo ${esc(a)}…`); ctx.abrir(a); }
         else print(`projeto não encontrado: ${esc(a || "")}. Tente <span class="k">projetos</span>.`, "err");
       },
-      stack: () => print([...window.SKILLS.map((s) => s.nome), ...window.CERTIFICADOS.map((c) => c.emissor)].map((s) => `<span class="chip">${esc(s)}</span>`).join(" ")),
+      stack: () => print([...window.SKILLS.map((s) => s.nome), ...window.CERTIFICADOS.map((c) => c.curto || c.emissor)].map((s) => `<span class="chip">${esc(s)}</span>`).join(" ")),
       skills: () => CMDS.stack(),
       contato: () => print(Object.entries(P.contatos).map(([k, v]) => `<span class="k">${k.padEnd(9, " ")}</span>${v ? `<a href="${esc(v.includes("@") && !v.startsWith("http") ? "mailto:" + v : v)}" target="_blank" rel="noopener">${esc(v)}</a>` : '<span class="muted">em breve</span>'}`).join("<br>"), "pre"),
       neofetch: () => print(

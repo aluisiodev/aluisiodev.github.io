@@ -1,0 +1,65 @@
+// Fala com o servidor do aluOS (worker/aluos-worker.js) e com o GoatCounter.
+// Sem ALU.CONFIG.api, tudo continua funcionando, mas só neste navegador.
+(function () {
+  const ALU = window.ALU, CFG = () => ALU.CONFIG || {};
+  const ls = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+  const base = () => String(CFG().api || "").replace(/\/+$/, "");
+  async function chamar(rota, corpo) {
+    if (!base()) return null;
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);
+    try {
+      const r = await fetch(base() + rota, corpo ? { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) } : { signal: ctl.signal });
+      return r.ok ? await r.json() : null;
+    } catch { return null; } finally { clearTimeout(t); }
+  }
+  const online = () => !!base();
+
+  // ---------- placar global do jogo da velha ----------
+  async function placar() { return (await chamar("/placar")) || ls.get("alu.placar.local", { todos: 0, zizi: 0, velha: 0 }); }
+  async function somarPlacar(vencedor) {
+    const r = await chamar("/placar", { vencedor });
+    if (r) return r;
+    const p = ls.get("alu.placar.local", { todos: 0, zizi: 0, velha: 0 }); p[vencedor] = (p[vencedor] || 0) + 1; ls.set("alu.placar.local", p); return p;
+  }
+
+  // ---------- ranking ----------
+  const ordenar = (r) => r.sort((a, b) => b.pontos - a.pontos).slice(0, 20);
+  async function ranking(jogo) { return (await chamar("/ranking?jogo=" + jogo)) || ordenar(ls.get("alu.ranking." + jogo, [])); }
+  async function enviarRanking(jogo, nome, pontos) {
+    const r = await chamar("/ranking", { jogo, nome, pontos });
+    if (r) return r;
+    const l = ls.get("alu.ranking." + jogo, []), i = l.findIndex((x) => x.nome.toLowerCase() === nome.toLowerCase());
+    if (i >= 0) l[i].pontos = Math.max(l[i].pontos, pontos); else l.push({ nome, pontos });
+    ls.set("alu.ranking." + jogo, l); return ordenar(l);
+  }
+
+  // ---------- livro de visitas ----------
+  async function assinar(dados) {
+    ls.set("alu.visitante", dados);
+    const r = await chamar("/visitas", { ...dados, idioma: ALU.lang });
+    // sem servidor, o GoatCounter também registra o nome (a pessoa escolheu se identificar)
+    evento("livro-de-visitas/" + dados.nome.slice(0, 40), "Assinou o livro de visitas");
+    return !!r || !!CFG().goatcounter;
+  }
+
+  // ---------- GoatCounter (estatística de visitas, sem cookies) ----------
+  const preview = /claude|anthropic|usercontent/.test(location.hostname) || location.hostname === "localhost" || location.protocol === "file:";
+  function evento(caminho, titulo) {
+    if (preview || !CFG().goatcounter || !window.goatcounter || !window.goatcounter.count) return;
+    try { window.goatcounter.count({ path: caminho, title: titulo, event: true }); } catch {}
+  }
+  function iniciarGoat() {
+    const codigo = CFG().goatcounter;
+    if (preview || !codigo) return;
+    window.goatcounter = { no_onload: false, allow_local: false };
+    const s = document.createElement("script");
+    s.async = true; s.src = "https://gc.zgo.at/count.js";
+    s.dataset.goatcounter = /^https?:/.test(codigo) ? codigo : `https://${codigo}.goatcounter.com/count`;
+    document.head.appendChild(s);
+  }
+  // abrir apps vira evento no GoatCounter (dá pra ver quais janelas as pessoas mais abrem)
+  ALU.contarApp = (id) => evento("app/" + id, "Abriu " + id);
+
+  ALU.api = { online, placar, somarPlacar, ranking, enviarRanking, assinar, evento };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciarGoat); else iniciarGoat();
+})();

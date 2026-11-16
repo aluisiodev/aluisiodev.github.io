@@ -11,7 +11,7 @@
     ["memoria", "Memória de elefante"], ["pato-evoluiu", "O pato evoluiu"], ["nudge", "Chamando atenção"], ["luminaria", "Iluminado"],
     ["turista", "Turista do quarto"], ["desligar", "Pode desligar"], ["professor", "Professor de bot"], ["bonzinho", "Amizade com Zizi"],
     ["ebaa", "Membro do fórum"], ["recado", "Deixou recado"], ["segunda", "Odeio segunda-feira"], ["barrel", "Deu um giro"], ["musikzify", "Trilha sonora"],
-    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"],
+    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"],
   ];
   const ler = () => { try { return JSON.parse(localStorage.getItem("alu.conquistas")) || {}; } catch { return {}; } };
   const salvar = (o) => { try { localStorage.setItem("alu.conquistas", JSON.stringify(o)); } catch {} };

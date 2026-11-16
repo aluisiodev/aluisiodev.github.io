@@ -21,7 +21,7 @@
   };
   PROJ.forEach((p) => (APPS["proj:" + p.id] = { titulo: p.nome, curto: p.curto, projeto: p, w: 640, h: 560 }));
   window.SKILLS.forEach((s) => (APPS["skill:" + s.id] = { titulo: "Propriedades de " + s.nome, curto: s.nome, icone: s.icone, item: s, w: 420, h: 300 }));
-  window.CERTIFICADOS.forEach((c) => (APPS["cert:" + c.id] = { titulo: "Propriedades de " + c.nome, curto: c.emissor, icone: "cert", item: c, w: 440, h: 300 }));
+  window.CERTIFICADOS.forEach((c) => (APPS["cert:" + c.id] = { titulo: "Propriedades de " + c.nome, curto: c.curto || c.emissor, icone: "cert", item: c, w: 440, h: 300 }));
 
   // ---------- conteúdo das pastas ----------
   // cada item: { nome, icone, abre: id do app, arg }
@@ -39,7 +39,7 @@
     ],
     skills: () => [
       ...window.SKILLS.map((s) => ({ nome: s.nome, icone: s.icone, abre: "skill:" + s.id })),
-      ...window.CERTIFICADOS.map((c) => ({ nome: c.emissor, icone: "cert", abre: "cert:" + c.id })),
+      ...window.CERTIFICADOS.map((c) => ({ nome: c.curto || c.emissor, icone: "cert", abre: "cert:" + c.id })),
     ],
   };
 
@@ -91,7 +91,7 @@
       ...P.bio.flatMap((b) => [b, ""]),
       `Projetos que eu mais gosto:`, ...PROJ.map((p) => `  - ${p.nome}: ${p.resumo}`), ``,
       `Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`,
-      `Cursos: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, ``,
+      `Cursos: ${window.CERTIFICADOS.map((c) => c.curto || c.emissor).join(", ")}`, ``,
       `PS: tem uma foto do meu quarto aqui na pasta (quarto_360.png).`,
       `Dá pra girar e clicar nas coisas.`,
     ];
@@ -125,7 +125,7 @@
 
   // ---------- Propriedades (skill / certificado) ----------
   function renderProps(el, ctx, a) {
-    const it = a.item, cert = !!it.emissor;
+    const it = a.item, cert = "emissor" in it;
     el.innerHTML = `
       <div class="props">
         <div class="tabs"><span class="on">Geral</span></div>
@@ -134,7 +134,7 @@
           <hr>
           <dl>
             <dt>Tipo:</dt><dd>${cert ? "Curso" : "Habilidade"}</dd>
-            ${cert ? `<dt>Emissor:</dt><dd>${esc(it.emissor)}</dd>` : ""}
+            ${cert && it.emissor ? `<dt>Emissor:</dt><dd>${esc(it.emissor)}</dd>` : ""}
             <dt>Descrição:</dt><dd>${esc(cert ? it.detalhe : it.texto)}</dd>
           </dl>
         </div>

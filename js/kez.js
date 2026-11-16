@@ -23,22 +23,23 @@
         </div>`,
     },
     {
-      re: /^ligadin\.com\/in\/aluisio-alves\/?$/, titulo: () => `${P.nome} | LigadIn`,
+      re: /^ligadin\.com\/in\/aluisio-alves\/?$/, titulo: () => `${P.nomeCompleto || P.nome} | LigadIn`,
       html: () => `
         <div class="li-page">
           <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav"><button class="link" data-ir="ligadin.com/feed">Início</button> · Rede · Vagas · Mensagens · <b>Eu</b></span></header>
           <div class="li-card">
             <div class="li-capa"></div>
             <img class="li-foto" src="${esc(P.foto)}" alt="Foto de ${esc(P.nome)}">
-            <h1>${esc(P.nome)}</h1>
-            <p>${esc(P.cargo)} · ${esc(P.local)}</p>
-            <p class="muted">500+ conexões (na savana)</p>
+            <h1>${esc(P.nomeCompleto || P.nome)}</h1>
+            <p>${esc(P.headline || P.cargo)}</p>
+            <p class="muted">${esc(P.local)} · 500+ conexões (na savana)</p>
             <div class="row">${real(P.contatos.linkedin, "Sair da savana: abrir perfil real")}<button class="btn sec" data-ir="chat">Mandar mensagem</button></div>
           </div>
           <div class="li-card"><h2>Sobre</h2>${P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
-          <div class="li-card" id="certs"><h2>Cursos</h2>
-            ${window.CERTIFICADOS.map((c) => `<div class="li-item">${ALU.pix("cert")}<div><strong>${esc(c.nome)}</strong><small>${esc(c.emissor)}</small></div></div>`).join("")}</div>
-          ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>Atividade</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-item"><div><small>${esc(p.quando || "")}</small><p>${esc(p.texto).replace(/\n/g, "<br>")}</p></div></div>`).join("")}</div>` : ""}
+          ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>Atividade</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-post"><small class="muted">${esc(p.autor || P.nomeCompleto || P.nome)}${p.colab ? " · com " + esc(p.colab) : ""} · ${esc(p.quando || "")}</small><p class="li-post-txt">${esc(p.texto).replace(/\n/g, "<br>")}</p></div>`).join("")}<button class="link" data-ir="ligadin.com/feed">Ver no feed →</button></div>` : ""}
+          ${(window.EXPERIENCIAS || []).length ? `<div class="li-card"><h2>Experiência</h2>${window.EXPERIENCIAS.map((x) => `<div class="li-item"><span class="li-emp">💼</span><div><strong>${esc(x.cargo)}</strong><small>${esc(x.empresa)}${x.tipo ? " · " + esc(x.tipo) : ""}</small><small>${esc(x.periodo)}</small></div></div>`).join("")}</div>` : ""}
+          <div class="li-card" id="certs"><h2>Licenças e certificações</h2>
+            ${window.CERTIFICADOS.map((c) => `<div class="li-item">${ALU.pix("cert")}<div><strong>${esc(c.nome)}</strong>${c.emissor ? `<small>${esc(c.emissor)}</small>` : ""}</div></div>`).join("")}</div>
           <div class="li-card"><h2>Competências</h2>${window.SKILLS.map((s) => `<div class="li-item">${ALU.pix(s.icone)}<div><strong>${esc(s.nome)}</strong></div></div>`).join("")}</div>
         </div>`,
     },

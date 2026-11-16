@@ -88,6 +88,22 @@
     { de: "Peep Studio", assunto: "Seu pato compilou com sucesso", quando: "dom", corpo: "Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nquack." },
     { de: "Gerente da Pizzaria", assunto: "turno da noite: 12AM às 6AM", quando: "sáb", corpo: "Olá, olá!\n\nSó lembrando que as câmeras precisam ser checadas.\nE a porta. Cuide da porta.\n\nhar har har" },
   ];
+  // Enviados: a maratona de candidaturas. Spam: as respostas, todas com o MESMO texto (só muda a empresa).
+  const VAGAS = [
+    ["Girafa Labs", "Desenvolvedor Back-end Júnior (C#/.NET)", "13 nov"], ["Zebra Bank", "Estágio em Desenvolvimento .NET", "12 nov"],
+    ["Pato Systems", "Desenvolvedor Full Stack Júnior", "12 nov"], ["Leão Cloud Solutions", "Desenvolvedor .NET Júnior", "11 nov"],
+    ["Banana Pay", "Software Engineer I (Back-end)", "10 nov"], ["Capivara Digital", "Desenvolvedor React + Node Júnior", "8 nov"],
+    ["Tucano Soft", "Programador C# Júnior", "7 nov"], ["Jacaré Data", "Desenvolvedor Back-end (APIs REST)", "5 nov"],
+    ["Mico Mobile", "Desenvolvedor TypeScript Júnior", "4 nov"], ["Arara Analytics", "Estágio em Engenharia de Software", "1 nov"],
+    ["Onça Logística", "Desenvolvedor .NET + Redis", "30 out"], ["Tamanduá Tech", "Desenvolvedor Júnior (Docker/APIs)", "28 out"],
+  ];
+  const nomeCompleto = P.nomeCompleto || P.nome;
+  VAGAS.forEach(([emp, vaga, dia]) => EMAILS.push({ pasta: "enviados", de: `para: rh@${emp.toLowerCase().normalize("NFD").replace(/[^a-z]/g, "")}.com.br`, assunto: `Candidatura: ${vaga} · ${nomeCompleto}`, quando: dia,
+    corpo: `Olá, time da ${emp}!\n\nMeu nome é ${nomeCompleto} e gostaria de me candidatar à vaga de ${vaga}.\n\nTrabalho com C#/.NET, TypeScript e React, Redis, Docker e APIs REST. Meus projetos estão no meu portfolio (que, por acaso, é um sistema operacional inteiro).\n\nSegue meu currículo em anexo.\n\nFico à disposição!\n${nomeCompleto}\n\n📎 curriculo-aluisio-alves-FINAL-v7-agora-vai.pdf` }));
+  const FEEDBACK = (emp) => `Olá, ${P.nome}!\n\nAgradecemos muito o seu interesse em fazer parte do time da ${emp}.\n\nApós uma análise cuidadosa do seu perfil, decidimos seguir com outros candidatos cujo perfil está mais alinhado às necessidades da vaga neste momento.\n\nSeu currículo ficará em nosso banco de talentos e, caso surja uma oportunidade compatível, entraremos em contato.\n\nDesejamos muito sucesso em sua jornada!\n\nAtenciosamente,\nEquipe de Talent Acquisition | ${emp}`;
+  VAGAS.slice(0, 10).forEach(([emp, , dia]) => EMAILS.push({ pasta: "spam", feedback: true, de: `Talent Acquisition · ${emp}`, assunto: `Atualização sobre sua candidatura · ${emp}`, quando: dia, corpo: FEEDBACK(emp) }));
+  EMAILS.forEach((e) => { e.pasta = e.pasta || (e.spam ? "spam" : "entrada"); });
+  const PASTAS = [["entrada", "📥 Entrada"], ["enviados", "📤 Enviados"], ["spam", "🗑️ Spam"]];
   ALU.kezSites.push({
     re: /^(imaiu|imaíu)\.com\/?$/, titulo: () => "Caixa de entrada · imaíu",
     atalho: { url: "imaiu.com", nome: "imaíu", icone: logoMail },
@@ -95,19 +111,28 @@
       <div class="im">
         <aside class="im-side"><div class="im-logo">${logoMail}<b>imaíu</b></div>
           <button class="btn im-novo">✎ Escrever</button>
-          <div class="im-pastas"><b>📥 Entrada (${EMAILS.filter((e) => !e.spam).length})</b><span>⭐ Favoritos</span><span>📤 Enviados</span><span>🗑️ Spam (1)</span></div></aside>
-        <section class="im-lista">${EMAILS.map((e, i) => `<button class="im-item ${i === 0 ? "nao-lido" : ""} ${e.spam ? "spam" : ""}" data-i="${i}"><b>${esc(e.de)}</b><span>${esc(e.assunto)}</span><small>${esc(e.quando)}</small></button>`).join("")}</section>
+          <div class="im-pastas">${PASTAS.map(([id, n]) => `<button data-p="${id}" class="${id === "entrada" ? "on" : ""}">${n} (${EMAILS.filter((e) => e.pasta === id).length})</button>`).join("")}<span>⭐ Favoritos</span></div></aside>
+        <section class="im-lista"></section>
         <section class="im-ler"><p class="muted">Selecione um e-mail.</p></section>
       </div>`,
     init: (view, ctx) => {
-      const ler = view.querySelector(".im-ler");
-      view.querySelectorAll(".im-item").forEach((b) => (b.onclick = () => {
+      const ler = view.querySelector(".im-ler"), lista = view.querySelector(".im-lista"), lidos = new Set();
+      const mostrarPasta = (pasta) => {
+        view.querySelectorAll(".im-pastas button").forEach((b) => b.classList.toggle("on", b.dataset.p === pasta));
+        lista.innerHTML = EMAILS.map((e, i) => (e.pasta === pasta ? `<button class="im-item ${i === 0 ? "nao-lido" : ""} ${e.pasta === "spam" ? "spam" : ""}" data-i="${i}"><b>${esc(e.de)}</b><span>${esc(e.assunto)}</span><small>${esc(e.quando)}</small></button>` : "")).join("");
+        ler.innerHTML = `<p class="muted">${pasta === "spam" ? "O filtro de spam do imaíu aprendeu sozinho onde colocar estes e-mails." : pasta === "enviados" ? `${EMAILS.filter((e) => e.pasta === "enviados").length} candidaturas enviadas. Persistência é tudo.` : "Selecione um e-mail."}</p>`;
+        ligar();
+      };
+      view.querySelectorAll(".im-pastas button").forEach((b) => (b.onclick = () => mostrarPasta(b.dataset.p)));
+      const ligar = () => lista.querySelectorAll(".im-item").forEach((b) => (b.onclick = () => {
         const e = EMAILS[+b.dataset.i];
         view.querySelectorAll(".im-item").forEach((x) => x.classList.remove("on")); b.classList.add("on"); b.classList.remove("nao-lido");
         ler.innerHTML = `<h2>${esc(e.assunto)}</h2><p class="muted">De: <b>${esc(e.de)}</b> · ${esc(e.quando)}</p><pre>${esc(e.corpo)}</pre>${e.spam ? '<p class="im-alerta">⚠️ O imaíu acha que isto é golpe.</p>' : ""}`;
         if (e.spam) conq("spam", "Quase caiu", "Abriu o e-mail do príncipe da savana.");
         if (e.de.startsWith("Gerente")) conq("freddy", "Turno da noite II", "Leu o e-mail do gerente da pizzaria.");
+        if (e.feedback) { lidos.add(e.de); if (lidos.size >= 3) ler.insertAdjacentHTML("beforeend", '<p class="im-alerta">🔁 Você já leu este e-mail ' + lidos.size + " vezes. Com empresas diferentes.</p>"); if (lidos.size >= 5) conq("talentos", "Banco de talentos", "Leu 5 feedbacks idênticos no spam do imaíu."); }
       }));
+      mostrarPasta("entrada");
       view.querySelector(".im-novo").onclick = () => {
         ler.innerHTML = `<h2>Nova mensagem</h2>
           <label>Para<input value="${esc(P.contatos.email || P.usuario + "@imaiu.com")}" readonly></label>
@@ -130,7 +155,7 @@
   // ======================= clicajogos =======================
   const JOGOS = [
     { id: "cobrinha", nome: "Cobrinha", desc: "Coma as frutinhas. Setas ou WASD.", cor: "#2fbf1f", emoji: "🐍" },
-    { id: "velha", nome: "Jogo da velha", desc: "Você é o X. Zizi é a espada (e provoca).", cor: "#2f6bff", emoji: "⚔️" },
+    { id: "velha", nome: "Jogo da velha", desc: "Você é o X. Zizi é a estrela ★ (e provoca).", cor: "#2f6bff", emoji: "⚔️" },
     { id: "pato", nome: "Pato Clicker", desc: "Clique no pato. Compre melhorias. Domine o mundo.", cor: "#9b6bff", emoji: "🦆" },
     { id: "memoria", nome: "Memória da savana", desc: "Ache os pares de ícones do aluOS.", cor: "#e07b12", emoji: "🧠" },
     { id: "voador", nome: "Pato Voador", desc: "Bata as asas entre os canos. Espaço ou toque.", cor: "#f2a25a", emoji: "🪽" },

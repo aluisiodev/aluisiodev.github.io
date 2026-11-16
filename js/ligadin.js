@@ -41,9 +41,9 @@
   ];
   const NOTICIAS = ["Pesquisa: 9 em 10 devs juram que \"funciona na minha máquina\"", "Empresa troca aumento por pufe colorido", "Bombom se valoriza 300% no mercado de RH", "Gato é promovido a Head após entrega noturna", "Segunda-feira continua sendo segunda-feira", "IA aprende a escrever posts de gratidão sozinha"];
 
-  const avatar = (a) => (a === "zizi" ? (ALU.ziziSVG ? ALU.ziziSVG("ri") : "⚔️") : a === "eu" ? `<img src="${esc(P.foto)}" alt="">` : a.startsWith("img:") ? `<img src="${esc(a.slice(4))}" alt="">` : a);
+  const avatar = (a) => (a === "zizi" ? (ALU.ziziSVG ? ALU.ziziSVG("ri") : "⚔️") : a === "eu" ? `<img src="${esc(P.foto)}" alt="">` : a.startsWith("img:") ? `<img src="${esc(a.slice(4))}" alt="">` : /^[A-Z]{1,2}$/.test(a) ? `<b class="lf-ini">${a}</b>` : a);
   const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(".0", "").replace(".", ",") + " mil" : String(n);
-  const linkPerfil = (n) => n === "aluisio.dev" || n === P.nome;
+  const linkPerfil = (n) => n === "aluisio.dev" || n === P.nome || n === P.nomeCompleto || n.endsWith(" e " + P.nomeCompleto);
 
   function postHTML([id, autor, av, titulo, tempo, texto, reac, coments, cs], curt) {
     const curto = texto.length > 260;
@@ -60,13 +60,13 @@
   ALU.kezSites.push({
     re: /^ligadin\.com(?:\/feed)?\/?$/, titulo: () => "Feed | LigadIn",
     html: () => {
-      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, "aluisio.dev", "eu", P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, []]);
+      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? " e " + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, []]);
       const curt = ler();
       const lista = [...meus, ...FEED];
       return `<div class="li-page">
         <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav"><button class="link on" data-ir="ligadin.com/feed">Início</button> · Rede · Vagas · Mensagens · <button class="link" data-ir="ligadin.com/in/aluisio-alves">Eu</button></span></header>
         <div class="lf-wrap">
-          <aside class="lf-lado"><div class="li-card lf-eu"><div class="li-capa"></div><img class="lf-foto" src="${esc(P.foto)}" alt=""><button class="link" data-ir="ligadin.com/in/aluisio-alves"><b>${esc(P.nome)}</b></button><small>${esc(P.cargo)}</small><hr><small>Quem viu seu perfil: <b>muita gente</b></small><small>Impressões do post: <b>uma girafa</b></small></div></aside>
+          <aside class="lf-lado"><div class="li-card lf-eu"><div class="li-capa"></div><img class="lf-foto" src="${esc(P.foto)}" alt=""><button class="link" data-ir="ligadin.com/in/aluisio-alves"><b>${esc(P.nomeCompleto || P.nome)}</b></button><small>${esc(P.headline || P.cargo)}</small><hr><small>Quem viu seu perfil: <b>muita gente</b></small><small>Impressões do post: <b>uma girafa</b></small></div></aside>
           <main class="lf-feed">
             <div class="li-card lf-novo"><span class="lf-av"><img src="${esc(P.foto)}" alt=""></span><button class="lf-comecar">Comece um post (sobre gratidão, de preferência)</button></div>
             ${lista.map((p) => postHTML(p, curt[p[0]])).join("")}

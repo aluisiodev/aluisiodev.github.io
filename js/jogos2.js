@@ -20,12 +20,37 @@
     } catch {}
   }
 
+  // ---------- ranking (compartilhado por velha, voador e ritmo) ----------
+  // A pessoa escolhe o nome que quiser e publica a melhor marca dela. Do lado aparece o top 10.
+  function ranking(caixa, jogo, rotulo, minhaMarca) {
+    const esc = (s) => ALU.esc(s);
+    caixa.innerHTML = `<div class="rk"><h4>🏆 Ranking · ${esc(rotulo)}</h4>
+      <form class="rk-form"><input class="rk-nome" maxlength="20" placeholder="Seu nome no ranking" value="${esc(ls.get("alu.rk.nome", ""))}" aria-label="Seu nome no ranking"><button class="btn">Publicar <b class="rk-m">0</b></button></form>
+      <ol class="rk-lista"><li class="muted">carregando…</li></ol>
+      <small class="muted rk-aviso">${ALU.api && ALU.api.online() ? "Ranking de todo mundo que jogou." : "Ranking deste navegador (o global liga quando o servidor estiver no ar)."}</small></div>`;
+    const lista = caixa.querySelector(".rk-lista"), m = caixa.querySelector(".rk-m"), nome = caixa.querySelector(".rk-nome");
+    const pintar = (r) => { const eu = nome.value.trim().toLowerCase(); lista.innerHTML = (r || []).slice(0, 10).map((x, i) => `<li class="${x.nome.toLowerCase() === eu ? "eu" : ""}"><span>${["🥇", "🥈", "🥉"][i] || i + 1 + "."}</span><b>${esc(x.nome)}</b><i>${x.pontos}</i></li>`).join("") || '<li class="muted">Ninguém ainda. Seja o primeiro!</li>'; };
+    const atualizar = () => { m.textContent = minhaMarca(); };
+    caixa.querySelector(".rk-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const n = nome.value.trim().slice(0, 20);
+      if (!n) { nome.focus(); nome.placeholder = "Escreva um nome primeiro 🙂"; return; }
+      ls.set("alu.rk.nome", n);
+      if (!ALU.api) return;
+      pintar(await ALU.api.enviarRanking(jogo, n, minhaMarca()));
+    };
+    if (ALU.api) ALU.api.ranking(jogo).then(pintar); else pintar([]);
+    atualizar();
+    return atualizar;
+  }
+
   // =================== Jogo da velha contra Zizi ===================
   const FALAS = {
-    inicio: ["Pode começar. Eu deixo. 😏", "Você é X. Eu sou a espada.", "Já perdeu e nem sabe ainda.", "Respira fundo. Vai precisar."],
+    inicio: ["Pode começar. Eu deixo. 😏", "Você é X. Eu sou a estrela. ⭐", "Já perdeu e nem sabe ainda.", "Respira fundo. Vai precisar."],
     jogador: ["Hmm… corajoso.", "Essa jogada aí? Sério?", "Tô vendo tudo daqui. 👀", "Interessante… pra um iniciante.", "Você tá suando? Parece.", "Vou fingir que não vi isso.", "Tá jogando de olho fechado?"],
-    zizi: ["Toma essa. ⚔️", "Calculado.", "Sua vez. Sem pressão. (muita pressão)", "Eu já vi esse final.", "Isso foi só o aquecimento."],
+    zizi: ["Toma essa. ⭐", "Calculado.", "Sua vez. Sem pressão. (muita pressão)", "Eu já vi esse final.", "Isso foi só o aquecimento."],
     quase: ["Opa, opa, opa! Quase.", "Tá esquentando hein…", "Achou que eu não ia ver?"],
+    vacilo: ["Ops. Isso foi de propósito. Acho.", "Deixa eu ver… não, peraí…", "Eu tava olhando o relógio, não vale."],
     ziziVence: ["GG fácil. 😎", "Quer revanche? Vai perder de novo.", "Eu avisei.", "Mais sorte da próxima. Você vai precisar."],
     jogadorVence: ["Não… impossível!", "Foi sorte. Pura sorte.", "Ok, você venceu. Dessa vez.", "Vou contar pra ninguém."],
     velha: ["Empate. Respeito… um pouquinho.", "Deu velha. Que nem você. Brincadeira!", "Ninguém ganha. Que sem graça."],
@@ -34,43 +59,53 @@
     const pl = ls.get("alu.velha", { v: 0, z: 0, e: 0 });
     area.innerHTML = `<div class="zv">
       <div class="zv-lado"><div class="zv-zizi">${ALU.ziziSVG ? ALU.ziziSVG() : ""}</div><div class="zv-balao"><p></p></div></div>
-      <div><div class="jg-hud"><span class="msg">Sua vez (X)</span><span>Você <b class="v">${pl.v}</b> × <b class="z">${pl.z}</b> Zizi · Velha <b class="e">${pl.e}</b></span><button class="btn jg-go">Revanche</button></div>
-      <div class="velha zv-tab"></div></div></div>`;
+      <div><div class="zv-global" title="Placar somado de todas as pessoas que jogaram"><span>All users <b class="g-t">…</b></span><i>×</i><span><b class="g-z">…</b> Zizi</span></div>
+        <div class="jg-hud"><span class="msg">Sua vez (X)</span><span>Você <b class="v">${pl.v}</b> × <b class="z">${pl.z}</b> Zizi · Velha <b class="e">${pl.e}</b></span><button class="btn jg-go">Revanche</button></div>
+        <div class="velha zv-tab"></div></div>
+      <div class="zv-rk"></div></div>`;
     const tab = area.querySelector(".zv-tab"), msg = area.querySelector(".msg"), balao = area.querySelector(".zv-balao p"), zEl = area.querySelector(".zv-zizi");
     const L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
     let b, fim, tFala;
     const ganhou = (q, s) => L.some((l) => l.every((i) => q[i] === s));
     const pose = (p) => { if (ALU.ziziSVG) zEl.innerHTML = ALU.ziziSVG(p); };
+    const pintarGlobal = (p) => { if (!p || !area.isConnected) return; area.querySelector(".g-t").textContent = p.todos || 0; area.querySelector(".g-z").textContent = p.zizi || 0; };
+    if (ALU.api) ALU.api.placar().then(pintarGlobal);
+    const attRk = ranking(area.querySelector(".zv-rk"), "velha", "vitórias contra Zizi", () => pl.v);
     function falar(tipo, p) {
       balao.textContent = um(FALAS[tipo]); balao.parentElement.classList.remove("pop"); void balao.offsetWidth; balao.parentElement.classList.add("pop");
       if (p) { pose(p); clearTimeout(tFala); tFala = setTimeout(() => !fim && pose("normal"), 1400); }
       tom(520 + Math.random() * 200, 0.05, "square", 0.03); tom(700, 0.05, "square", 0.03, 0.06);
     }
+    // Zizi joga bem, mas se distrai: às vezes não bloqueia e às vezes joga em qualquer lugar.
     function cpu() {
       const vazios = b.map((v, i) => (v ? null : i)).filter((i) => i !== null);
-      for (const s of ["O", "X"]) for (const i of vazios) { const q = b.slice(); q[i] = s; if (ganhou(q, s)) return [i, s === "X"]; }
-      if (!b[4]) return [4, false];
-      if (Math.random() < 0.2) return [um(vazios), false];
-      const cantos = [0, 2, 6, 8].filter((i) => !b[i]); if (cantos.length) return [um(cantos), false];
-      return [vazios[0], false];
+      const fecha = (s) => vazios.find((i) => { const q = b.slice(); q[i] = s; return ganhou(q, s); });
+      const vence = fecha("O"); if (vence != null && Math.random() < 0.85) return [vence, "zizi"];
+      const bloqueio = fecha("X");
+      if (bloqueio != null) return Math.random() < 0.55 ? [bloqueio, "quase"] : [(() => { const o = vazios.filter((i) => i !== bloqueio); return o.length ? um(o) : bloqueio; })(), "vacilo"];
+      if (Math.random() < 0.4) return [um(vazios), "zizi"];
+      if (!b[4] && Math.random() < 0.6) return [4, "zizi"];
+      const cantos = [0, 2, 6, 8].filter((i) => !b[i]); if (cantos.length) return [um(cantos), "zizi"];
+      return [um(vazios), "zizi"];
     }
     function checar() {
-      if (ganhou(b, "X")) { fim = true; pl.v++; msg.textContent = "Você venceu! 🎉"; falar("jogadorVence"); pose("triste"); conq("velha", "Mais esperto que Zizi", "Venceu Zizi no jogo da velha."); }
-      else if (ganhou(b, "O")) { fim = true; pl.z++; msg.textContent = "Zizi venceu."; falar("ziziVence"); pose("ri"); }
-      else if (b.every(Boolean)) { fim = true; pl.e++; msg.textContent = "Deu velha."; falar("velha"); pose("normal"); }
+      let vencedor = null;
+      if (ganhou(b, "X")) { fim = true; vencedor = "todos"; pl.v++; msg.textContent = "Você venceu! 🎉"; falar("jogadorVence"); pose("triste"); conq("velha", "Mais esperto que Zizi", "Venceu Zizi no jogo da velha."); }
+      else if (ganhou(b, "O")) { fim = true; vencedor = "zizi"; pl.z++; msg.textContent = "Zizi venceu."; falar("ziziVence"); pose("ri"); }
+      else if (b.every(Boolean)) { fim = true; vencedor = "velha"; pl.e++; msg.textContent = "Deu velha."; falar("velha"); pose("normal"); }
       area.querySelector(".v").textContent = pl.v; area.querySelector(".z").textContent = pl.z; area.querySelector(".e").textContent = pl.e;
-      if (fim) ls.set("alu.velha", pl);
+      if (fim) { ls.set("alu.velha", pl); attRk(); if (ALU.api) ALU.api.somarPlacar(vencedor).then(pintarGlobal); }
     }
-    const ZICON = `<span class="zv-o">⚔</span>`;
-    function desenhar() { tab.innerHTML = b.map((v, i) => `<button data-i="${i}" class="${v || ""}">${v === "O" ? ZICON : v || ""}</button>`).join(""); tab.querySelectorAll("button").forEach((x) => (x.onclick = () => jogar(+x.dataset.i))); }
+    const ZICON = `<span class="zv-o">★</span>`;
+    function desenhar() { tab.innerHTML = b.map((v, i) => `<button data-i="${i}" class="${v || ""}" aria-label="${v === "O" ? "estrela da Zizi" : v || "vazio"}">${v === "O" ? ZICON : v || ""}</button>`).join(""); tab.querySelectorAll("button").forEach((x) => (x.onclick = () => jogar(+x.dataset.i))); }
     function jogar(i) {
       if (fim || b[i] || msg.dataset.pensando) return; b[i] = "X"; tom(330, 0.06); checar(); desenhar(); if (fim) return;
       falar("jogador", Math.random() < 0.5 ? "brava" : null);
       msg.textContent = "Zizi está pensando…"; msg.dataset.pensando = "1";
       setTimeout(() => {
         delete msg.dataset.pensando; if (fim || !area.isConnected) return;
-        const [j, bloqueio] = cpu(); b[j] = "O"; tom(440, 0.06); checar(); desenhar();
-        if (!fim) { msg.textContent = "Sua vez (X)"; falar(bloqueio ? "quase" : "zizi", bloqueio ? "brava" : "ri"); }
+        const [j, tipo] = cpu(); b[j] = "O"; tom(440, 0.06); checar(); desenhar();
+        if (!fim) { msg.textContent = "Sua vez (X)"; falar(tipo, tipo === "quase" ? "brava" : tipo === "vacilo" ? "triste" : "ri"); }
       }, 700 + Math.random() * 500);
     }
     function novo() { b = Array(9).fill(null); fim = false; msg.textContent = "Sua vez (X)"; desenhar(); pose("normal"); falar("inicio"); }
@@ -82,15 +117,17 @@
   function voador(area) {
     const W = 288, H = 400;
     area.innerHTML = `<div class="jg-hud"><span>Pontos: <b class="pt">0</b></span><span>Recorde: <b class="rc">${ls.get("alu.voador", 0)}</b></span></div>
-      <canvas class="jg-canvas pv" width="${W}" height="${H}"></canvas><p class="muted">Clique, toque ou aperte espaço para bater as asas.</p>`;
+      <div class="pv-wrap"><div><canvas class="jg-canvas pv" width="${W}" height="${H}"></canvas><p class="muted">Clique, toque ou aperte espaço para bater as asas.</p></div><div class="zv-rk"></div></div>`;
+    const attRk = ranking(area.querySelector(".zv-rk"), "voador", "recorde no Pato Voador", () => ls.get("alu.voador", 0));
     const cv = area.querySelector("canvas"), g = cv.getContext("2d");
     let y, vy, canos, pts, estado = "pronto", raf, t = 0;
-    const GAP = 110, VX = 2;
-    function reset() { y = H / 2; vy = 0; canos = []; pts = 0; t = 0; area.querySelector(".pt").textContent = 0; }
+    const GAP = 135, VX = 1.7; // física por tempo (não por quadro), senão em telas de 120/144 Hz fica o dobro de rápido
+    let ultT = 0, k = 1, prox = 0;
+    function reset() { y = H / 2; vy = 0; canos = []; pts = 0; t = 0; prox = 40; area.querySelector(".pt").textContent = 0; }
     function pular() {
       if (estado === "morto") { reset(); estado = "pronto"; return; }
       if (estado === "pronto") estado = "jogando";
-      vy = -6.2; tom(660, 0.06, "square", 0.04);
+      vy = -5; tom(660, 0.06, "square", 0.04);
     }
     function pato(x, y, ang) {
       g.save(); g.translate(x, y); g.rotate(ang);
@@ -104,21 +141,22 @@
       g.fillStyle = "#1b1426"; g.fillRect(x - 3, topo - 14, 50, 14); g.fillRect(x - 3, topo + GAP, 50, 14);
       g.fillStyle = "#3aa34a"; g.fillRect(x - 1, topo - 12, 46, 10); g.fillRect(x - 1, topo + GAP + 2, 46, 10);
     }
-    function quadro() {
-      t++;
+    function quadro(agora) {
+      agora = agora || performance.now(); k = ultT ? Math.min(3, (agora - ultT) / 16.67) : 1; ultT = agora; t += k;
       // céu de fim de tarde em faixas
       ["#f6c56b", "#f2a25a", "#e9845a", "#c9667a", "#8e5a9a"].forEach((c, i) => { g.fillStyle = c; g.fillRect(0, i * 72, W, 72); });
       g.fillStyle = "#ffe9a8"; g.fillRect(200, 250, 40, 40);
       g.fillStyle = "#5a3a6a"; for (let i = 0; i < W; i += 24) g.fillRect((i - (t * 0.5) % 24), 300 - ((i * 7) % 30), 24, 60);
       if (estado === "jogando") {
-        vy += 0.38; y += vy;
-        if (t % 90 === 0) canos.push({ x: W, topo: 50 + Math.random() * (H - GAP - 140), ok: false });
-        canos.forEach((c) => { c.x -= VX; if (!c.ok && c.x + 44 < 60) { c.ok = true; pts++; area.querySelector(".pt").textContent = pts; tom(880, 0.08, "triangle", 0.05); if (pts === 10) conq("voador", "Asas de pato", "Fez 10 pontos no Pato Voador."); } });
+        vy = Math.min(6.5, vy + 0.24 * k); y += vy * k;
+        prox -= k; if (prox <= 0) { prox = 105; canos.push({ x: W, topo: 50 + Math.random() * (H - GAP - 140), ok: false }); }
+        canos.forEach((c) => { c.x -= VX * k; if (!c.ok && c.x + 44 < 60) { c.ok = true; pts++; area.querySelector(".pt").textContent = pts; tom(880, 0.08, "triangle", 0.05); if (pts === 10) conq("voador", "Asas de pato", "Fez 10 pontos no Pato Voador."); } });
         canos = canos.filter((c) => c.x > -60);
-        const bateu = y > H - 52 || y < 0 || canos.some((c) => 60 + 14 > c.x && 60 - 14 < c.x + 44 && (y - 10 < c.topo || y + 10 > c.topo + GAP));
+        if (y < 8) { y = 8; vy = Math.max(0, vy); }
+        const bateu = y > H - 52 || canos.some((c) => 60 + 14 > c.x && 60 - 14 < c.x + 44 && (y - 10 < c.topo || y + 10 > c.topo + GAP));
         if (bateu) {
           estado = "morto"; tom(160, 0.3, "sawtooth", 0.06);
-          if (pts > ls.get("alu.voador", 0)) { ls.set("alu.voador", pts); area.querySelector(".rc").textContent = pts; }
+          if (pts > ls.get("alu.voador", 0)) { ls.set("alu.voador", pts); area.querySelector(".rc").textContent = pts; attRk(); }
         }
       } else if (estado === "pronto") y = H / 2 + Math.sin(t / 10) * 6;
       canos.forEach((c) => cano(c.x, c.topo));
@@ -243,8 +281,9 @@
       <div><div class="jg-hud"><span>Pontos <b class="rt-p">0</b></span><span>Combo <b class="rt-c">0</b></span><span>Recorde <b class="rt-r">${ls.get("alu.ritmo", 0)}</b></span><button class="btn jg-go">Começar</button></div>
       <canvas class="jg-canvas" width="${W}" height="${H}"></canvas>
       <div class="rt-pads">${SIMB.map((s, i) => `<button data-l="${i}" style="--c:${CORES[i]}">${s}</button>`).join("")}</div>
-      <p class="muted">Setas (ou A S W D) quando a nota chegar na linha. No celular, toque nos botões.</p></div></div>`;
+      <p class="muted">Setas (ou A S W D) quando a nota chegar na linha. No celular, toque nos botões.</p></div><div class="zv-rk"></div></div>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d"), balao = area.querySelector(".zv-balao p"), zEl = area.querySelector(".rt-zizi");
+    const attRk = ranking(area.querySelector(".zv-rk"), "ritmo", "recorde na Batalha de Ritmo", () => ls.get("alu.ritmo", 0));
     const BPM = 120, BEAT = 60 / BPM, ALVO = H - 60, VEL = 260;
     let notas = [], inicio = 0, raf = null, tocando = false, pts = 0, combo = 0, flash = [0, 0, 0, 0], txt = "", txtT = 0, agendado = 0;
     // música original: baixo + melodia em escala pentatônica, gerada na hora
@@ -317,7 +356,7 @@
         if (notas.every((n) => n.ok || n.perdida)) {
           tocando = false;
           const tot = notas.length, ac2 = notas.filter((n) => n.ok).length;
-          if (pts > ls.get("alu.ritmo", 0)) { ls.set("alu.ritmo", pts); area.querySelector(".rt-r").textContent = pts; }
+          if (pts > ls.get("alu.ritmo", 0)) { ls.set("alu.ritmo", pts); area.querySelector(".rt-r").textContent = pts; attRk(); }
           falar(ac2 / tot > 0.8 ? "Tá bom, você venceu. Dessa vez. 😤" : ac2 / tot > 0.5 ? "Empate técnico. Eu ainda sou melhor." : "Vitória da Zizi! Volta quando treinar. 😎", ac2 / tot > 0.8 ? "triste" : "ri");
         }
       } else { g.fillStyle = "#cfd6e4"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText("Batalha de Ritmo", W / 2, 150); g.font = `14px ${FONTE}`; g.fillText("clique em Começar", W / 2, 176); }

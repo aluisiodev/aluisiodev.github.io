@@ -54,6 +54,7 @@
       if (id === "chat") { tray.classList.remove("pisca"); toasts.innerHTML = ""; }
       if (wins.has(id)) { const w = wins.get(id); w.el.hidden = false; focar(id); if (arg && w.api && w.api.ir) w.api.ir(arg); return; }
       const a = ALU.APPS[id]; if (!a) return;
+      ALU.contarApp && ALU.contarApp(id);
       const vw = innerWidth, vh = innerHeight - 40;
       const w = Math.min(a.w, vw - 30), h = Math.min(a.h, vh - 30);
       const off = (abertos++ % 7) * 26;
@@ -202,7 +203,7 @@
     setTimeout(() => chegou("oiii"), 6500);
     setTimeout(() => chegou("tá por aí? 👀"), 9000);
 
-    // ---- Zizi, o mascote ----
+    // ---- Zizi, a assistente virtual ----
     ALU.buddy && ALU.buddy(root.querySelector(".desk"));
   };
 })();

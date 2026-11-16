@@ -20,7 +20,7 @@
     [/idade|quantos anos/, () => ["idade é só um número… de commits 😅", "mas sou jovem o bastante pra achar que dá pra fazer um SO no navegador"]],
     [/projet|portfolio|o que (voce|vc) (fez|faz)|trabalhos/, () => ["meus favoritos:", ...PROJ.map((p) => `• ${p.curto}: ${p.resumo}`), "tem tudo na pasta Projetos da área de trabalho"]],
     ...PROJ.map((p) => [new RegExp(sem(p.curto) + "|" + p.id), () => [`${p.curto}! ${p.descricao.split(". ")[0].toLowerCase()}.`, `feito com ${p.stack.slice(0, 4).join(", ")}`]]),
-    [/skill|habilidade|stack|tecnologia|linguage|sabe programar/, () => [`na pasta Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `cursos: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`]],
+    [/skill|habilidade|stack|tecnologia|linguage|sabe programar/, () => [`na pasta Skills: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `cursos: ${window.CERTIFICADOS.map((c) => c.curto || c.emissor).join(", ")}`]],
     [/c#|csharp|dotnet|\.net/, () => ["C# é meu xodó", "inclusive dá pra rodar C# no Peep Studio, testa lá"]],
     [/python|javascript|\bjs\b/, () => ["abre o Peep Studio e cria um arquivo na pasta meus-codigos. roda de verdade!"]],
     [/contato|email|e-mail|falar com voce|linkedin|ligadin|github|doghub|achar voce/, () => [`DogHub: ${P.contatos.github.replace("https://github.com", "doghub.com")}`, `LigadIn: ${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`]],
@@ -30,7 +30,7 @@
     [/anime|manga|chainsaw|jujutsu|berserk|hora de aventura|adventure time/, () => [um(["Chainsaw Man, Jujutsu Kaisen e Berserk tão na estante", "Hora de Aventura é eterno. Marshall Lee na TV do quarto"])]],
     [/pato|quack|peep/, () => [um(["quack", "QUACK", "o pato roxo do Peep Studio manda um oi 🦆"])]],
     [/girafa|savana|leao|zebra/, () => [um(["🦒", "a savana agradece a visita", "já tentou digitar savana em algum lugar?"])]],
-    [/zizi|mascote/, () => ["Zizi é o mascote do aluOS. mora na área de trabalho e é invencível no jogo da velha (diz que é)"]],
+    [/zizi|mascote|assistente/, () => ["Zizi é a assistente virtual do aluOS. mora na área de trabalho, te mostra o sistema e te ajuda a deixar seu nome com um commit", "e jura que é invencível no jogo da velha"]],
     [/segredo|easter|conquista|dica/, () => [um(["tenta o terminal e digita algo que um hacker digitaria", "o relógio da barra de tarefas não gosta de ser cutucado", "a lixeira tem mais coisa do que parece", "tem uma luminária no quarto que quase ninguém acha"])]],
     [/piada|me faz rir|conta uma/, () => [um([["por que o programador foi ao médico?", "porque estava com um bug no sistema 🥁"], ["quantos devs são precisos pra trocar uma lâmpada?", "nenhum, é problema de hardware"], ["o que o pato disse pro dev?", "quack quack (tradução: você esqueceu o ponto e vírgula)"]])]],
     [/hora|que horas/, () => [`aqui são ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`]],
@@ -52,13 +52,13 @@
     [/where.*(live|from)|city|country/, () => [`i live in ${P.local}`, "in a late-afternoon little room (you can see it in quarto_360 😉)"]],
     [/project|portfolio|what (have )?you (do|built|made)|work/, () => ["my favorites:", ...PROJ.map((p) => `• ${p.curto}: ${p.resumo}`), "everything is in the Projects folder on the desktop"]],
     ...PROJ.map((p) => [new RegExp(sem(p.curto) + "|" + p.id), () => [`${p.curto}! ${p.descricao.split(". ")[0].toLowerCase()}.`, `built with ${p.stack.slice(0, 4).join(", ")}`]]),
-    [/skill|stack|tech|language|program/, () => [`in the Skills folder: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `courses: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`]],
+    [/skill|stack|tech|language|program/, () => [`in the Skills folder: ${window.SKILLS.map((s) => s.nome).join(", ")}`, `courses: ${window.CERTIFICADOS.map((c) => c.curto || c.emissor).join(", ")}`]],
     [/contact|email|linkedin|ligadin|github|doghub|reach you|find you/, () => [`DogHub: ${P.contatos.github.replace("https://github.com", "doghub.com")}`, `LigadIn: ${P.contatos.linkedin.replace(/^https?:\/\/(www\.)?/, "")}`]],
     [/job|hire|hiring|freelance|work (with|together)|opportunit/, () => ["oh nice!! 😄", "message me on LigadIn and i'll get back to you quickly"]],
     [/music|band|listen|spotify|playlist/, () => [um(["Arctic Monkeys, Radiohead and Joji on repeat", "my playlist is on musikzify, in Kez(i)avana 🎧"])]],
     [/game|play/, () => [um(["try clicajogos in Kez(i)avana, there's even a Duck Clicker", "challenge Zizi at tic-tac-toe. good luck"])]],
     [/duck|quack|peep/, () => [um(["quack", "QUACK", "the purple duck from Peep Studio says hi 🦆"])]],
-    [/zizi|mascot/, () => ["Zizi is the aluOS mascot. lives on the desktop and is unbeatable at tic-tac-toe (says Zizi)"]],
+    [/zizi|mascot|assistant/, () => ["Zizi is the aluOS virtual assistant. lives on the desktop, shows you around and helps you leave your name with a commit", "and swears to be unbeatable at tic-tac-toe"]],
     [/secret|easter|achievement|hint|tip/, () => [um(["try the terminal and type something a hacker would type", "the taskbar clock doesn't like being poked", "the recycle bin holds more than it seems"])]],
     [/joke|make me laugh/, () => [um([["why do programmers wear glasses?", "because they can't C# 🤓"], ["how many devs does it take to change a light bulb?", "none, that's a hardware problem"]])]],
     [/thank|thx|ty\b/, () => [um(["you're welcome!!", "anytime", "no problem :)"])]],
@@ -79,7 +79,7 @@
   }
 
   async function responder(texto, historico) {
-    const api = ALU.CONFIG && ALU.CONFIG.chatApi;
+    const C = ALU.CONFIG || {}, api = C.chatApi || (C.api ? String(C.api).replace(/\/+$/, "") + "/chat" : "");
     if (api) {
       try {
         const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 9000);

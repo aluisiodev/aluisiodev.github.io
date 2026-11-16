@@ -174,8 +174,8 @@
       ["pato_roxo", "🦆", "quack. (tradução: explica o código linha por linha pra mim)"],
       ["dev_noturno", "🦉", "expliquei pro pato e achei o erro. era um ponto e vírgula. RESOLVIDO."]] },
     { id: "urso", cat: "Geral da savana", t: "tem alguém de cabelo azul com uma espada na minha área de trabalho??", autor: "visitante_2006", posts: [
-      ["visitante_2006", "👀", "apareceu um mascote de cabelo azul e espada nas costas no meu desktop. é vírus???"],
-      ["Zizi", "⚔️", "oi! não sou vírus, sou Zizi, mascote do aluOS. prometo não instalar barra de ferramentas."],
+      ["visitante_2006", "👀", "apareceu uma assistente de cabelo azul e espada nas costas no meu desktop. é vírus???"],
+      ["Zizi", "⚔️", "oi! não sou vírus, sou Zizi, assistente virtual do aluOS. prometo não instalar barra de ferramentas."],
       ["girafa_da_404", "🦒", "ele é gente boa. me ajudou a achar a página que eu perdi"]] },
     { id: "vim", cat: "Programação", t: "tutorial: como sair do vim", autor: "sudo_su", posts: [
       ["sudo_su", "💻", "entrei no vim em 2019. alguém sabe sair? minha família sente minha falta"],
@@ -287,7 +287,7 @@
   const COMUNIDADES = [["segunda", "Eu odeio segunda-feira", GATO], ["csharp", "Eu amo C#", ALU.pix("csharp")], ["madrugada", "Programo de madrugada", "🌙"], ["abas", "Eu não fecho as abas do navegador", "🗂️"], ["sekiro", "Sekiro me humilhou", "🗡️"], ["aventura", "Hora de Aventura", "🍬"], ["pato", "Patos roxos existem", ALU.pix("peep")], ["cafe", "Café > sono", "☕"]];
   const recados = () => ls.get("alu.yakurt", []);
   const avYk = (e) => (e.startsWith("img:") ? `<img src="${esc(e.slice(4))}" alt="">` : e);
-  const RECADOS_BASE = [["pato_roxo", "🦆", "quack quack! passando pra deixar um recado 🦆✨"], ["kez_e_olmo", "img:img/kez.jpg", "oiii!! passando pra deixar meu recado aqui 💙"], ["Zizi", "⚔️", "lembrete: beber água e commitar com mensagem decente"]];
+  const RECADOS_BASE = [["pato_roxo", "🦆", "quack quack! passando pra deixar um recado 🦆✨"], ["kez_e_olmo", "img:img/kez.jpg", "oiii!! perfil lindo, amor beijos 😘"], ["Zizi", "⚔️", "lembrete: beber água e commitar com mensagem decente"]];
   const topoYk = () => `<header class="yk-top"><b>yakurt</b><nav><button class="link" data-ir="yakurt.com/perfil/aluisio">Início</button> · <span>Recados</span> · <span>Comunidades</span></nav><small>visitante@kez.com · Sair</small></header>`;
   ALU.kezSites.push({
     re: /^yakurt\.com\/perfil\/aluisio\/?$/, titulo: () => `yakurt - ${P.nome}`,
@@ -350,9 +350,9 @@
     Aluisio: { t: P.nome, ib: true, txt: () => `<p><b>${esc(P.nome)}</b> é um ${esc(P.cargo.toLowerCase())} brasileiro, criador do <a data-ir="kezpedia.org/wiki/aluOS">aluOS</a> e tutor de pelo menos um <a data-ir="kezpedia.org/wiki/Pato_roxo">pato roxo</a>.</p>
       <h2>Carreira</h2><p>${esc(P.bio.join(" "))}</p>
       <h2>Projetos notáveis</h2><ul>${PROJ.map((p) => `<li><a data-ir="doghub.com/aluisiodev/${repoDe(p)}">${esc(p.nome)}</a>: ${esc(p.resumo)}</li>`).join("")}</ul>
-      <h2>Vida pessoal</h2><p>Ama a Kézia. Mora num quarto rosa com luz de fim de tarde, um violão azul-esverdeado e uma estante com mais ninjas do que livros. Ouve Arctic Monkeys enquanto programa.<sup>[carece de fontes]</sup></p>` },
+      <h2>Vida pessoal</h2><p>Ama a Kezia. Mora num quarto rosa com luz de fim de tarde, um violão azul-esverdeado e uma estante com mais ninjas do que livros. Ouve Arctic Monkeys enquanto programa.<sup>[carece de fontes]</sup></p>` },
     aluOS: { t: "aluOS", txt: () => `<p>O <b>aluOS</b> é um sistema operacional fictício que roda dentro de uma página web e serve de portfolio para <a data-ir="kezpedia.org/wiki/Aluisio">${esc(P.nome)}</a>. Foi inspirado nos computadores dos anos 2000 e em jogos de mensageiro antigo.</p>
-      <h2>Componentes</h2><ul><li><b>Kez(i)avana</b>: navegador da <a data-ir="kezpedia.org/wiki/Savana">savana</a>.</li><li><b>Peep Studio</b>: IDE que roda Python, JavaScript e C# de bolso.</li><li><b>MessagerTale</b>: mensageiro com um bot que aprende frases.</li><li><b>Zizi</b>: mascote de cabelo azul que mora na área de trabalho.</li></ul>
+      <h2>Componentes</h2><ul><li><b>Kez(i)avana</b>: navegador da <a data-ir="kezpedia.org/wiki/Savana">savana</a>.</li><li><b>Peep Studio</b>: IDE que roda Python, JavaScript e C# de bolso.</li><li><b>MessagerTale</b>: mensageiro com um bot que aprende frases.</li><li><b>Zizi</b>: assistente virtual de cabelo azul que mora na área de trabalho e guia os visitantes.</li></ul>
       <h2>Curiosidades</h2><p>Existem conquistas escondidas pelo sistema. O número exato é segredo de Estado.<sup>[citação necessária]</sup></p>` },
     Pato_roxo: { t: "Pato roxo", txt: () => `<p>O <b>pato roxo</b> (<i>Anas peepstudiensis</i>) é o mascote do Peep Studio. Comunica-se exclusivamente por quacks.</p><h2>Evolução</h2><p>Relatos indicam que, após cinco execuções seguidas de código, o pato evolui e passa a revisar pull requests.</p>` },
     Savana: { t: "Savana", txt: () => `<p>A <b>savana</b> é o bioma onde fica a internet do aluOS. Habitada por girafas que guardam páginas 404, zebras e um leão que ruge quando alguém digita o próprio nome dela.</p>` },

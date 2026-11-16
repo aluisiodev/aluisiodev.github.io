@@ -37,7 +37,7 @@
         ops: [...PROJ.map((p) => [T(`me conta do ${p.curto}`, `tell me about ${p.curto}`), "p:" + p.id]), [T("depois eu vejo, valeu", "i'll check later, thanks"), "tchau"]],
       },
       stack: {
-        diz: [T(`na pasta Skills tem: ${window.SKILLS.map((x) => x.nome).join(", ")}`, `in the Skills folder: ${window.SKILLS.map((x) => x.nome).join(", ")}`), T(`e os cursos que fiz: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`, `and the courses i took: ${window.CERTIFICADOS.map((c) => c.emissor).join(", ")}`), T("e eu vou adicionando mais coisa por lá :)", "and i keep adding more stuff there :)")],
+        diz: [T(`na pasta Skills tem: ${window.SKILLS.map((x) => x.nome).join(", ")}`, `in the Skills folder: ${window.SKILLS.map((x) => x.nome).join(", ")}`), T(`e os cursos que fiz: ${window.CERTIFICADOS.map((c) => c.curto || c.emissor).join(", ")}`, `and the courses i took: ${window.CERTIFICADOS.map((c) => c.curto || c.emissor).join(", ")}`), T("e eu vou adicionando mais coisa por lá :)", "and i keep adding more stuff there :)")],
         ops: [[T("e os projetos?", "and the projects?"), "projetos"], [T("como te acho?", "where can i find you?"), "contato"]],
       },
       contato: {

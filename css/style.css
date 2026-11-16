@@ -792,3 +792,37 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .tray-lang { font: 700 11px var(--ui); color: #fff; padding: 1px 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); margin-right: 4px; background: rgba(0,0,0,.2); }
 .tray-lang:hover { background: rgba(255,255,255,.25); }
 .la-foot button[data-act="lang"] { background: #2f6bff; margin-right: auto; }
+.lf-ini { font: 700 16px var(--ui); color: #fff; background: #1d6fd1; width: 100%; height: 100%; display: grid; place-items: center; }
+.li-emp { width: 36px; height: 36px; display: grid; place-items: center; font-size: 22px; background: #f1ede7; flex: none; }
+.li-item small + small { color: #999; }
+.li-post { padding: 6px 0; border-top: 2px solid #eee; } .li-post-txt { max-height: 7.5em; overflow: hidden; -webkit-mask: linear-gradient(#000 60%, transparent); mask: linear-gradient(#000 60%, transparent); }
+/* placar global e ranking */
+.zv-o { color: #ffd23f; font-size: 46px; text-shadow: 2px 2px 0 #b07a00; }
+.zv-global { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 4px 10px; background: #0a1633; box-shadow: 0 0 0 2px #ffd23f, 3px 3px 0 2px #000; font: 18px "VT323", monospace; color: #cfe; }
+.zv-global b { color: #ffd23f; font-size: 22px; } .zv-global i { color: #ff4d6d; font-style: normal; }
+.pv-wrap { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.rk { width: 210px; padding: 8px 10px; background: #0a1633; box-shadow: 0 0 0 2px #2f6bff, 4px 4px 0 2px #000; font-size: 13px; }
+.rk h4 { margin: 0 0 6px; font-size: 14px; color: #ffd23f; }
+.rk-form { display: flex; flex-direction: column; gap: 4px; }
+.rk-form input { padding: 4px 6px; background: #fff; color: #1b1426; border: 0; box-shadow: inset 0 0 0 2px #000; font: 13px var(--ui); }
+.rk-form .btn { font-size: 12px; } .rk-form .btn b { color: inherit; }
+.rk-lista { list-style: none; margin: 8px 0 4px; padding: 0; }
+.rk-lista li { display: flex; gap: 6px; padding: 2px 0; border-bottom: 1px dashed #2a3a6a; } .rk-lista li b { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; }
+.rk-lista li i { color: #ffd23f; font-style: normal; } .rk-lista li.eu b { color: #7fe3ff; }
+.rk-aviso { display: block; font-size: 11px; line-height: 1.2; }
+/* commit do livro de visitas */
+.peep { position: relative; }
+.peep-commit { margin-left: auto; padding: 1px 10px; background: #3a2f5c; color: #ffd23f; box-shadow: inset 0 0 0 2px #ffd23f; font: 700 13px var(--ui); }
+.peep-commit:hover { background: #ffd23f; color: #1b1426; }
+.peep-commit + .peep-stop, .peep-commit ~ .peep-run { margin-left: 6px; }
+.peep-modal { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; background: rgba(10, 6, 20, .6); }
+.peep-modal[hidden] { display: none; }
+.pm-box { width: min(360px, 90%); display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #241d3a; color: #e6e0ff; box-shadow: 0 0 0 2px #9b6bff, 6px 6px 0 2px #000; }
+.pm-box b { color: #ffd23f; } .pm-quem { color: #b9b0dc; }
+.pm-box label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.pm-box input { padding: 6px; background: #120f1e; color: #fff; border: 0; box-shadow: inset 0 0 0 2px #5a4a8a; font: 15px "VT323", monospace; }
+.pm-b { display: flex; gap: 6px; justify-content: flex-end; }
+.urso.guia .urso-corpo { animation: zzpula .6s steps(2) 3; }
+@keyframes zzpula { 50% { transform: translateY(-6px); } }
+.im-pastas button { text-align: left; padding: 3px 6px; background: none; font: 13px var(--ui); }
+.im-pastas button.on { background: #ffd9c9; font-weight: 700; } .im-pastas button:hover { background: #ffeadf; }
