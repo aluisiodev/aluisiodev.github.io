@@ -80,8 +80,13 @@
   });
 
   // ======================= imaíu =======================
+  const celular = () => document.body.dataset.modo === "mobile";
   const EMAILS = [
-    { de: P.usuario, assunto: "bem-vindo ao meu computador :)", quando: "agora", corpo: `Oi!\n\nQue bom que você chegou até aqui. Este computador inteiro é o meu portfolio.\n\nDicas:\n- as pastas da área de trabalho têm tudo sobre mim\n- o quarto_360.png dá pra girar\n- tem vários segredos escondidos (tente o terminal)\n\nAbraço,\n${P.nome}` },
+    { de: P.usuario, quando: "agora",
+      get assunto() { return celular() ? "bem-vindo ao meu celular :)" : "bem-vindo ao meu computador :)"; },
+      get corpo() { return celular()
+        ? `Oi!\n\nQue bom que você chegou até aqui. Este celular inteiro é o meu portfolio.\n\nDicas:\n- as pastas da tela inicial têm tudo sobre mim\n- o Quarto 360° gira com o dedo\n- deslize a tela inicial pro lado: tem mais apps lá\n- a Zizi flutuando te ajuda em tudo\n\nAbraço,\n${P.nome}`
+        : `Oi!\n\nQue bom que você chegou até aqui. Este computador inteiro é o meu portfolio.\n\nDicas:\n- as pastas da área de trabalho têm tudo sobre mim\n- o quarto_360.png dá pra girar\n- tem vários segredos escondidos (tente o terminal)\n\nAbraço,\n${P.nome}`; } },
     { de: "DogHub", assunto: "[aluisiodev] 4 repositórios fixados no seu perfil", quando: "10:42", corpo: PROJ.map((p) => `• ${p.nome}: ${p.resumo}`).join("\n") + "\n\nAuau,\nequipe DogHub" },
     { de: "LigadIn", assunto: "Você apareceu em 3 pesquisas esta semana (na savana)", quando: "ontem", corpo: "Quem pesquisou você:\n- uma girafa (recrutadora)\n- um pato roxo (dev sênior)\n- você mesmo, 14 vezes\n\nLigue-se. LigadIn." },
     { de: "Príncipe da Savana", assunto: "URGENTE: herança de 1.000.000 de bananas", quando: "seg", spam: true, corpo: "Prezado amigo,\n\nSou o príncipe da savana e preciso da sua ajuda para transferir 1.000.000 de bananas.\nEnvie apenas sua senha do MessagerTale.\n\n(isto é spam. não faça isso. nunca.)" },

@@ -76,7 +76,7 @@
     const abrirItem = (it) => (it.href ? window.open(it.href, "_blank", "noopener") : ctx.abrir(it.abre, it.arg));
     el.querySelectorAll(".f-item").forEach((b) => {
       const it = itens[+b.dataset.i];
-      b.addEventListener("click", () => { el.querySelectorAll(".f-item.sel").forEach((x) => x.classList.remove("sel")); b.classList.add("sel"); });
+      b.addEventListener("click", () => { el.querySelectorAll(".f-item.sel").forEach((x) => x.classList.remove("sel")); b.classList.add("sel"); if (ctx.mobile) abrirItem(it); });
       b.addEventListener("dblclick", () => abrirItem(it));
       b.addEventListener("keydown", (e) => e.key === "Enter" && abrirItem(it));
     });

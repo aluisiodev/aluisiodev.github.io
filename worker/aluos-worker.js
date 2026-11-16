@@ -3,7 +3,8 @@
 //   • o ranking dos jogos (nome que a pessoa escolher + pontos)
 //   • o livro de visitas (quem quis se identificar pelo commit no Peep Studio)
 //   • o chat com IA do MessagerTale (Google Gemini, com a Groq de reserva se você quiser)
-//   • e a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada).
+//   • a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada) e o "tocando agora" do Last.fm
+//   • as estatísticas reais do GitHub no DogHub e o clima real do climaselva.
 //
 // Como colocar no ar (uns 10 minutos):
 //   1. Crie uma conta grátis em https://dash.cloudflare.com
@@ -21,6 +22,12 @@
 //          Grátis em https://developer.spotify.com/dashboard > Create app (Redirect URI pode ser https://aluisiodev.github.io,
 //          marque "Web API"). Sem eles, o servidor lê a playlist pelo player público, só que sem capas.
 //        PLAYLIST_ID = 6kNcU6KqmK0X4zxYZCuhMq (Text, opcional; é o padrão)
+//        GITHUB_USER  = aluisiodev (Text, opcional; é o padrão)  (estatísticas reais no DogHub)
+//        GITHUB_TOKEN = token do GitHub (Secret, opcional): sobe o limite da API e traz o gráfico de contribuições.
+//          Crie em https://github.com/settings/tokens > Fine-grained, sem nenhuma permissão extra (só leitura pública).
+//        LASTFM_API_KEY = chave da API do Last.fm (Secret) e LASTFM_USER = seu usuário do Last.fm (Text):
+//          o musikzify mostra o que você está ouvindo agora. Chave grátis em https://www.last.fm/api/account/create
+//      O clima do climaselva vem do Open-Meteo, que não precisa de chave.
 //
 // Base de conhecimento do chat (opcional): no KV "aluos", crie a chave "conhecimento" com qualquer texto
 // (sobre você, seus projetos, respostas prontas). O chat lê esse texto em toda conversa. Dá pra editar pelo painel, sem novo deploy.
@@ -40,13 +47,17 @@ letras minúsculas, sem markdown, emoji só de vez em quando. Responda no idioma
 Pode ajudar com qualquer coisa que um assistente ajudaria: dúvidas de programação, explicar um conceito, revisar um trecho
 de código, dar ideia, conversar. Seja útil de verdade: responda a pergunta, não fuja dela.
 Em dúvidas de programação pode passar das 3 frases (até umas 8 linhas) e mostrar um exemplo curto de código,
-uma instrução por linha, sem cercas de markdown. Exemplo:
-pessoa: como crio uma classe em c#?
-você: é só usar a palavra class:
+uma instrução por linha, sem cercas de markdown. Por exemplo, se perguntarem como criar uma classe em C#,
+uma boa resposta é (sem as aspas):
+"é só usar a palavra class:
 public class Pessoa {
     public string Nome { get; set; }
 }
-depois é só fazer: var p = new Pessoa { Nome = "Ana" };
+depois é só fazer: var p = new Pessoa { Nome = "Ana" };"
+
+Regra mais importante: escreva só a SUA próxima mensagem e pare. Nunca escreva a fala da outra pessoa,
+nunca simule a conversa continuando, nunca comece linhas com "pessoa:", "visitante:", "você:" ou "aluísio:".
+Não repita o que você já disse antes na conversa.
 Quando o assunto for o Aluísio, use só os fatos abaixo e a base de conhecimento, e não invente nada.
 
 Sobre ele:
@@ -61,6 +72,22 @@ Sobre ele:
 Se não souber algo sobre a vida dele, diga que prefere responder pessoalmente no LinkedIn.`;
 
 const JOGOS = ["velha", "voador", "ritmo"];
+// a IA às vezes continua a conversa sozinha ("pessoa: ... você: ..."): corta isso
+const PARAR = ["\npessoa:", "\nvisitante:", "\nvocê:", "\nuser:", "\nPessoa:"];
+function so_minha_fala(txt) {
+  const linhas = String(txt || "").replace(/^\s*(você|voce|aluísio|aluisio|aluisio\.dev)\s*:\s*/i, "").split("\n");
+  const fim = linhas.findIndex((l, i) => i > 0 && /^\s*(pessoa|visitante|você|voce|user|usuário|aluísio|aluisio|aluisio\.dev)\s*:/i.test(l));
+  return (fim > 0 ? linhas.slice(0, fim) : linhas).join("\n").trim().slice(0, 1500);
+}
+// guarda respostas de APIs de fora por alguns minutos (cache grátis da Cloudflare, sem gastar o KV)
+async function comCache(chave, segundos, buscar) {
+  const c = caches.default, k = new Request("https://cache.aluos/" + encodeURIComponent(chave));
+  const hit = await c.match(k);
+  if (hit) return hit.json();
+  const dado = await buscar();
+  if (dado) await c.put(k, new Response(JSON.stringify(dado), { headers: { "Cache-Control": "max-age=" + segundos } }));
+  return dado;
+}
 const limpa = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
 
 export default {
@@ -128,13 +155,16 @@ export default {
       const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-12)
         .map((m) => ({ de: m.de === "visitante" ? "user" : "model", texto: limpa(m.texto, 800) })).filter((m) => m.texto);
       while (hist.length && hist[0].de !== "user") hist.shift();
+      // o site manda uma entrada por linha; a IA entende melhor uma mensagem por vez de cada lado
+      for (let i = hist.length - 1; i > 0; i--) if (hist[i].de === hist[i - 1].de) { hist[i - 1].texto += "\n" + hist[i].texto; hist.splice(i, 1); }
+      if (hist.length && hist[hist.length - 1].de === "user") hist.pop();
       const extra = db ? (await db.get("conhecimento")) || "" : "";
       const sistema = PERSONA + (extra ? "\n\nBase de conhecimento (escrita pelo Aluísio, use como verdade):\n" + extra.slice(0, 12000) : "")
         + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
       let resposta = "", via = "";
       if (env.GEMINI_API_KEY) {
         const modelo = env.GEMINI_MODEL || "gemini-2.5-flash";
-        const config = { maxOutputTokens: 400, temperature: 0.7 };
+        const config = { maxOutputTokens: 350, temperature: 0.6, stopSequences: PARAR };
         if (modelo.startsWith("gemini-2.5")) config.thinkingConfig = { thinkingBudget: 0 }; // sem "pensar": resposta rápida e não gasta a cota
         try {
           const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
@@ -148,13 +178,74 @@ export default {
         try {
           const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ model: env.GROQ_MODEL || "llama-3.3-70b-versatile", max_tokens: 400, temperature: 0.7,
+            body: JSON.stringify({ model: env.GROQ_MODEL || "llama-3.3-70b-versatile", max_tokens: 350, temperature: 0.6, stop: PARAR.slice(0, 4),
               messages: [{ role: "system", content: sistema }, ...hist.map((m) => ({ role: m.de === "user" ? "user" : "assistant", content: m.texto })), { role: "user", content: msg }] }),
           });
           if (r.ok) { const j = await r.json(); resposta = j.choices?.[0]?.message?.content?.trim() || ""; via = "groq"; }
         } catch {}
       }
+      resposta = so_minha_fala(resposta);
       return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);
+    }
+
+    // ---------- DogHub: estatísticas reais do GitHub (guardadas por 1 hora) ----------
+    if (rota === "/github") {
+      const user = env.GITHUB_USER || "aluisiodev";
+      const dado = await comCache("github:" + user, 3600, async () => {
+        const h = { "User-Agent": "aluOS-worker", Accept: "application/vnd.github+json", ...(env.GITHUB_TOKEN ? { Authorization: "Bearer " + env.GITHUB_TOKEN } : {}) };
+        const u = await fetch(`https://api.github.com/users/${user}`, { headers: h });
+        if (!u.ok) return null;
+        const perfil = await u.json();
+        const repos = await (await fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed&type=owner`, { headers: h })).json();
+        const meus = (Array.isArray(repos) ? repos : []).filter((r) => !r.fork);
+        const ling = {};
+        meus.forEach((r) => { if (r.language) ling[r.language] = (ling[r.language] || 0) + 1; });
+        const res = {
+          perfil: { nome: perfil.name, login: perfil.login, bio: perfil.bio, avatar: perfil.avatar_url, seguidores: perfil.followers, seguindo: perfil.following, repos: perfil.public_repos, desde: perfil.created_at, url: perfil.html_url },
+          estrelas: meus.reduce((a, r) => a + r.stargazers_count, 0),
+          forks: meus.reduce((a, r) => a + r.forks_count, 0),
+          linguagens: Object.entries(ling).sort((a, b) => b[1] - a[1]).slice(0, 6),
+          recentes: meus.slice(0, 6).map((r) => ({ nome: r.name, desc: r.description, lang: r.language, estrelas: r.stargazers_count, atualizado: r.pushed_at, url: r.html_url })),
+        };
+        // com GITHUB_TOKEN dá pra trazer o gráfico de contribuições do último ano
+        if (env.GITHUB_TOKEN) {
+          try {
+            const q = `query { user(login: "${user}") { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } } } } }`;
+            const g = await (await fetch("https://api.github.com/graphql", { method: "POST", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) })).json();
+            const cal = g.data.user.contributionsCollection.contributionCalendar;
+            res.contribuicoes = { total: cal.totalContributions, semanas: cal.weeks.map((w) => w.contributionDays.map((d) => d.contributionCount)) };
+          } catch {}
+        }
+        return res;
+      });
+      return dado ? json(dado) : json({ erro: "GitHub não respondeu" }, 502);
+    }
+
+    // ---------- musikzify: o que o Aluísio está ouvindo agora (Last.fm) ----------
+    if (rota === "/lastfm") {
+      if (!env.LASTFM_API_KEY || !env.LASTFM_USER) return json({ erro: "Last.fm não configurado" }, 404);
+      const dado = await comCache("lastfm:" + env.LASTFM_USER, 45, async () => {
+        const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(env.LASTFM_USER)}&api_key=${env.LASTFM_API_KEY}&format=json&limit=6`);
+        if (!r.ok) return null;
+        const lista = ((await r.json()).recenttracks?.track || []).map((t) => ({
+          nome: t.name, artista: t.artist?.["#text"] || "", album: t.album?.["#text"] || "", url: t.url,
+          capa: (t.image || []).map((i) => i["#text"]).filter(Boolean).pop() || "",
+          agora: t["@attr"]?.nowplaying === "true", quando: t.date ? Number(t.date.uts) * 1000 : Date.now(),
+        }));
+        return { usuario: env.LASTFM_USER, tocando: lista[0] && lista[0].agora ? lista[0] : null, recentes: lista.filter((t) => !t.agora).slice(0, 5) };
+      });
+      return dado ? json(dado) : json({ erro: "Last.fm não respondeu" }, 502);
+    }
+
+    // ---------- climaselva: tempo real (Open-Meteo, sem chave) ----------
+    if (rota === "/clima") {
+      const lat = Number(url.searchParams.get("lat")), lon = Number(url.searchParams.get("lon"));
+      if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return json({ erro: "lat/lon inválidos" }, 400);
+      const dado = await comCache(`clima:${lat.toFixed(2)},${lon.toFixed(2)}`, 600, async () => {
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
+        return r.ok ? r.json() : null;
+      });
+      return dado ? json(dado) : json({ erro: "Open-Meteo não respondeu" }, 502);
     }
 
     // ---------- musikzify: playlist do Spotify com capas, guardada por 1 hora ----------

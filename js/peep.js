@@ -186,6 +186,32 @@ class Programa
       out = $(".po-txt"), stdinEl = $(".po-in textarea"), psf = $(".ps-f"), btnRun = $(".peep-run"), btnStop = $(".peep-stop");
     const abertos = []; let atual = null, rodando = false, timerParar = null, runs = 0;
 
+    // ---------- versão celular: arquivos numa gaveta, teclas de símbolos e saída que sobe ----------
+    const MOBILE = !!(ctx && ctx.mobile), pe = $(".peep");
+    if (MOBILE) {
+      pe.classList.add("mob");
+      $(".menubar").insertAdjacentHTML("afterbegin", `<button class="peep-arqs" type="button">☰ ${T("Arquivos", "Files")}</button>`);
+      $(".peep-arqs").onclick = () => pe.classList.toggle("arv");
+      $(".peep-main").insertAdjacentHTML("beforeend", `<button class="peep-veu" type="button" aria-label="${T("Fechar arquivos", "Close files")}"></button>`);
+      $(".peep-veu").onclick = () => pe.classList.remove("arv");
+      const TECLAS = [["⇥", "    "], ["{"], ["}"], ["("], [")"], ["["], ["]"], [";"], ['"'], ["="], ["<"], [">"], ["."], [","], [":"], ["_"], ["+"], ["-"], ["*"], ["/"], ["!"], ["&"], ["|"], ["↶", null]];
+      $(".peep-code").insertAdjacentHTML("afterend", `<div class="peep-teclas">${TECLAS.map(([k], i) => `<button type="button" data-i="${i}">${esc(k)}</button>`).join("")}</div>`);
+      $(".peep-teclas").querySelectorAll("button").forEach((b) => {
+        b.addEventListener("pointerdown", (e) => e.preventDefault()); // mantém o teclado aberto
+        b.onclick = () => {
+          const [k, ins] = TECLAS[+b.dataset.i];
+          if (!editavel(atual)) return;
+          if (ins === null) { cm ? cm.undo() : document.execCommand("undo"); return; }
+          const txt = ins || k;
+          if (cm) { cm.replaceSelection(txt, "end"); cm.focus(); }
+          else { ta.setRangeText(txt, ta.selectionStart, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); ta.focus(); }
+        };
+      });
+      $(".po-h span").insertAdjacentHTML("beforeend", " ▴");
+      $(".po-h span").onclick = () => pe.classList.toggle("saida");
+      [".peep-run", ".peep-commit"].forEach((sel) => $(sel).addEventListener("click", () => pe.classList.add("saida")));
+    }
+
     const conteudo = (id) => (id === LIVRO ? livro : id.startsWith("meus-codigos/") ? meus[id.slice(13)] : RO[id]);
     const editavel = (id) => id === LIVRO || id.startsWith("meus-codigos/");
 
@@ -240,7 +266,7 @@ class Programa
       if (cm || !window.CodeMirror || !el.isConnected) return;
       const caixa = $(".peep-code"); caixa.innerHTML = ""; caixa.classList.add("cm");
       cm = window.CodeMirror(caixa, {
-        lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, smartIndent: true, lineWrapping: false, theme: "peep",
+        lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, smartIndent: true, lineWrapping: MOBILE, theme: "peep",
         extraKeys: {
           "Ctrl-Enter": () => executar(), "Cmd-Enter": () => executar(),
           "Ctrl-S": () => salvarAtalho(), "Cmd-S": () => salvarAtalho(),
@@ -273,6 +299,7 @@ class Programa
 
     function abrir(id) {
       if (conteudo(id) == null) id = "Aluisio.cs";
+      pe.classList.remove("arv");
       atual = id;
       if (!abertos.includes(id)) abertos.push(id);
       tabs.innerHTML = abertos.map((n) => `<button class="pt-tab ${n === id ? "on" : ""}" data-f="${esc(n)}">${esc(n.split("/").pop())}</button>`).join("");

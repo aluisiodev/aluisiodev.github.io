@@ -163,7 +163,7 @@ Agradeço à UNIP pela oportunidade, aos meus colegas pela parceria e a todos os
 // goatcounter: o código do seu site no GoatCounter (ex.: "aluisio" para aluisio.goatcounter.com).
 //      Crie a conta grátis em https://www.goatcounter.com/signup e cole o código aqui.
 window.ALU.CONFIG = {
-  api: "",
+  api: "https://aluos.aluisioalves6.workers.dev",
   goatcounter: "aluisio",
   chatApi: "",   // opcional: URL só do chat (se vazio e api estiver preenchida, usa api + "/chat")
   csharpApi: "",

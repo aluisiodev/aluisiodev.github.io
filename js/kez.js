@@ -58,7 +58,35 @@
               ${PROJ.map((p) => `<button class="dh-repo" data-ir="doghub.com/aluisiodev/${repoDe(p)}"><strong>${esc(repoDe(p))}</strong><p>${esc(p.resumo)}</p><small><i style="background:${p.cor[0]}"></i>${esc(p.stack[0])}</small></button>`).join("")}
             </section>
           </div>
+          <section class="dh-stats" hidden></section>
         </div>`,
+      // estatísticas reais do GitHub, pelo servidor do aluOS
+      init: (view) => {
+        const api = ALU.CONFIG && ALU.CONFIG.api, box = view.querySelector(".dh-stats");
+        if (!api || !box) return;
+        let vivo = true;
+        const CORES = { TypeScript: "#3178c6", JavaScript: "#f1e05a", "C#": "#178600", Go: "#00ADD8", Python: "#3572A5", HTML: "#e34c26", CSS: "#563d7c", Java: "#b07219", Shell: "#89e051" };
+        const quando = (iso) => { const d = Math.max(0, Math.round((Date.now() - new Date(iso)) / 864e5)); return d === 0 ? "hoje" : d === 1 ? "ontem" : d < 30 ? `há ${d} dias` : d < 365 ? `há ${Math.round(d / 30)} meses` : `há ${Math.round(d / 365)} anos`; };
+        fetch(String(api).replace(/\/+$/, "") + "/github").then((r) => (r.ok ? r.json() : null)).then((g) => {
+          if (!vivo || !g || !g.perfil) return;
+          const totL = g.linguagens.reduce((a, [, n]) => a + n, 0) || 1;
+          const desde = g.perfil.desde ? new Date(g.perfil.desde).getFullYear() : "";
+          const contrib = g.contribuicoes ? `<div class="dh-contrib"><h3>${g.contribuicoes.total} contribuições no último ano</h3><div class="dh-graf">${g.contribuicoes.semanas.map((w) => `<div>${w.map((n) => `<i class="n${n === 0 ? 0 : n < 3 ? 1 : n < 6 ? 2 : n < 10 ? 3 : 4}" title="${n}"></i>`).join("")}</div>`).join("")}</div></div>` : "";
+          box.innerHTML = `
+            <h2>📊 Estatísticas reais <small>(direto do GitHub, sem filtro da savana)</small></h2>
+            <div class="dh-nums">
+              <div><b>${g.perfil.repos}</b><span>repositórios</span></div><div><b>${g.estrelas}</b><span>estrelas</span></div>
+              <div><b>${g.perfil.seguidores}</b><span>seguidores</span></div><div><b>${desde}</b><span>no GitHub desde</span></div>
+            </div>
+            ${g.linguagens.length ? `<div class="dh-ling"><div class="dh-barra">${g.linguagens.map(([l, n]) => `<i style="flex:${n};background:${CORES[l] || "#8b949e"}" title="${esc(l)}"></i>`).join("")}</div>
+              <ul>${g.linguagens.map(([l, n]) => `<li><i style="background:${CORES[l] || "#8b949e"}"></i>${esc(l)} <span>${Math.round((n / totL) * 100)}%</span></li>`).join("")}</ul></div>` : ""}
+            ${contrib}
+            <h3>Mexeu por último</h3>
+            <ul class="dh-rec">${g.recentes.map((r) => `<li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.nome)} ↗</a><p>${esc(r.desc || "Sem descrição (ainda).")}</p><small>${r.lang ? `<i style="background:${CORES[r.lang] || "#8b949e"}"></i>${esc(r.lang)} · ` : ""}★ ${r.estrelas} · atualizado ${quando(r.atualizado)}</small></li>`).join("")}</ul>`;
+          box.hidden = false;
+        }).catch(() => {});
+        return () => { vivo = false; };
+      },
     },
     {
       re: /^doghub\.com\/aluisiodev\/([\w.-]+)\/?$/, titulo: (m) => `aluisiodev/${m[1]} · DogHub`,

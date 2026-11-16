@@ -141,6 +141,7 @@
           <div class="mz-hero"><div class="mz-capa"><img src="${esc(P.foto)}" alt=""><i>♫</i></div>
             <div><small>PLAYLIST PÚBLICA</small><h1>favs oat</h1><p>O que toca no monitor esquerdo enquanto eu programo. De Cartola a Joji, de Terno Rei a System Of A Down.</p>
             <p class="mz-quem"><img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${FAIXAS.length} músicas</p></div></div>
+          <div class="mz-agora" hidden></div>
           <div class="mz-acoes"><button class="mz-play" aria-label="Tocar">▶</button><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Sair da savana: ouvir no Spotify ↗</a></div>
           <div class="mz-player" hidden><iframe title="Prévia no Spotify" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
           <p class="mz-aviso" hidden>Nesta prévia o navegador não deixa o player do Spotify aparecer. Clique numa música para ouvir no Spotify, ou abra o site publicado.</p>
@@ -181,6 +182,24 @@
       }).catch(() => {});
       if (!bloqueado) abrirPlayer(); else aviso.hidden = false;
       conq("musikzify", "Trilha sonora", "Abriu a playlist no musikzify.");
+      // "tocando agora": o que o Aluísio está ouvindo de verdade (Last.fm, pelo servidor do aluOS)
+      const agora = view.querySelector(".mz-agora");
+      const ha = (ms) => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? "agora há pouco" : m < 60 ? `há ${m} min` : m < 1440 ? `há ${Math.round(m / 60)} h` : `há ${Math.round(m / 1440)} dias`; };
+      const lastfm = () => {
+        if (!api || !view.isConnected) return;
+        fetch(String(api).replace(/\/+$/, "") + "/lastfm").then((r) => (r.ok ? r.json() : null)).then((j) => {
+          if (!j || !view.isConnected) return;
+          const t = j.tocando || (j.recentes || [])[0];
+          if (!t) return;
+          agora.innerHTML = `${t.capa ? `<img src="${esc(t.capa)}" alt="">` : `<span class="mz-sem">♫</span>`}
+            <div><small>${j.tocando ? `<span class="mz-eq"><i></i><i></i><i></i></span> ${esc(P.nome)} está ouvindo agora` : `Última que ${esc(P.nome)} ouviu · ${ha(t.quando)}`}</small>
+            <b>${esc(t.nome)}</b><span>${esc(t.artista)}</span></div>
+            <a href="${esc(t.url)}" target="_blank" rel="noopener" class="mz-lfm">Last.fm ↗</a>`;
+          agora.classList.toggle("ao-vivo", !!j.tocando); agora.hidden = false;
+        }).catch(() => {});
+      };
+      lastfm();
+      const tLfm = setInterval(() => (view.isConnected ? lastfm() : clearInterval(tLfm)), 60000);
     },
   });
 
@@ -270,7 +289,7 @@
       const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0];
       return `
       <div class="cl">
-        <header class="cl-top">${icCl}<b>Clima da ${esc(c[1])}</b><label class="cl-sel">Estado: <select aria-label="Escolher estado">${CIDADES.map((x) => `<option value="${x[0]}" ${x === c ? "selected" : ""}>${x[0]} · ${esc(x[2])}</option>`).join("")}</select></label></header>
+        <header class="cl-top">${icCl}<b>Clima da ${esc(c[1])}</b><label class="cl-sel">Estado: <select aria-label="Escolher estado">${CIDADES.map((x) => `<option value="${x[0]}" ${x === c ? "selected" : ""}>${x[0]} · ${esc(x[2])}</option>`).join("")}</select></label><button class="cl-loc" type="button">📍 Usar minha localização</button></header>
         <div class="cl-agora"><div class="cl-ic">⏳</div><div><small>${esc(c[1])} (${esc(c[2])}, ${c[0]}) · agora</small><h1 class="cl-t">--°C</h1><p class="cl-c">Consultando os pombos…</p></div>
           <ul class="cl-extra"><li>💧 Umidade: <b class="cl-u">--</b></li><li>💨 Vento: <b class="cl-v">--</b></li><li>✨ ${esc(c[5].split(":")[0])}:<b>${esc(c[5].split(":").slice(1).join(":") || "")}</b></li></ul></div>
         <div class="cl-semana"></div>
@@ -290,11 +309,30 @@
         view.querySelector(".cl-fonte").textContent = real ? "Dados reais de Open-Meteo.com. As piadas são por nossa conta." : "Sem conexão com os satélites. Estes números foram chutados por um pombo experiente.";
       };
       const falso = () => { const h = new Date(); return { temp: 22, code: 51, umid: 81, vento: 9, dias: [0, 1, 2, 3, 4].map((i) => ({ dia: i ? DIAS[(h.getDay() + i) % 7] : "hoje", code: [51, 3, 61, 2, 80][i], max: [24, 26, 21, 27, 23][i], min: [16, 17, 15, 18, 16][i] })) }; };
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c[3]}&longitude=${c[4]}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`)
+      // tempo real: Open-Meteo direto; se o navegador bloquear, pelo servidor do aluOS; se nada der, o pombo chuta
+      const api = ALU.CONFIG && ALU.CONFIG.api;
+      const buscar = (lat, lon) => fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`)
         .then((r) => r.ok ? r.json() : Promise.reject())
+        .catch(() => api ? fetch(`${String(api).replace(/\/+$/, "")}/clima?lat=${lat}&lon=${lon}`).then((r) => r.ok ? r.json() : Promise.reject()) : Promise.reject());
+      const carregar = (lat, lon) => buscar(lat, lon)
         .then((j) => pintar({ temp: j.current.temperature_2m, code: j.current.weather_code, umid: j.current.relative_humidity_2m, vento: j.current.wind_speed_10m,
           dias: j.daily.time.map((t, i) => ({ dia: i ? DIAS[new Date(t + "T12:00").getDay()] : "hoje", code: j.daily.weather_code[i], max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i] })) }, true))
         .catch(() => pintar(falso(), false));
+      carregar(c[3], c[4]);
+      const loc = view.querySelector(".cl-loc");
+      if (loc) {
+        if (!navigator.geolocation) loc.hidden = true;
+        loc.onclick = () => {
+          loc.disabled = true; loc.textContent = "📍 procurando você…";
+          navigator.geolocation.getCurrentPosition((pos) => {
+            if (!vivo) return;
+            const lat = pos.coords.latitude.toFixed(2), lon = pos.coords.longitude.toFixed(2);
+            view.querySelector(".cl-agora small").textContent = `Onde você está (${lat}, ${lon}) · agora`;
+            loc.textContent = "📍 Sua localização"; carregar(lat, lon);
+            conq("clima-local", "Previsão sob medida", "Viu o clima de onde você está no climaselva.");
+          }, () => { loc.disabled = false; loc.textContent = "📍 Não deu. Tentar de novo"; }, { timeout: 10000, maximumAge: 600000 });
+        };
+      }
       return () => { vivo = false; };
     },
   });
