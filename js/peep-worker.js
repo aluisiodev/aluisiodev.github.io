@@ -7,7 +7,9 @@ async function carregarPython() {
   if (py) return py;
   out("Carregando Python (só na primeira vez, uns segundos)…\n", "info");
   importScripts("vendor/pyodide/pyodide.js");
-  py = await loadPyodide({ indexURL: new URL("vendor/pyodide/", location.href).href });
+  const base = new URL("vendor/pyodide/", location.href).href;
+  // a biblioteca padrão é um .zip; está com extensão .wasm só para qualquer servidor estático entregar sem frescura
+  py = await loadPyodide({ indexURL: base, stdLibURL: base + "python_stdlib.wasm" });
   return py;
 }
 
