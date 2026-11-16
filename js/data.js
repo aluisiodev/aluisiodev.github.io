@@ -155,6 +155,17 @@ Nos dias 28, 29 e 30 de setembro, tive a oportunidade de atuar como instrutor na
 💡 Participar dessa experiência foi uma oportunidade de desenvolver ainda mais minhas habilidades de comunicação, colaboração e compartilhamento de conhecimento técnico, além de contribuir para o aprendizado de outros estudantes e incentivar o interesse pela tecnologia.
 
 Agradeço à UNIP pela oportunidade, aos meus colegas pela parceria e a todos os participantes pelo envolvimento ao longo dos três dias de oficina. Ensinar também é uma forma de aprender, evoluir e transformar conhecimento em novas possibilidades!`,
+    // versão em inglês do site (tradução do post)
+    tituloEn: "Technology student · UNIP", quandoEn: "Sep 2025",
+    textoEn: `🚀 Sharing knowledge and fostering innovation at UNIP's Integrated Technology Week!
+
+On September 28, 29 and 30, I had the opportunity to work as an instructor in the workshop “Programming and Electronics with Tinkercad”, during UNIP's Integrated Technology Week, alongside Aluísio Alves, Erick Carvalho and Enzo Orlandi.
+
+🤖 The workshop was fully hands-on, combining theory on the whiteboard with demos in Tinkercad and individual activities on the computers. That way, participants could follow the concepts presented and apply them in practice, exploring programming and electronics features in a simulation environment.
+
+💡 Being part of this experience was a chance to further develop my communication, collaboration and technical knowledge-sharing skills, while also helping other students learn and sparking their interest in technology.
+
+Thanks to UNIP for the opportunity, to my colleagues for the partnership and to all participants for their engagement throughout the three days of the workshop. Teaching is also a way to learn, grow and turn knowledge into new possibilities!`,
   },
 ];
 
@@ -163,7 +174,7 @@ Agradeço à UNIP pela oportunidade, aos meus colegas pela parceria e a todos os
 // goatcounter: o código do seu site no GoatCounter (ex.: "aluisio" para aluisio.goatcounter.com).
 //      Crie a conta grátis em https://www.goatcounter.com/signup e cole o código aqui.
 window.ALU.CONFIG = {
-  api: "",
+  api: "https://aluos.aluisioalves6.workers.dev",
   goatcounter: "aluisio",
   chatApi: "",   // opcional: URL só do chat (se vazio e api estiver preenchida, usa api + "/chat")
   csharpApi: "",

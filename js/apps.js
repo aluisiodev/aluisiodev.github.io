@@ -76,7 +76,7 @@
     const abrirItem = (it) => (it.href ? window.open(it.href, "_blank", "noopener") : ctx.abrir(it.abre, it.arg));
     el.querySelectorAll(".f-item").forEach((b) => {
       const it = itens[+b.dataset.i];
-      b.addEventListener("click", () => { el.querySelectorAll(".f-item.sel").forEach((x) => x.classList.remove("sel")); b.classList.add("sel"); });
+      b.addEventListener("click", () => { el.querySelectorAll(".f-item.sel").forEach((x) => x.classList.remove("sel")); b.classList.add("sel"); if (ctx.mobile) abrirItem(it); });
       b.addEventListener("dblclick", () => abrirItem(it));
       b.addEventListener("keydown", (e) => e.key === "Enter" && abrirItem(it));
     });
@@ -153,6 +153,11 @@
     ['console.log("aqui").js', 'console.log("aqui");\nconsole.log("aqui 2");\nconsole.log("AQUI PELO AMOR");\n// funcionou e eu não sei por quê'],
     ["segredo.txt", "Se você chegou até aqui, tenta digitar quack em qualquer lugar.\nOu savana.\nOu aquele código antigo com as setas…"],
   ];
+  if (ALU.lang === "en") LIXO.splice(0, LIXO.length,
+    ["yesterdays-bugs.txt", "1. button doesn't click\n2. button clicks twice\n3. button clicks by itself at 3 AM\n\nstatus: it's a feature now."],
+    ["TODO-final-final-v3.md", "- [x] finish the portfolio\n- [ ] actually finish the portfolio\n- [ ] stop tweaking the portfolio"],
+    ['console.log("here").js', 'console.log("here");\nconsole.log("here 2");\nconsole.log("HERE FOR THE LOVE OF GOD");\n// it worked and I don\'t know why'],
+    ["secret.txt", "If you made it this far, try typing quack anywhere.\nOr savana.\nOr that old code with the arrow keys…"]);
   function renderLixeira(el) {
     el.innerHTML = `<div class="pad">
       <p>${LIXO.length} itens · clique para espiar</p>

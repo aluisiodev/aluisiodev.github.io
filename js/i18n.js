@@ -2,7 +2,7 @@
 // O idioma vem de localStorage ("alu.lang"); na primeira visita segue o idioma do navegador.
 // 1) Troca o conteúdo do data.js (perfil, projetos, cursos, quarto) pela versão em inglês.
 // 2) Traduz os textos fixos da interface (menus, janelas, botões) por um dicionário.
-// Os sites parodiados do Kez(i)avana continuam em português de propósito: são piadas locais.
+// 3) Os sites do Kez(i)avana, os jogos e o terminal usam o dicionário de js/i18n-sites.js (ALU.i18nMais).
 (function () {
   const ALU = (window.ALU = window.ALU || {});
   let lang = null;
@@ -97,7 +97,7 @@
     "O quarto_360 dá pra girar com o mouse. Os monitores têm links.": "You can spin quarto_360 with the mouse. The monitors have links.",
     "A playlist inteira está no musikzify, lá no Kez(i)avana.": "The whole playlist is on musikzify, in Kez(i)avana.",
     "O Painel de controle mostra quantas conquistas você já achou.": "The Control panel shows how many achievements you've found.",
-    "Dica secreta: o terminal conhece mais comandos do que o 'ajuda' mostra.": "Secret tip: the terminal knows more commands than 'ajuda' shows.",
+    "Dica secreta: o terminal conhece mais comandos do que o 'ajuda' mostra.": "Secret tip: the terminal knows more commands than 'help' shows.",
     "Me desafia no Jogo da velha do clicajogos. Eu não perco fácil. 😏": "Challenge me at tic-tac-toe on clicajogos. I don't lose easily. 😏",
     "Conquista desbloqueada": "Achievement unlocked", "Idioma": "Language",
     "Pesquise na savana ou digite um endereço": "Search the savanna or type an address",
@@ -115,14 +115,17 @@
     for (const [re, f] of RX) { const m = k.match(re); if (m) return t.replace(k, f(...m)); }
     return null;
   };
-  const PULA = ".cj,.al,.mz,.eb,.cl,.yk,.wk,.lf-wrap,.chat-log,.term-out,.peep-code,.src,textarea,script,style";
+  // mais traduções (sites, jogos, terminal) chegam por aqui
+  ALU.i18nMais = (dic, rx) => { Object.assign(D, dic || {}); (rx || []).forEach((r) => RX.push(r)); };
+  // não traduz o que a pessoa ou o bot escrevem, nem código
+  const PULA = ".chat-log,.peep-code,.src,script,style,.sms-log,.no-tr";
   function traduzir(raiz) {
-    if (raiz.nodeType === 3) { if (raiz.parentElement && raiz.parentElement.closest(PULA)) return; const r = tr(raiz.nodeValue); if (r !== null && r !== raiz.nodeValue) raiz.nodeValue = r; return; }
+    if (raiz.nodeType === 3) { if (raiz.parentElement && (raiz.parentElement.closest(PULA) || raiz.parentElement.tagName === "TEXTAREA")) return; const r = tr(raiz.nodeValue); if (r !== null && r !== raiz.nodeValue) raiz.nodeValue = r; return; }
     if (raiz.nodeType !== 1 || (raiz.closest && raiz.closest(PULA))) return;
     const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => (n.nodeType === 1 && n.matches(PULA) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     let n = raiz;
     do {
-      if (n.nodeType === 3) { const r = tr(n.nodeValue); if (r !== null && r !== n.nodeValue) n.nodeValue = r; }
+      if (n.nodeType === 3) { if (n.parentElement && n.parentElement.tagName === "TEXTAREA") continue; const r = tr(n.nodeValue); if (r !== null && r !== n.nodeValue) n.nodeValue = r; }
       else for (const a of ["placeholder", "title", "aria-label"]) { const v = n.getAttribute(a); if (v) { const r = tr(v); if (r !== null && r !== v) n.setAttribute(a, r); } }
     } while ((n = w.nextNode()));
   }

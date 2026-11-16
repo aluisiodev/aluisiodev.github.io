@@ -39,12 +39,12 @@ var visita = new Visita
   };
   const extDe = (n) => (n.match(/\.(\w+)$/) || [])[1] || "";
   const MODELOS = {
-    py: (n) => `# ${n}.py\nnome = input("Qual é o seu nome? ")\nprint(f"Olá, {nome or 'visitante'}!")\n`,
-    js: (n) => `// ${n}.js\nconst nome = prompt("Qual é o seu nome?") || "visitante";\nconsole.log(\`Olá, \${nome}!\`);\n`,
-    cs: (n) => `// ${n}.cs\nusing System;\n\nclass Programa\n{\n    static void Main()\n    {\n        Console.Write("Qual é o seu nome? ");\n        string nome = Console.ReadLine();\n        Console.WriteLine($"Olá, {nome}!");\n    }\n}\n`,
+    py: (n) => T(`# ${n}.py\nnome = input("Qual é o seu nome? ")\nprint(f"Olá, {nome or 'visitante'}!")\n`, `# ${n}.py\nname = input("What's your name? ")\nprint(f"Hi, {name or 'visitor'}!")\n`),
+    js: (n) => T(`// ${n}.js\nconst nome = prompt("Qual é o seu nome?") || "visitante";\nconsole.log(\`Olá, \${nome}!\`);\n`, `// ${n}.js\nconst name = prompt("What's your name?") || "visitor";\nconsole.log(\`Hi, \${name}!\`);\n`),
+    cs: (n) => `// ${n}.cs\nusing System;\n\nclass Programa\n{\n    static void Main()\n    {\n        Console.Write("Qual é o seu nome? ");\n        string nome = Console.ReadLine();\n        Console.WriteLine($"Olá, {nome}!");\n    }\n}\n`.replace(/Programa|Qual é o seu nome\? |nome|Olá/g, (x) => (ALU.lang === "en" ? { Programa: "Program", "Qual é o seu nome? ": "What's your name? ", nome: "name", "Olá": "Hi" }[x] : x)),
   };
   const EXEMPLOS = {
-    "ola.py": `# Python de verdade, rodando no seu navegador (Pyodide).
+    "ola.py": T(`# Python de verdade, rodando no seu navegador (Pyodide).
 nome = input("Qual é o seu nome? ")
 print(f"Olá, {nome or 'visitante'}! Bem-vindo à savana 🦒")
 
@@ -54,15 +54,31 @@ for i in range(1, 4):
 bichos = {"girafa": 3, "zebra": 5, "pato roxo": 1}
 maior = max(bichos, key=bichos.get)
 print(f"Tem mais {maior} do que qualquer outro bicho.")
-`,
-    "ola.js": `// JavaScript rodando num worker isolado (um loop infinito não trava o aluOS).
+`, `# Real Python, running in your browser (Pyodide).
+name = input("What's your name? ")
+print(f"Hi, {name or 'visitor'}! Welcome to the savanna 🦒")
+
+for i in range(1, 4):
+    print("quack " * i)
+
+animals = {"giraffe": 3, "zebra": 5, "purple duck": 1}
+most = max(animals, key=animals.get)
+print(f"There are more of the {most} than any other animal.")
+`),
+    "ola.js": T(`// JavaScript rodando num worker isolado (um loop infinito não trava o aluOS).
 const bichos = ["girafa", "zebra", "leão", "pato roxo"];
 bichos.forEach((b, i) => console.log(\`\${i + 1}. \${b}\`));
 
 const fib = (n) => (n < 2 ? n : fib(n - 1) + fib(n - 2));
 console.log("fib(20) =", fib(20));
-`,
-    "Ola.cs": `using System;
+`, `// JavaScript running in an isolated worker (an infinite loop won't freeze aluOS).
+const animals = ["giraffe", "zebra", "lion", "purple duck"];
+animals.forEach((a, i) => console.log(\`\${i + 1}. \${a}\`));
+
+const fib = (n) => (n < 2 ? n : fib(n - 1) + fib(n - 2));
+console.log("fib(20) =", fib(20));
+`),
+    "Ola.cs": T(`using System;
 using System.Collections.Generic;
 
 class Programa
@@ -84,27 +100,49 @@ class Programa
         return total;
     }
 }
-`,
+`, `using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Hello from C#!");
+        var animals = new List<string> { "giraffe", "zebra", "duck" };
+        animals.Add("lion");
+        foreach (var a in animals)
+            Console.WriteLine($"- {a.ToUpper()}");
+        Console.WriteLine($"Sum from 1 to 10: {Sum(10)}");
+    }
+
+    static int Sum(int n)
+    {
+        int total = 0;
+        for (int i = 1; i <= n; i++) total += i;
+        return total;
+    }
+}
+`),
   };
 
   function arquivosAluisio() {
     const cs = [
       "using Savana.Dev;", "", "namespace Portfolio;", "",
-      "// O arquivo mais importante deste computador.",
+      T("// O arquivo mais importante deste computador.", "// The most important file on this computer."),
       "public class Aluisio : Desenvolvedor", "{",
       `    public string Nome => ${q(P.nome)};`, `    public string Cargo => ${q(P.cargo)};`, `    public string Local => ${q(P.local)};`, "",
       "    public string[] Skills =>", `        [${window.SKILLS.map((s) => q(s.nome)).join(", ")}];`, "",
       "    public string[] Cursos =>", "    [", ...window.CERTIFICADOS.map((c) => `        ${q(c.nome)},`), "    ];", "",
       "    public Projeto[] Projetos =>", "    [", ...PROJ.map((p) => `        new(${q(p.nome)}, ${q(p.stack[0])}),`), "    ];", "",
       "    public static void Main()", "    {", "        var eu = new Aluisio();",
-      '        Console.WriteLine($"Olá! Eu sou o {eu.Nome}.");',
-      '        Console.WriteLine($"{eu.Projetos.Length} projetos na pasta, e contando.");',
-      '        Console.WriteLine("Me chama no MessagerTale! :)");', "    }", "}",
+      T('        Console.WriteLine($"Olá! Eu sou o {eu.Nome}.");', '        Console.WriteLine($"Hi! I\'m {eu.Nome}.");'),
+      T('        Console.WriteLine($"{eu.Projetos.Length} projetos na pasta, e contando.");', '        Console.WriteLine($"{eu.Projetos.Length} projects in the folder, and counting.");'),
+      T('        Console.WriteLine("Me chama no MessagerTale! :)");', '        Console.WriteLine("Ping me on MessagerTale! :)");'), "    }", "}",
     ].join("\n");
-    const readme = [`# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]), "## Projetos", ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`)].join("\n");
+    const readme = [`# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]), T("## Projetos", "## Projects"), ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`)].join("\n");
     const files = { "Aluisio.cs": cs, [LIVRO]: "", "README.md": readme };
     PROJ.forEach((p) => {
-      files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", p.descricao, "", "## Destaques", ...p.destaques.map((d) => `- ${d}`), "", "## Stack", p.stack.join(" · "), "", `Repositório: ${p.repo}`].join("\n");
+      files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", p.descricao, "", T("## Destaques", "## Highlights"), ...p.destaques.map((d) => `- ${d}`), "", "## Stack", p.stack.join(" · "), "", `${T("Repositório", "Repository")}: ${p.repo}`].join("\n");
     });
     return files;
   }
@@ -169,7 +207,7 @@ class Programa
           <aside class="peep-tree"></aside>
           <section class="peep-ed">
             <div class="peep-tabs"></div>
-            <div class="peep-code"><pre class="ln"></pre><div class="ed"><pre class="src"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Editor de código"></textarea></div></div>
+            <div class="peep-code"><pre class="ln"></pre><div class="ed"><pre class="src"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="${T("Editor de código", "Code editor")}"></textarea></div></div>
             <div class="peep-out">
               <div class="po-h"><span>SAÍDA</span><button class="po-limpar" title="Limpar saída">limpar</button></div>
               <div class="po-body"><pre class="po-txt"></pre><label class="po-in"><span>ENTRADA (stdin) · uma linha por input()</span><textarea spellcheck="false" placeholder="ex.: Ana"></textarea></label></div>
@@ -185,6 +223,32 @@ class Programa
     const tree = $(".peep-tree"), tabs = $(".peep-tabs"), ln = $(".ln"), src = $(".src"), ta = $(".ed textarea"),
       out = $(".po-txt"), stdinEl = $(".po-in textarea"), psf = $(".ps-f"), btnRun = $(".peep-run"), btnStop = $(".peep-stop");
     const abertos = []; let atual = null, rodando = false, timerParar = null, runs = 0;
+
+    // ---------- versão celular: arquivos numa gaveta, teclas de símbolos e saída que sobe ----------
+    const MOBILE = !!(ctx && ctx.mobile), pe = $(".peep");
+    if (MOBILE) {
+      pe.classList.add("mob");
+      $(".menubar").insertAdjacentHTML("afterbegin", `<button class="peep-arqs" type="button">☰ ${T("Arquivos", "Files")}</button>`);
+      $(".peep-arqs").onclick = () => pe.classList.toggle("arv");
+      $(".peep-main").insertAdjacentHTML("beforeend", `<button class="peep-veu" type="button" aria-label="${T("Fechar arquivos", "Close files")}"></button>`);
+      $(".peep-veu").onclick = () => pe.classList.remove("arv");
+      const TECLAS = [["⇥", "    "], ["{"], ["}"], ["("], [")"], ["["], ["]"], [";"], ['"'], ["="], ["<"], [">"], ["."], [","], [":"], ["_"], ["+"], ["-"], ["*"], ["/"], ["!"], ["&"], ["|"], ["↶", null]];
+      $(".peep-code").insertAdjacentHTML("afterend", `<div class="peep-teclas">${TECLAS.map(([k], i) => `<button type="button" data-i="${i}">${esc(k)}</button>`).join("")}</div>`);
+      $(".peep-teclas").querySelectorAll("button").forEach((b) => {
+        b.addEventListener("pointerdown", (e) => e.preventDefault()); // mantém o teclado aberto
+        b.onclick = () => {
+          const [k, ins] = TECLAS[+b.dataset.i];
+          if (!editavel(atual)) return;
+          if (ins === null) { cm ? cm.undo() : document.execCommand("undo"); return; }
+          const txt = ins || k;
+          if (cm) { cm.replaceSelection(txt, "end"); cm.focus(); }
+          else { ta.setRangeText(txt, ta.selectionStart, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); ta.focus(); }
+        };
+      });
+      $(".po-h span").insertAdjacentHTML("beforeend", " ▴");
+      $(".po-h span").onclick = () => pe.classList.toggle("saida");
+      [".peep-run", ".peep-commit"].forEach((sel) => $(sel).addEventListener("click", () => pe.classList.add("saida")));
+    }
 
     const conteudo = (id) => (id === LIVRO ? livro : id.startsWith("meus-codigos/") ? meus[id.slice(13)] : RO[id]);
     const editavel = (id) => id === LIVRO || id.startsWith("meus-codigos/");
@@ -225,9 +289,9 @@ class Programa
       form.onsubmit = (e) => {
         e.preventDefault();
         const n = nome.value.trim().replace(/\.(py|js|cs)$/i, ""), ext = tree.querySelector(".pt-ext").value;
-        if (!/^[\w\-À-ú]{1,40}$/.test(n)) { erro.textContent = "Use letras, números, - ou _ (sem espaços)."; return; }
+        if (!/^[\w\-À-ú]{1,40}$/.test(n)) { erro.textContent = T("Use letras, números, - ou _ (sem espaços).", "Use letters, numbers, - or _ (no spaces)."); return; }
         const arq = `${n}.${ext}`;
-        if (meus[arq] != null) { erro.textContent = "Já existe um arquivo com esse nome."; return; }
+        if (meus[arq] != null) { erro.textContent = T("Já existe um arquivo com esse nome.", "A file with that name already exists."); return; }
         meus[arq] = MODELOS[ext](n); salvar(); abrir(caminho(arq));
       };
     }
@@ -240,7 +304,7 @@ class Programa
       if (cm || !window.CodeMirror || !el.isConnected) return;
       const caixa = $(".peep-code"); caixa.innerHTML = ""; caixa.classList.add("cm");
       cm = window.CodeMirror(caixa, {
-        lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, smartIndent: true, lineWrapping: false, theme: "peep",
+        lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, smartIndent: true, lineWrapping: MOBILE, theme: "peep",
         extraKeys: {
           "Ctrl-Enter": () => executar(), "Cmd-Enter": () => executar(),
           "Ctrl-S": () => salvarAtalho(), "Cmd-S": () => salvarAtalho(),
@@ -273,6 +337,7 @@ class Programa
 
     function abrir(id) {
       if (conteudo(id) == null) id = "Aluisio.cs";
+      pe.classList.remove("arv");
       atual = id;
       if (!abertos.includes(id)) abertos.push(id);
       tabs.innerHTML = abertos.map((n) => `<button class="pt-tab ${n === id ? "on" : ""}" data-f="${esc(n)}">${esc(n.split("/").pop())}</button>`).join("");
@@ -281,7 +346,7 @@ class Programa
       else { ta.value = conteudo(id); ta.readOnly = !editavel(id); }
       pintarCodigo(); pintarArvore();
       const ext = extDe(id), L = LINGUAS[ext];
-      psf.textContent = id + " · " + (L ? L.nome : ext === "md" ? "Markdown" : ext.toUpperCase()) + (editavel(id) ? "" : " · só leitura");
+      psf.textContent = id + " · " + (L ? L.nome : ext === "md" ? "Markdown" : ext.toUpperCase()) + (editavel(id) ? "" : T(" · só leitura", " · read-only"));
       btnRun.disabled = !(L || id === "Aluisio.cs") || id === LIVRO || rodando;
       btnRun.title = btnRun.disabled ? "Nada para executar aqui" : "Executar (Ctrl+Enter)";
     }
@@ -333,12 +398,12 @@ class Programa
       rodando = false; clearTimeout(timerParar); btnStop.hidden = true; btnRun.disabled = false;
       escrever(`\n■ ${motivo}\n`, "erro");
     }
-    btnStop.onclick = () => parar("Execução interrompida.");
+    btnStop.onclick = () => parar(T("Execução interrompida.", "Execution stopped."));
 
     async function executar() {
       if (rodando || btnRun.disabled) return;
       runs++;
-      if (runs === 5) setTimeout(() => { escrever("\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs.\n", "aviso"); ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 700);
+      if (runs === 5) setTimeout(() => { escrever(T("\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs.\n", "\n⚠ Warning PEEP0005: the duck evolved. 🦆 → 🦢\nIt now reviews your PRs.\n"), "aviso"); ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 700);
       out.textContent = "";
       if (atual === "Aluisio.cs") {
         escrever("Compilando Aluisio.cs…\n", "info");
@@ -360,11 +425,11 @@ class Programa
           if (r.run.stderr) escrever(r.run.stderr, "erro");
           return terminou(!r.run.code, Math.round(performance.now() - t0), "C# real (.NET)");
         }
-        escrever("Servidor indisponível. Usando o C# de bolso (tradução para JS, só o básico).\n\n", "aviso");
+        escrever(T("Servidor indisponível. Usando o C# de bolso (tradução para JS, só o básico).\n\n", "Server unavailable. Using pocket C# (translated to JS, basics only).\n\n"), "aviso");
       }
 
       const w = worker || novoWorker();
-      const iniciarTimer = () => { clearTimeout(timerParar); timerParar = setTimeout(() => parar("Tempo esgotado (10 s). Tem um loop infinito aí?"), 10000); };
+      const iniciarTimer = () => { clearTimeout(timerParar); timerParar = setTimeout(() => parar(T("Tempo esgotado (10 s). Tem um loop infinito aí?", "Time's up (10 s). Is there an infinite loop in there?")), 10000); };
       if (ext !== "py") iniciarTimer();
       let jaCarregou = false;
       w.onmessage = (e) => {

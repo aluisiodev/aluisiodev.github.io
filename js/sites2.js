@@ -4,6 +4,7 @@
   const ALU = window.ALU, esc = (s) => ALU.esc(s);
   const P = window.PERFIL, PROJ = window.PROJETOS;
   const conq = (...a) => ALU.conquista && ALU.conquista(...a);
+  const EN = ALU.lang === "en", T = (pt, en) => (EN ? en : pt);
   const ls = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
   const repoDe = (p) => p.repo.replace("https://github.com/aluisiodev/", "");
   const sem = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -51,25 +52,25 @@
 
   // ======================= alulugle =======================
   const INDICE = () => [
-    { url: "ligadin.com/feed", t: "Feed | LigadIn", d: "Posts de gratidão corporativa, vagas sênior por R$ 1.200 e um gato muito produtivo.", k: "linkedin ligadin feed posts vagas gratidao linkedisney gato bombom demitido" },
-    { url: "ligadin.com/in/aluisio-alves", t: `${P.nome} | LigadIn`, d: "Perfil profissional, experiência e cursos.", k: "linkedin ligadin perfil curriculo certificado emprego vaga aluisio" },
-    { url: "doghub.com/aluisiodev", t: "aluisiodev · DogHub", d: "Repositórios e código dos projetos.", k: "github doghub codigo repositorio projetos" },
+    { url: "ligadin.com/feed", t: "Feed | LigadIn", d: T("Posts de gratidão corporativa, vagas sênior por R$ 1.200 e um gato muito produtivo.", "Corporate gratitude posts, senior roles for R$ 1,200 and a very productive cat."), k: "linkedin ligadin feed posts vagas gratidao linkedisney gato bombom demitido jobs gratitude cat" },
+    { url: "ligadin.com/in/aluisio-alves", t: `${P.nome} | LigadIn`, d: T("Perfil profissional, experiência e cursos.", "Professional profile, experience and courses."), k: "linkedin ligadin perfil curriculo certificado emprego vaga aluisio profile resume job" },
+    { url: "doghub.com/aluisiodev", t: "aluisiodev · DogHub", d: T("Repositórios e código dos projetos.", "Repositories and project code."), k: "github doghub codigo repositorio projetos code repository projects" },
     ...PROJ.map((p) => ({ url: "doghub.com/aluisiodev/" + repoDe(p), t: `${p.nome} · DogHub`, d: p.resumo, k: `${p.nome} ${p.id} ${p.stack.join(" ")} projeto` })),
-    { url: "kezpedia.org/wiki/Aluisio", t: "Aluísio – Kezpédia, a enciclopédia da savana", d: "Desenvolvedor, criador do aluOS e domador de patos roxos.", k: "aluisio quem biografia wiki kezpedia" },
-    { url: "kezpedia.org/wiki/aluOS", t: "aluOS – Kezpédia", d: "Sistema operacional feito em HTML, CSS e JavaScript para servir de portfolio.", k: "aluos sistema operacional portfolio desktop" },
-    { url: "kezpedia.org/wiki/Pato_roxo", t: "Pato roxo – Kezpédia", d: "Mascote do Peep Studio. Revisa PRs desde que evoluiu.", k: "pato roxo peep studio quack" },
-    { url: "musikzify.com", t: "musikzify · a playlist do Aluísio", d: "Ouça uma prévia das músicas que tocam enquanto ele programa.", k: "musica spotify musikzify playlist radio ouvir som" },
-    { url: "ebaa.com.br", t: "ebaa! · o fórum da savana", d: "Dúvidas, códigos que só funcionam às 3h da manhã e discussões sobre patos.", k: "forum ebaa duvida discussao comunidade" },
-    { url: "climaselva.com", t: "Clima da Terra da Garoa", d: "Previsão do tempo para a Terra da Garoa e todas as capitais do Brasil.", k: "clima tempo previsao chuva sol garoa sao paulo estado capital" },
-    { url: "yakurt.com/perfil/aluisio", t: `${P.nome} · yakurt`, d: "Recados, depoimentos e as comunidades mais importantes da sua vida.", k: "yakurt orkut rede social recado comunidade depoimento" },
-    { url: "yakurt.com/comunidade/segunda", t: "Eu odeio segunda-feira · yakurt", d: "Comunidade com 1.204.333 membros que concordam com você.", k: "segunda feira gato odeio comunidade" },
-    { url: "youinthescreenofcomputerorphone.com", t: "YouInTheScreenOfComputerOrPhone", d: "Vídeos. Muitos vídeos. Alguns de 10 horas.", k: "video youtube you assistir" },
-    { url: "imaiu.com", t: "imaíu · caixa de entrada", d: "E-mail grátis. Spam incluso sem custo adicional.", k: "email mail imaiu caixa" },
-    { url: "clicajogos.com", t: "clicajogos · jogos grátis!!", d: "Cobrinha, Jogo da velha, Pato Clicker e Memória.", k: "jogo jogos game clicajogos cobrinha velha pato memoria" },
+    { url: "kezpedia.org/wiki/Aluisio", t: T("Aluísio – Kezpédia, a enciclopédia da savana", "Aluísio – Kezpédia, the savanna encyclopedia"), d: T("Desenvolvedor, criador do aluOS e domador de patos roxos.", "Developer, creator of aluOS and tamer of purple ducks."), k: "aluisio quem biografia wiki kezpedia who biography about" },
+    { url: "kezpedia.org/wiki/aluOS", t: "aluOS – Kezpédia", d: T("Sistema operacional feito em HTML, CSS e JavaScript para servir de portfolio.", "An operating system made with HTML, CSS and JavaScript to serve as a portfolio."), k: "aluos sistema operacional portfolio desktop operating system" },
+    { url: "kezpedia.org/wiki/Pato_roxo", t: T("Pato roxo – Kezpédia", "Purple duck – Kezpédia"), d: T("Mascote do Peep Studio. Revisa PRs desde que evoluiu.", "Peep Studio's mascot. Has been reviewing PRs ever since it evolved."), k: "pato roxo peep studio quack purple duck" },
+    { url: "musikzify.com", t: T("musikzify · a playlist do Aluísio", "musikzify · Aluísio's playlist"), d: T("Ouça uma prévia das músicas que tocam enquanto ele programa.", "Preview the songs that play while he codes."), k: "musica spotify musikzify playlist radio ouvir som music songs listen" },
+    { url: "ebaa.com.br", t: T("ebaa! · o fórum da savana", "ebaa! · the savanna forum"), d: T("Dúvidas, códigos que só funcionam às 3h da manhã e discussões sobre patos.", "Questions, code that only works at 3 AM and discussions about ducks."), k: "forum ebaa duvida discussao comunidade questions community" },
+    { url: "climaselva.com", t: T("Clima da Terra da Garoa", "Land of Drizzle Weather"), d: T("Previsão do tempo para a Terra da Garoa e todas as capitais do Brasil.", "Weather forecast for the Land of Drizzle and every Brazilian state capital."), k: "clima tempo previsao chuva sol garoa sao paulo estado capital weather forecast rain" },
+    { url: "yakurt.com/perfil/aluisio", t: `${P.nome} · yakurt`, d: T("Recados, depoimentos e as comunidades mais importantes da sua vida.", "Scraps, testimonials and the most important communities of your life."), k: "yakurt orkut rede social recado comunidade depoimento social network scraps" },
+    { url: "yakurt.com/comunidade/segunda", t: T("Eu odeio segunda-feira · yakurt", "I hate Mondays · yakurt"), d: T("Comunidade com 1.204.333 membros que concordam com você.", "A community of 1,204,333 members who agree with you."), k: "segunda feira gato odeio comunidade monday cat hate" },
+    { url: "youinthescreenofcomputerorphone.com", t: "YouInTheScreenOfComputerOrPhone", d: T("Vídeos. Muitos vídeos. Alguns de 10 horas.", "Videos. Lots of videos. Some of them 10 hours long."), k: "video youtube you assistir watch" },
+    { url: "imaiu.com", t: T("imaíu · caixa de entrada", "imaíu · inbox"), d: T("E-mail grátis. Spam incluso sem custo adicional.", "Free email. Spam included at no extra cost."), k: "email mail imaiu caixa inbox" },
+    { url: "clicajogos.com", t: T("clicajogos · jogos grátis!!", "clicajogos · free games!!"), d: T("Cobrinha, Jogo da velha, Pato Clicker e Memória.", "Snake, Tic-tac-toe, Pato Clicker and Memory."), k: "jogo jogos game clicajogos cobrinha velha pato memoria games snake memory duck" },
   ];
   const ATALHOS = () => [
     ["ligadin.com/in/aluisio-alves", ALU.pix("ligadin"), "LigadIn"], ["doghub.com/aluisiodev", ALU.pix("doghub"), "DogHub"],
-    ["musikzify.com", icMz, "musikzify"], ["ebaa.com.br", icEb, "ebaa!"], ["climaselva.com", icCl, "Clima"], ["yakurt.com/perfil/aluisio", icYk, "yakurt"], ["kezpedia.org/wiki/Aluisio", icWk, "Kezpédia"],
+    ["musikzify.com", icMz, "musikzify"], ["ebaa.com.br", icEb, "ebaa!"], ["climaselva.com", icCl, T("Clima", "Weather")], ["yakurt.com/perfil/aluisio", icYk, "yakurt"], ["kezpedia.org/wiki/Aluisio", icWk, "Kezpédia"],
     ...ALU.kezSites.filter((x) => x.atalho).map((x) => [x.atalho.url, x.atalho.icone, x.atalho.nome]),
   ];
   ALU.kezAtalhos = ATALHOS;
@@ -92,34 +93,34 @@
     html: () => `
       <div class="al-home">
         ${logoAlu()}
-        <form class="al-busca"><input placeholder="Pesquise na savana ou digite um endereço" aria-label="Pesquisar no Alulugle"><button class="btn" aria-label="Pesquisar">🔍</button></form>
-        <div class="row"><button class="btn sec al-pesq" type="button">Pesquisar no Alulugle</button><button class="btn sec al-sorte" type="button">Estou com sorte</button></div>
+        <form class="al-busca"><input placeholder="${T("Pesquise na savana ou digite um endereço", "Search the savanna or type an address")}" aria-label="${T("Pesquisar no Alulugle", "Search Alulugle")}"><button class="btn" aria-label="${T("Pesquisar", "Search")}">🔍</button></form>
+        <div class="row"><button class="btn sec al-pesq" type="button">${T("Pesquisar no Alulugle", "Alulugle Search")}</button><button class="btn sec al-sorte" type="button">${T("Estou com sorte", "I'm Feeling Lucky")}</button></div>
         <div class="kz-atalhos">${ATALHOS().map(([u, ic, n]) => `<button data-ir="${u}">${ic}<span>${esc(n)}</span></button>`).join("")}
           ${PROJ.map((p) => `<button data-ir="doghub.com/aluisiodev/${repoDe(p)}">${ALU.iconeHTML("proj:" + p.id)}<span>${esc(p.curto)}</span></button>`).join("")}</div>
-        <p class="al-rodape">Alulugle oferecido em: <b>Português</b> · <b>Savanês</b> · <b>Quack</b></p>
+        <p class="al-rodape">${T("Alulugle oferecido em", "Alulugle offered in")}: <b>${T("Português", "English")}</b> · <b>${T("Savanês", "Savannese")}</b> · <b>Quack</b></p>
       </div>`,
     init: buscaInit,
   });
   ALU.kezSites.push({
-    re: /^alulugle\.com\/busca\?q=(.*)$/, titulo: (m) => `${decodeURIComponent(m[1])} - Pesquisa Alulugle`,
+    re: /^alulugle\.com\/busca\?q=(.*)$/, titulo: (m) => `${decodeURIComponent(m[1])} - ${T("Pesquisa Alulugle", "Alulugle Search")}`,
     html: (m) => {
       const q = decodeURIComponent(m[1]), qs = sem(q);
       let extra = "", lista = resultados(q);
-      if (/barrel roll|giro|gira/.test(qs)) extra = `<p class="al-dica">🌀 Uau.</p>`;
-      if (qs === "alulugle" || qs === "recursao") extra = `<p class="al-dica">Você quis dizer: <button class="link" data-ir="alulugle.com/busca?q=${encodeURIComponent(q)}">${esc(q)}</button></p>`;
-      if (/^(quack|pato)/.test(qs)) extra = `<p class="al-dica">🦆 Aproximadamente 9.999.999 quacks (0,01 segundo)</p>`;
+      if (/barrel roll|giro|gira|spin/.test(qs)) extra = `<p class="al-dica">🌀 Uau.</p>`;
+      if (qs === "alulugle" || qs === "recursao" || qs === "recursion") extra = `<p class="al-dica">${T("Você quis dizer", "Did you mean")}: <button class="link" data-ir="alulugle.com/busca?q=${encodeURIComponent(q)}">${esc(q)}</button></p>`;
+      if (/^(quack|pato|duck)/.test(qs)) extra = `<p class="al-dica">🦆 ${T("Aproximadamente 9.999.999 quacks (0,01 segundo)", "About 9,999,999 quacks (0.01 seconds)")}</p>`;
       return `
       <div class="al-res">
-        <header class="al-top">${logoAlu(true)}<form class="al-busca"><input value="${esc(q)}" aria-label="Pesquisar no Alulugle"><button class="btn">🔍</button></form></header>
-        <p class="muted">Aproximadamente ${lista.length ? lista.length * 1337 : 0} resultados (0,42 segundo)</p>${extra}
+        <header class="al-top">${logoAlu(true)}<form class="al-busca"><input value="${esc(q)}" aria-label="${T("Pesquisar no Alulugle", "Search Alulugle")}"><button class="btn">🔍</button></form></header>
+        <p class="muted">${T("Aproximadamente", "About")} ${(lista.length ? lista.length * 1337 : 0).toLocaleString(T("pt-BR", "en-US"))} ${T("resultados (0,42 segundo)", "results (0.42 seconds)")}</p>${extra}
         ${lista.length ? lista.map((r) => `<div class="al-item"><small>kez://${esc(r.url)}</small><button class="link" data-ir="${esc(r.url)}">${esc(r.t)}</button><p>${esc(r.d)}</p></div>`).join("")
-          : `<div class="al-nada"><p>Sua pesquisa <b>${esc(q)}</b> não encontrou nenhum documento na savana.</p><p>Sugestões: tente <button class="link" data-ir="alulugle.com/busca?q=projetos">projetos</button>, <button class="link" data-ir="alulugle.com/busca?q=musica">música</button> ou pergunte no <button class="link" data-ir="ebaa.com.br">ebaa!</button></p></div>`}
+          : `<div class="al-nada"><p>${T("Sua pesquisa", "Your search")} <b>${esc(q)}</b> ${T("não encontrou nenhum documento na savana.", "did not match any documents in the savanna.")}</p><p>${T("Sugestões: tente", "Suggestions: try")} <button class="link" data-ir="alulugle.com/busca?q=${T("projetos", "projects")}">${T("projetos", "projects")}</button>, <button class="link" data-ir="alulugle.com/busca?q=${T("musica", "music")}">${T("música", "music")}</button> ${T("ou pergunte no", "or ask on")} <button class="link" data-ir="ebaa.com.br">ebaa!</button></p></div>`}
       </div>`;
     },
     init: (view, ctx, m, ir) => {
       buscaInit(view, ctx, m, ir);
       const qs = sem(decodeURIComponent(m[1]));
-      if (/barrel roll|giro|gira/.test(qs)) { view.classList.add("al-gira"); setTimeout(() => view.classList.remove("al-gira"), 1300); conq("barrel", "Deu um giro", "Pediu um giro pro Alulugle."); }
+      if (/barrel roll|giro|gira|spin/.test(qs)) { view.classList.add("al-gira"); setTimeout(() => view.classList.remove("al-gira"), 1300); conq("barrel", T("Deu um giro", "Do a barrel roll"), T("Pediu um giro pro Alulugle.", "Asked Alulugle to spin.")); }
     },
   });
 
@@ -135,15 +136,15 @@
     html: () => `
       <div class="mz">
         <aside class="mz-side"><div class="mz-logo">${icMz}<b>musikzify</b></div>
-          <span>⌂ Início</span><span>🔍 Buscar</span><span>▤ Sua biblioteca</span>
-          <hr><span class="on">♫ favs oat</span><span>♫ Rádio da savana</span><span>♫ Quack-fi beats to code to</span></aside>
+          <span>⌂ ${T("Início", "Home")}</span><span>🔍 ${T("Buscar", "Search")}</span><span>▤ ${T("Sua biblioteca", "Your Library")}</span>
+          <hr><span class="on">♫ favs oat</span><span>♫ ${T("Rádio da savana", "Savanna Radio")}</span><span>♫ Quack-fi beats to code to</span></aside>
         <section class="mz-main">
           <div class="mz-hero"><div class="mz-capa"><img src="${esc(P.foto)}" alt=""><i>♫</i></div>
-            <div><small>PLAYLIST PÚBLICA</small><h1>favs oat</h1><p>O que toca no monitor esquerdo enquanto eu programo. De Cartola a Joji, de Terno Rei a System Of A Down.</p>
-            <p class="mz-quem"><img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${FAIXAS.length} músicas</p></div></div>
-          <div class="mz-acoes"><button class="mz-play" aria-label="Tocar">▶</button><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Sair da savana: ouvir no Spotify ↗</a></div>
-          <div class="mz-player" hidden><iframe title="Prévia no Spotify" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
-          <p class="mz-aviso" hidden>Nesta prévia o navegador não deixa o player do Spotify aparecer. Clique numa música para ouvir no Spotify, ou abra o site publicado.</p>
+            <div><small>${T("PLAYLIST PÚBLICA", "PUBLIC PLAYLIST")}</small><h1>favs oat</h1><p>${T("O que toca no monitor esquerdo enquanto eu programo. De Cartola a Joji, de Terno Rei a System Of A Down.", "What plays on the left monitor while I code. From Cartola to Joji, from Terno Rei to System Of A Down.")}</p>
+            <p class="mz-quem"><img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${FAIXAS.length} ${T("músicas", "songs")}</p></div></div>
+          <div class="mz-acoes"><button class="mz-play" aria-label="${T("Tocar", "Play")}">▶</button><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">${T("Sair da savana: ouvir no Spotify", "Leave the savanna: listen on Spotify")} ↗</a></div>
+          <div class="mz-player" hidden><iframe title="${T("Prévia no Spotify", "Spotify preview")}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
+          <p class="mz-aviso" hidden>${T("Nesta prévia o navegador não deixa o player do Spotify aparecer. Clique numa música para ouvir no Spotify, ou abra o site publicado.", "In this preview the browser won't show the Spotify player. Click a song to listen on Spotify, or open the published site.")}</p>
           <ol class="mz-lista"></ol>
         </section>
       </div>`,
@@ -162,13 +163,13 @@
       const dur = (ms) => `${Math.floor(ms / 60000)}:${String(Math.round(ms / 1000) % 60).padStart(2, "0")}`;
       function pintar() {
         ol.innerHTML = lista.map((f, i) => `<li><button data-i="${i}"><span class="n">${i + 1}</span>${f.capa ? `<img class="mz-mini" src="${esc(f.capa)}" alt="" loading="lazy">` : ""}<span class="t"><b>${esc(f.nome)}</b><small>${esc(f.artista)}</small></span><span class="d">${esc(f.d)}</span></button></li>`).join("");
-        if (quem) quem.innerHTML = `<img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${lista.length} músicas`;
+        if (quem) quem.innerHTML = `<img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${lista.length} ${T("músicas", "songs")}`;
         ol.querySelectorAll("button").forEach((b) => (b.onclick = () => {
           const f = lista[+b.dataset.i];
           ol.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
           if (bloqueado) { aviso.hidden = false; window.open(f.id ? `https://open.spotify.com/track/${f.id}` : buscaSpotify([f.nome, f.artista]), "_blank", "noopener"); return; }
           if (f.id) { fr.src = `https://open.spotify.com/embed/track/${f.id}?utm_source=generator&theme=0`; player.hidden = false; } else abrirPlayer();
-          ALU.urso && ALU.urso.falar && ALU.urso.falar(`Boa! ${f.nome} é das boas.`);
+          ALU.urso && ALU.urso.falar && ALU.urso.falar(T(`Boa! ${f.nome} é das boas.`, `Nice! ${f.nome} is a good one.`));
         }));
       }
       pintar();
@@ -180,7 +181,7 @@
         pintar();
       }).catch(() => {});
       if (!bloqueado) abrirPlayer(); else aviso.hidden = false;
-      conq("musikzify", "Trilha sonora", "Abriu a playlist no musikzify.");
+      conq("musikzify", T("Trilha sonora", "Soundtrack"), T("Abriu a playlist no musikzify.", "Opened the playlist on musikzify."));
     },
   });
 
@@ -210,34 +211,44 @@
       ["lobo_de_um_braco", "🗡️", "200 horas. o Isshin me ensinou mais que a faculdade."],
       ["aluisio.dev", "🎧", "hesitation is defeat. bora pra NG+"]] },
   ];
+  // versão em inglês dos tópicos: id -> [categoria, título, [falas]]
+  const TOPICOS_EN = {
+    funciona: ["Programming", "[SOLVED] my code only works when I'm not looking at it", ["Every time I call someone over to see the bug, it disappears. When they leave, it comes back. Anyone?", "quack. (translation: explain the code to me line by line)", "explained it to the duck and found the bug. it was a semicolon. SOLVED."]],
+    urso: ["Savanna Lounge", "is there someone with blue hair and a sword on my desktop??", ["a blue-haired assistant with a sword on her back showed up on my desktop. is it a virus???", "hi! I'm not a virus, I'm Zizi, aluOS's virtual assistant. I promise not to install any toolbars.", "she's nice. she helped me find the page I lost"]],
+    vim: ["Programming", "tutorial: how to exit vim", ["I opened vim in 2019. does anyone know how to get out? my family misses me", ":q!", "THANK YOU. I'll see the sun for the first time in years"]],
+    album: ["Music", "best album: Humbug, Nectar or OK Computer?", ["all three are on my bedroom wall, so you know my answer: yes.", "OK Computer. no arguments accepted.", "Humbug is underrated and I will die on this hill"]],
+    fnaf: ["Games", "tips for surviving the night shift", ["first day at the pizzeria. any tips?", "har har har", "that didn't help at all"]],
+    sekiro: ["Games", "beat Sekiro and now I don't know what to do with my life", ["200 hours. Isshin taught me more than college did.", "hesitation is defeat. on to NG+"]],
+  };
+  if (EN) TOPICOS.forEach((t) => { const e = TOPICOS_EN[t.id]; if (!e) return; t.cat = e[0]; t.t = e[1]; t.posts.forEach((p, i) => { if (e[2][i]) p[2] = e[2][i]; }); });
   const meusPosts = () => ls.get("alu.ebaa", {});
   ALU.kezSites.push({
-    re: /^ebaa\.com\.br\/?$/, titulo: () => "ebaa! · o fórum da savana",
+    re: /^ebaa\.com\.br\/?$/, titulo: () => T("ebaa! · o fórum da savana", "ebaa! · the savanna forum"),
     html: () => {
       const cats = [...new Set(TOPICOS.map((t) => t.cat))], mp = meusPosts();
       return `<div class="eb">
-        <header class="eb-top">${icEb}<b>ebaa!</b><span>o fórum da savana desde 2004 · ${1337 + Object.values(mp).flat().length} membros online</span></header>
-        ${cats.map((c) => `<table class="eb-tab"><thead><tr><th>${esc(c)}</th><th>Respostas</th><th>Autor</th></tr></thead><tbody>
+        <header class="eb-top">${icEb}<b>ebaa!</b><span>${T("o fórum da savana desde 2004", "the savanna forum since 2004")} · ${1337 + Object.values(mp).flat().length} ${T("membros online", "members online")}</span></header>
+        ${cats.map((c) => `<table class="eb-tab"><thead><tr><th>${esc(c)}</th><th>${T("Respostas", "Replies")}</th><th>${T("Autor", "Author")}</th></tr></thead><tbody>
           ${TOPICOS.filter((t) => t.cat === c).map((t) => `<tr><td><button class="link" data-ir="ebaa.com.br/t/${t.id}">${esc(t.t)}</button></td><td>${t.posts.length - 1 + (mp[t.id] || []).length}</td><td>${esc(t.autor)}</td></tr>`).join("")}</tbody></table>`).join("")}
-        <p class="eb-rodape">Powered by ebaaBB 2.0.4 · Regras: não alimente os trolls nem os patos.</p></div>`;
+        <p class="eb-rodape">Powered by ebaaBB 2.0.4 · ${T("Regras: não alimente os trolls nem os patos.", "Rules: do not feed the trolls or the ducks.")}</p></div>`;
     },
   });
   ALU.kezSites.push({
-    re: /^ebaa\.com\.br\/t\/([\w-]+)\/?$/, titulo: (m) => ((TOPICOS.find((t) => t.id === m[1]) || {}).t || "Tópico") + " · ebaa!",
+    re: /^ebaa\.com\.br\/t\/([\w-]+)\/?$/, titulo: (m) => ((TOPICOS.find((t) => t.id === m[1]) || {}).t || T("Tópico", "Topic")) + " · ebaa!",
     html: (m) => {
       const t = TOPICOS.find((x) => x.id === m[1]); if (!t) return null;
-      const extras = (meusPosts()[t.id] || []).map((x) => ["visitante", "🙂", x]);
+      const extras = (meusPosts()[t.id] || []).map((x) => [T("visitante", "visitor"), "🙂", x]);
       return `<div class="eb">
         <header class="eb-top">${icEb}<button class="link" data-ir="ebaa.com.br"><b>ebaa!</b></button><span>${esc(t.cat)} › ${esc(t.t)}</span></header>
         <h2 class="eb-h">${esc(t.t)}</h2>
-        <div class="eb-posts">${[...t.posts, ...extras].map(([a, av, txt], i) => `<div class="eb-post"><aside><span>${av}</span><b>${esc(a)}</b><small>${i === 0 ? "autor do tópico" : "membro"}</small></aside><div><small>#${i + 1} · postado há ${i + 1} ${i ? "horas" : "dia"}</small><p>${esc(txt)}</p><em>— ${esc(a)} | ${a === "pato_roxo" ? "quack" : a === "aluisio.dev" ? "feito com HTML e café" : "minha assinatura é muito legal"}</em></div></div>`).join("")}</div>
-        <form class="eb-resp"><b>Responder</b><textarea maxlength="400" placeholder="Seja gentil. O pato está de olho." aria-label="Sua resposta"></textarea><button class="btn real">Enviar resposta</button></form></div>`;
+        <div class="eb-posts">${[...t.posts, ...extras].map(([a, av, txt], i) => `<div class="eb-post"><aside><span>${av}</span><b>${esc(a)}</b><small>${i === 0 ? T("autor do tópico", "topic starter") : T("membro", "member")}</small></aside><div><small>#${i + 1} · ${EN ? `posted ${i + 1} ${i ? "hours" : "day"} ago` : `postado há ${i + 1} ${i ? "horas" : "dia"}`}</small><p>${esc(txt)}</p><em>— ${esc(a)} | ${a === "pato_roxo" ? "quack" : a === "aluisio.dev" ? T("feito com HTML e café", "made with HTML and coffee") : T("minha assinatura é muito legal", "my signature is really cool")}</em></div></div>`).join("")}</div>
+        <form class="eb-resp"><b>${T("Responder", "Reply")}</b><textarea maxlength="400" placeholder="${T("Seja gentil. O pato está de olho.", "Be kind. The duck is watching.")}" aria-label="${T("Sua resposta", "Your reply")}"></textarea><button class="btn real">${T("Enviar resposta", "Post reply")}</button></form></div>`;
     },
     init: (view, ctx, m, ir) => {
       view.querySelector(".eb-resp").onsubmit = (e) => {
         e.preventDefault(); const v = view.querySelector(".eb-resp textarea").value.trim(); if (!v) return;
         const mp = meusPosts(); (mp[m[1]] = mp[m[1]] || []).push(v.slice(0, 400)); ls.set("alu.ebaa", mp);
-        conq("ebaa", "Membro do fórum", "Respondeu um tópico no ebaa!.");
+        conq("ebaa", T("Membro do fórum", "Forum member"), T("Respondeu um tópico no ebaa!.", "Replied to a topic on ebaa!."));
         ir("ebaa.com.br/t/" + m[1]);
       };
     },
@@ -261,18 +272,28 @@
     ["AC", "Terra do Acre (existe!)", "Rio Branco", -9.97, -67.81, "Existência confirmada"], ["RO", "Portal da Amazônia Ocidental", "Porto Velho", -8.76, -63.9, "Chuva: em breve"],
     ["TO", "Capital Mais Nova", "Palmas", -10.18, -48.33, "Calor de planejamento"],
   ];
-  const COND = (c) => c === 0 ? ["☀️", "Céu limpo (aproveite)"] : c <= 2 ? ["🌤️", "Sol entre nuvens"] : c === 3 ? ["☁️", "Nublado"] : c <= 48 ? ["🌫️", "Neblina"]
-    : c <= 57 ? ["🌦️", "Garoa"] : c <= 67 ? ["🌧️", "Chuva: leve o guarda-chuva"] : c <= 77 ? ["❄️", "Neve?! Confira seu termômetro"] : c <= 82 ? ["🌧️", "Pancadas de chuva"] : ["⛈️", "Tempestade. Fique em casa programando"];
-  const DIAS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+  // apelidos e piadas em inglês, na mesma ordem de CIDADES
+  if (EN) [
+    ["Land of Drizzle", "Chance of drizzle: always"], ["Marvelous City", "Feels like: oven"], ["Land of Cheese Bread", "Chance of coffee: 100%"], ["Land of Moqueca", "Clay pot: on the stove"],
+    ["Smile City", "4 seasons in a single day"], ["Island of Magic", "South wind: incoming"], ["Land of Chimarrão", "Gourd: always full"], ["Brunette City", "Tereré: ice cold"],
+    ["Gateway to the Amazon", "Heat: yes"], ["Land of Pequi", "Watch out for the pit"], ["Capital of Brazil", "Humidity: desert"], ["Land of Happiness", "Axé in the air: high"],
+    ["City of Quality of Life", "Crab: allowed"], ["Water Paradise", "Sea: aqua green"], ["Brazilian Venice", "Frevo: likely"], ["Where the Sun Rises First", "Sunrise: before everyone else"],
+    ["City of the Sun", "Sunscreen: mandatory"], ["Land of Light", "Wind: perfect for kitesurfing"], ["Green City", "Heat: legendary"], ["Island of Love", "Reggae: playing"],
+    ["City of Mango Trees", "Afternoon rain: on time"], ["Middle of the World", "Hemisphere: both"], ["Heart of the Amazon", "Humidity: rainforest"], ["Land of Makunaimã", "Sun: guaranteed"],
+    ["Land of Acre (it exists!)", "Existence: confirmed"], ["Gateway to the Western Amazon", "Rain: coming soon"], ["Newest Capital", "Planned heat"],
+  ].forEach(([ap, piada], i) => { if (CIDADES[i]) { CIDADES[i][1] = ap; CIDADES[i][5] = piada; } });
+  const COND = (c) => c === 0 ? ["☀️", T("Céu limpo (aproveite)", "Clear sky (enjoy it)")] : c <= 2 ? ["🌤️", T("Sol entre nuvens", "Partly cloudy")] : c === 3 ? ["☁️", T("Nublado", "Cloudy")] : c <= 48 ? ["🌫️", T("Neblina", "Fog")]
+    : c <= 57 ? ["🌦️", T("Garoa", "Drizzle")] : c <= 67 ? ["🌧️", T("Chuva: leve o guarda-chuva", "Rain: bring an umbrella")] : c <= 77 ? ["❄️", T("Neve?! Confira seu termômetro", "Snow?! Check your thermometer")] : c <= 82 ? ["🌧️", T("Pancadas de chuva", "Rain showers")] : ["⛈️", T("Tempestade. Fique em casa programando", "Thunderstorm. Stay home and code")];
+  const DIAS = EN ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
   ALU.kezSites.push({
-    re: /^climaselva\.com(?:\/(\w\w))?\/?$/, titulo: (m) => { const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0]; return "Clima da " + c[1]; },
+    re: /^climaselva\.com(?:\/(\w\w))?\/?$/, titulo: (m) => { const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0]; return T("Clima da ", "Weather · ") + c[1]; },
     html: (m) => {
       const c = CIDADES.find((x) => x[0] === (m[1] || "SP").toUpperCase()) || CIDADES[0];
       return `
       <div class="cl">
-        <header class="cl-top">${icCl}<b>Clima da ${esc(c[1])}</b><label class="cl-sel">Estado: <select aria-label="Escolher estado">${CIDADES.map((x) => `<option value="${x[0]}" ${x === c ? "selected" : ""}>${x[0]} · ${esc(x[2])}</option>`).join("")}</select></label></header>
-        <div class="cl-agora"><div class="cl-ic">⏳</div><div><small>${esc(c[1])} (${esc(c[2])}, ${c[0]}) · agora</small><h1 class="cl-t">--°C</h1><p class="cl-c">Consultando os pombos…</p></div>
-          <ul class="cl-extra"><li>💧 Umidade: <b class="cl-u">--</b></li><li>💨 Vento: <b class="cl-v">--</b></li><li>✨ ${esc(c[5].split(":")[0])}:<b>${esc(c[5].split(":").slice(1).join(":") || "")}</b></li></ul></div>
+        <header class="cl-top">${icCl}<b>${T("Clima da ", "Weather · ")}${esc(c[1])}</b><label class="cl-sel">${T("Estado", "State")}: <select aria-label="${T("Escolher estado", "Choose state")}">${CIDADES.map((x) => `<option value="${x[0]}" ${x === c ? "selected" : ""}>${x[0]} · ${esc(x[2])}</option>`).join("")}</select></label><button class="cl-loc" type="button">📍 ${T("Usar minha localização", "Use my location")}</button></header>
+        <div class="cl-agora"><div class="cl-ic">⏳</div><div><small>${esc(c[1])} (${esc(c[2])}, ${c[0]}) · ${T("agora", "now")}</small><h1 class="cl-t">--°C</h1><p class="cl-c">${T("Consultando os pombos…", "Asking the pigeons…")}</p></div>
+          <ul class="cl-extra"><li>💧 ${T("Umidade", "Humidity")}: <b class="cl-u">--</b></li><li>💨 ${T("Vento", "Wind")}: <b class="cl-v">--</b></li><li>✨ ${esc(c[5].split(":")[0])}:<b>${esc(c[5].split(":").slice(1).join(":") || "")}</b></li></ul></div>
         <div class="cl-semana"></div>
         <p class="cl-fonte muted"></p>
       </div>`;
@@ -287,78 +308,97 @@
         view.querySelector(".cl-ic").textContent = ic; view.querySelector(".cl-t").textContent = Math.round(d.temp) + "°C"; view.querySelector(".cl-c").textContent = txt;
         view.querySelector(".cl-u").textContent = d.umid + "%"; view.querySelector(".cl-v").textContent = Math.round(d.vento) + " km/h";
         view.querySelector(".cl-semana").innerHTML = d.dias.map((x) => `<div><small>${x.dia}</small><span>${COND(x.code)[0]}</span><b>${Math.round(x.max)}°</b><i>${Math.round(x.min)}°</i></div>`).join("");
-        view.querySelector(".cl-fonte").textContent = real ? "Dados reais de Open-Meteo.com. As piadas são por nossa conta." : "Sem conexão com os satélites. Estes números foram chutados por um pombo experiente.";
+        view.querySelector(".cl-fonte").textContent = real ? T("Dados reais de Open-Meteo.com. As piadas são por nossa conta.", "Real data from Open-Meteo.com. The jokes are on us.") : T("Sem conexão com os satélites. Estes números foram chutados por um pombo experiente.", "No connection to the satellites. These numbers were guessed by an experienced pigeon.");
       };
-      const falso = () => { const h = new Date(); return { temp: 22, code: 51, umid: 81, vento: 9, dias: [0, 1, 2, 3, 4].map((i) => ({ dia: i ? DIAS[(h.getDay() + i) % 7] : "hoje", code: [51, 3, 61, 2, 80][i], max: [24, 26, 21, 27, 23][i], min: [16, 17, 15, 18, 16][i] })) }; };
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c[3]}&longitude=${c[4]}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`)
+      const falso = () => { const h = new Date(); return { temp: 22, code: 51, umid: 81, vento: 9, dias: [0, 1, 2, 3, 4].map((i) => ({ dia: i ? DIAS[(h.getDay() + i) % 7] : T("hoje", "today"), code: [51, 3, 61, 2, 80][i], max: [24, 26, 21, 27, 23][i], min: [16, 17, 15, 18, 16][i] })) }; };
+      // tempo real: Open-Meteo direto; se o navegador bloquear, pelo servidor do aluOS; se nada der, o pombo chuta
+      const api = ALU.CONFIG && ALU.CONFIG.api;
+      const buscar = (lat, lon) => fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`)
         .then((r) => r.ok ? r.json() : Promise.reject())
+        .catch(() => api ? fetch(`${String(api).replace(/\/+$/, "")}/clima?lat=${lat}&lon=${lon}`).then((r) => r.ok ? r.json() : Promise.reject()) : Promise.reject());
+      const carregar = (lat, lon) => buscar(lat, lon)
         .then((j) => pintar({ temp: j.current.temperature_2m, code: j.current.weather_code, umid: j.current.relative_humidity_2m, vento: j.current.wind_speed_10m,
-          dias: j.daily.time.map((t, i) => ({ dia: i ? DIAS[new Date(t + "T12:00").getDay()] : "hoje", code: j.daily.weather_code[i], max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i] })) }, true))
+          dias: j.daily.time.map((t, i) => ({ dia: i ? DIAS[new Date(t + "T12:00").getDay()] : T("hoje", "today"), code: j.daily.weather_code[i], max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i] })) }, true))
         .catch(() => pintar(falso(), false));
+      carregar(c[3], c[4]);
+      const loc = view.querySelector(".cl-loc");
+      if (loc) {
+        if (!navigator.geolocation) loc.hidden = true;
+        loc.onclick = () => {
+          loc.disabled = true; loc.textContent = T("📍 procurando você…", "📍 looking for you…");
+          navigator.geolocation.getCurrentPosition((pos) => {
+            if (!vivo) return;
+            const lat = pos.coords.latitude.toFixed(2), lon = pos.coords.longitude.toFixed(2);
+            view.querySelector(".cl-agora small").textContent = T(`Onde você está (${lat}, ${lon}) · agora`, `Where you are (${lat}, ${lon}) · now`);
+            loc.textContent = T("📍 Sua localização", "📍 Your location"); carregar(lat, lon);
+            conq("clima-local", T("Previsão sob medida", "Tailor-made forecast"), T("Viu o clima de onde você está no climaselva.", "Checked the weather where you are on climaselva."));
+          }, () => { loc.disabled = false; loc.textContent = T("📍 Não deu. Tentar de novo", "📍 Didn't work. Try again"); }, { timeout: 10000, maximumAge: 600000 });
+        };
+      }
       return () => { vivo = false; };
     },
   });
 
   // ======================= yakurt =======================
-  const AMIGOS = [["pato_roxo", "🦆"], ["kez_e_olmo", "img:img/kez.jpg"], ["Zizi", "⚔️"], ["Gerente", "🎩"], ["Lobo", "🐺"], ["Marshall", "🧛"], ["Sonic", "💨"], ["visitante", "🙂"], ["leão", "🦁"]];
-  const COMUNIDADES = [["segunda", "Eu odeio segunda-feira", GATO], ["csharp", "Eu amo C#", ALU.pix("csharp")], ["madrugada", "Programo de madrugada", "🌙"], ["abas", "Eu não fecho as abas do navegador", "🗂️"], ["sekiro", "Sekiro me humilhou", "🗡️"], ["aventura", "Hora de Aventura", "🍬"], ["pato", "Patos roxos existem", ALU.pix("peep")], ["cafe", "Café > sono", "☕"]];
+  const AMIGOS = [["pato_roxo", "🦆"], ["kez_e_olmo", "img:img/kez.jpg"], ["Zizi", "⚔️"], [T("Gerente", "Manager"), "🎩"], [T("Lobo", "Wolf"), "🐺"], ["Marshall", "🧛"], ["Sonic", "💨"], [T("visitante", "visitor"), "🙂"], [T("leão", "lion"), "🦁"]];
+  const COMUNIDADES = [["segunda", T("Eu odeio segunda-feira", "I hate Mondays"), GATO], ["csharp", T("Eu amo C#", "I love C#"), ALU.pix("csharp")], ["madrugada", T("Programo de madrugada", "I code at 3 AM"), "🌙"], ["abas", T("Eu não fecho as abas do navegador", "I never close my browser tabs"), "🗂️"], ["sekiro", T("Sekiro me humilhou", "Sekiro humbled me"), "🗡️"], ["aventura", T("Hora de Aventura", "Adventure Time"), "🍬"], ["pato", T("Patos roxos existem", "Purple ducks are real"), ALU.pix("peep")], ["cafe", T("Café > sono", "Coffee > sleep"), "☕"]];
   const recados = () => ls.get("alu.yakurt", []);
   const avYk = (e) => (e.startsWith("img:") ? `<img src="${esc(e.slice(4))}" alt="">` : e);
-  const RECADOS_BASE = [["pato_roxo", "🦆", "quack quack! passando pra deixar um recado 🦆✨"], ["kez_e_olmo", "img:img/kez.jpg", "oiii!! perfil lindo, amor beijos 😘"], ["Zizi", "⚔️", "lembrete: beber água e commitar com mensagem decente"]];
-  const topoYk = () => `<header class="yk-top"><b>yakurt</b><nav><button class="link" data-ir="yakurt.com/perfil/aluisio">Início</button> · <span>Recados</span> · <span>Comunidades</span></nav><small>visitante@kez.com · Sair</small></header>`;
+  const RECADOS_BASE = [["pato_roxo", "🦆", T("quack quack! passando pra deixar um recado 🦆✨", "quack quack! just stopping by to leave a scrap 🦆✨")], ["kez_e_olmo", "img:img/kez.jpg", T("oiii!! perfil lindo, amor beijos 😘", "hiii!! lovely profile, love you kisses 😘")], ["Zizi", "⚔️", T("lembrete: beber água e commitar com mensagem decente", "reminder: drink water and write decent commit messages")]];
+  const topoYk = () => `<header class="yk-top"><b>yakurt</b><nav><button class="link" data-ir="yakurt.com/perfil/aluisio">${T("Início", "Home")}</button> · <span>${T("Recados", "Scraps")}</span> · <span>${T("Comunidades", "Communities")}</span></nav><small>${T("visitante", "visitor")}@kez.com · ${T("Sair", "Log out")}</small></header>`;
   ALU.kezSites.push({
     re: /^yakurt\.com\/perfil\/aluisio\/?$/, titulo: () => `yakurt - ${P.nome}`,
     html: () => `
       <div class="yk">${topoYk()}
         <div class="yk-wrap">
-          <aside class="yk-esq"><img src="${esc(P.foto)}" alt="Foto de ${esc(P.nome)}"><b>${esc(P.nome)}</b><small>${esc(P.local)}</small>
-            <ul><li>📝 recados</li><li>📷 fotos (1)</li><li>🎬 vídeos</li><li>💬 depoimentos (3)</li></ul></aside>
+          <aside class="yk-esq"><img src="${esc(P.foto)}" alt="${T("Foto de", "Photo of")} ${esc(P.nome)}"><b>${esc(P.nome)}</b><small>${esc(P.local)}</small>
+            <ul><li>📝 ${T("recados", "scraps")}</li><li>📷 ${T("fotos", "photos")} (1)</li><li>🎬 ${T("vídeos", "videos")}</li><li>💬 ${T("depoimentos", "testimonials")} (3)</li></ul></aside>
           <section class="yk-meio">
-            <div class="yk-box"><h1>${esc(P.nome)}</h1><p class="yk-sorte">sorte do dia: hoje é um bom dia para dar commit.</p>
-              <div class="yk-notas"><span>confiável <i>😊😊😊</i></span><span>legal <i>🧊🧊🧊</i></span><span>nerd <i>🤓🤓🤓</i></span><span>fãs <i>⭐ 404</i></span></div>
-              <dl><dt>quem sou eu:</dt><dd>${esc(P.bio[0])}</dd><dt>humor:</dt><dd>depende do build</dd><dt>estilo:</dt><dd>pixel art e café</dd><dt>músicas:</dt><dd>Arctic Monkeys, Radiohead, Joji</dd></dl></div>
-            <div class="yk-box"><h2>recados (<span class="yk-n">0</span>)</h2>
-              <form class="yk-form"><textarea maxlength="300" placeholder="deixe um recado pro ${esc(P.nome)}…" aria-label="Seu recado"></textarea><button class="btn">enviar recado</button></form>
+            <div class="yk-box"><h1>${esc(P.nome)}</h1><p class="yk-sorte">${T("sorte do dia: hoje é um bom dia para dar commit.", "fortune of the day: today is a good day to commit.")}</p>
+              <div class="yk-notas"><span>${T("confiável", "trusty")} <i>😊😊😊</i></span><span>${T("legal", "cool")} <i>🧊🧊🧊</i></span><span>nerd <i>🤓🤓🤓</i></span><span>${T("fãs", "fans")} <i>⭐ 404</i></span></div>
+              <dl><dt>${T("quem sou eu", "about me")}:</dt><dd>${esc(P.bio[0])}</dd><dt>${T("humor", "mood")}:</dt><dd>${T("depende do build", "depends on the build")}</dd><dt>${T("estilo", "style")}:</dt><dd>${T("pixel art e café", "pixel art and coffee")}</dd><dt>${T("músicas", "music")}:</dt><dd>Arctic Monkeys, Radiohead, Joji</dd></dl></div>
+            <div class="yk-box"><h2>${T("recados", "scraps")} (<span class="yk-n">0</span>)</h2>
+              <form class="yk-form"><textarea maxlength="300" placeholder="${T("deixe um recado pro", "leave a scrap for")} ${esc(P.nome)}…" aria-label="${T("Seu recado", "Your scrap")}"></textarea><button class="btn">${T("enviar recado", "send scrap")}</button></form>
               <div class="yk-recados"></div></div>
-            <div class="yk-box"><h2>depoimentos</h2>
-              <p><b>🦆 pato_roxo:</b> conheci o Aluísio quando ele ainda usava console.log pra tudo. hoje ele usa console.log pra tudo com mais confiança.</p>
-              <p><b>⚔️ Zizi:</b> me deixou morar na área de trabalho dele. sem aluguel. recomendo.</p></div>
+            <div class="yk-box"><h2>${T("depoimentos", "testimonials")}</h2>
+              <p><b>🦆 pato_roxo:</b> ${T("conheci o Aluísio quando ele ainda usava console.log pra tudo. hoje ele usa console.log pra tudo com mais confiança.", "I met Aluísio back when he used console.log for everything. Now he uses console.log for everything with more confidence.")}</p>
+              <p><b>⚔️ Zizi:</b> ${T("me deixou morar na área de trabalho dele. sem aluguel. recomendo.", "let me live on his desktop. rent free. recommended.")}</p></div>
           </section>
           <aside class="yk-dir">
-            <div class="yk-box"><h3>amigos (${AMIGOS.length})</h3><div class="yk-grade">${AMIGOS.map(([n, e]) => `<span><i>${avYk(e)}</i>${esc(n)}</span>`).join("")}</div></div>
-            <div class="yk-box"><h3>comunidades (${COMUNIDADES.length})</h3><div class="yk-grade">${COMUNIDADES.map(([id, n, ic]) => `<button data-ir="yakurt.com/comunidade/${id}"><i>${ic}</i>${esc(n)}</button>`).join("")}</div></div>
+            <div class="yk-box"><h3>${T("amigos", "friends")} (${AMIGOS.length})</h3><div class="yk-grade">${AMIGOS.map(([n, e]) => `<span><i>${avYk(e)}</i>${esc(n)}</span>`).join("")}</div></div>
+            <div class="yk-box"><h3>${T("comunidades", "communities")} (${COMUNIDADES.length})</h3><div class="yk-grade">${COMUNIDADES.map(([id, n, ic]) => `<button data-ir="yakurt.com/comunidade/${id}"><i>${ic}</i>${esc(n)}</button>`).join("")}</div></div>
           </aside>
         </div></div>`,
     init: (view) => {
       const lista = view.querySelector(".yk-recados"), n = view.querySelector(".yk-n");
-      const pintar = () => { const r = [...recados().map((t) => ["visitante", "🙂", t]), ...RECADOS_BASE]; n.textContent = r.length; lista.innerHTML = r.map(([a, e, t]) => `<div class="yk-recado"><i>${avYk(e)}</i><div><b>${esc(a)}</b><p>${esc(t)}</p></div></div>`).join(""); };
-      view.querySelector(".yk-form").onsubmit = (e) => { e.preventDefault(); const ta = view.querySelector(".yk-form textarea"), v = ta.value.trim(); if (!v) return; ls.set("alu.yakurt", [v.slice(0, 300), ...recados()].slice(0, 30)); ta.value = ""; pintar(); conq("recado", "Deixou recado", "Escreveu um recado no yakurt."); };
+      const pintar = () => { const r = [...recados().map((t) => [T("visitante", "visitor"), "🙂", t]), ...RECADOS_BASE]; n.textContent = r.length; lista.innerHTML = r.map(([a, e, t]) => `<div class="yk-recado"><i>${avYk(e)}</i><div><b>${esc(a)}</b><p>${esc(t)}</p></div></div>`).join(""); };
+      view.querySelector(".yk-form").onsubmit = (e) => { e.preventDefault(); const ta = view.querySelector(".yk-form textarea"), v = ta.value.trim(); if (!v) return; ls.set("alu.yakurt", [v.slice(0, 300), ...recados()].slice(0, 30)); ta.value = ""; pintar(); conq("recado", T("Deixou recado", "Left a scrap"), T("Escreveu um recado no yakurt.", "Wrote a scrap on yakurt.")); };
       pintar();
     },
   });
   const COM_TOPICOS = {
-    segunda: ["segunda deveria ser opcional", "o despertador tocou e eu levei como ofensa pessoal", "lasanha resolve segunda-feira? (debate)", "contagem regressiva pra sexta: 4 dias"],
+    segunda: EN ? ["mondays should be optional", "the alarm went off and I took it personally", "does lasagna fix mondays? (debate)", "countdown to friday: 4 days"] : ["segunda deveria ser opcional", "o despertador tocou e eu levei como ofensa pessoal", "lasanha resolve segunda-feira? (debate)", "contagem regressiva pra sexta: 4 dias"],
   };
   ALU.kezSites.push({
-    re: /^yakurt\.com\/comunidade\/([\w-]+)\/?$/, titulo: (m) => ((COMUNIDADES.find((c) => c[0] === m[1]) || [])[1] || "Comunidade") + " · yakurt",
+    re: /^yakurt\.com\/comunidade\/([\w-]+)\/?$/, titulo: (m) => ((COMUNIDADES.find((c) => c[0] === m[1]) || [])[1] || T("Comunidade", "Community")) + " · yakurt",
     html: (m) => {
       const c = COMUNIDADES.find((x) => x[0] === m[1]); if (!c) return null;
-      const membros = c[0] === "segunda" ? "1.204.333" : (Math.abs([...c[1]].reduce((a, ch) => a * 31 + ch.charCodeAt(0), 7)) % 90000 + 1000).toLocaleString("pt-BR");
-      const tops = COM_TOPICOS[c[0]] || ["apresente-se aqui", "o que te trouxe a esta comunidade?", "tópico oficial de memes"];
+      const membros = c[0] === "segunda" ? T("1.204.333", "1,204,333") : (Math.abs([...c[0]].reduce((a, ch) => a * 31 + ch.charCodeAt(0), 7)) % 90000 + 1000).toLocaleString(T("pt-BR", "en-US"));
+      const tops = COM_TOPICOS[c[0]] || (EN ? ["introduce yourself here", "what brought you to this community?", "official meme thread"] : ["apresente-se aqui", "o que te trouxe a esta comunidade?", "tópico oficial de memes"]);
       const entrou = ls.get("alu.yakurt.com", []).includes(c[0]);
       return `<div class="yk">${topoYk()}
         <div class="yk-com">
-          <aside class="yk-esq yk-com-img">${c[2].startsWith("<") ? c[2] : `<span class="yk-emoji">${c[2]}</span>`}<b>${esc(c[1])}</b><small>${membros} membros</small>
-            <button class="btn yk-entrar">${entrou ? "✔ você participa" : "participar"}</button></aside>
+          <aside class="yk-esq yk-com-img">${c[2].startsWith("<") ? c[2] : `<span class="yk-emoji">${c[2]}</span>`}<b>${esc(c[1])}</b><small>${membros} ${T("membros", "members")}</small>
+            <button class="btn yk-entrar">${entrou ? T("✔ você participa", "✔ you're a member") : T("participar", "join")}</button></aside>
           <section class="yk-meio"><div class="yk-box"><h1>${esc(c[1])}</h1>
-            <dl><dt>descrição:</dt><dd>${c[0] === "segunda" ? "Para quem acorda na segunda já com saudade do domingo. Aqui a gente reclama junto, com um gato laranja como mascote e uma caneca de café na mão." : "Uma das comunidades favoritas do Aluísio. Entre e fique à vontade."}</dd>
-              <dt>dono:</dt><dd>${c[0] === "segunda" ? "gato_de_caneca" : "aluisio.dev"}</dd><dt>categoria:</dt><dd>Estilo de vida</dd></dl></div>
-            <div class="yk-box"><h2>fórum</h2>${tops.map((t, i) => `<p class="yk-top-f"><b>${esc(t)}</b><small>${(i + 2) * 17} posts</small></p>`).join("")}</div></section>
+            <dl><dt>${T("descrição", "description")}:</dt><dd>${c[0] === "segunda" ? T("Para quem acorda na segunda já com saudade do domingo. Aqui a gente reclama junto, com um gato laranja como mascote e uma caneca de café na mão.", "For those who wake up on Monday already missing Sunday. Here we complain together, with an orange cat as our mascot and a mug of coffee in hand.") : T("Uma das comunidades favoritas do Aluísio. Entre e fique à vontade.", "One of Aluísio's favorite communities. Come in and make yourself at home.")}</dd>
+              <dt>${T("dono", "owner")}:</dt><dd>${c[0] === "segunda" ? T("gato_de_caneca", "mug_cat") : "aluisio.dev"}</dd><dt>${T("categoria", "category")}:</dt><dd>${T("Estilo de vida", "Lifestyle")}</dd></dl></div>
+            <div class="yk-box"><h2>${T("fórum", "forum")}</h2>${tops.map((t, i) => `<p class="yk-top-f"><b>${esc(t)}</b><small>${(i + 2) * 17} posts</small></p>`).join("")}</div></section>
         </div></div>`;
     },
     init: (view, ctx, m) => {
       const b = view.querySelector(".yk-entrar");
-      b.onclick = () => { const l = ls.get("alu.yakurt.com", []); if (!l.includes(m[1])) l.push(m[1]); ls.set("alu.yakurt.com", l); b.textContent = "✔ você participa"; if (m[1] === "segunda") conq("segunda", "Odeio segunda-feira", "Entrou na comunidade mais honesta do yakurt."); };
+      b.onclick = () => { const l = ls.get("alu.yakurt.com", []); if (!l.includes(m[1])) l.push(m[1]); ls.set("alu.yakurt.com", l); b.textContent = T("✔ você participa", "✔ you're a member"); if (m[1] === "segunda") conq("segunda", T("Odeio segunda-feira", "I hate Mondays"), T("Entrou na comunidade mais honesta do yakurt.", "Joined the most honest community on yakurt.")); };
     },
   });
 
@@ -374,21 +414,34 @@
     Pato_roxo: { t: "Pato roxo", txt: () => `<p>O <b>pato roxo</b> (<i>Anas peepstudiensis</i>) é o mascote do Peep Studio. Comunica-se exclusivamente por quacks.</p><h2>Evolução</h2><p>Relatos indicam que, após cinco execuções seguidas de código, o pato evolui e passa a revisar pull requests.</p>` },
     Savana: { t: "Savana", txt: () => `<p>A <b>savana</b> é o bioma onde fica a internet do aluOS. Habitada por girafas que guardam páginas 404, zebras e um leão que ruge quando alguém digita o próprio nome dela.</p>` },
   };
+  // artigos em inglês
+  const WIKI_EN = {
+    Aluisio: () => `<p><b>${esc(P.nome)}</b> is a Brazilian ${esc(P.cargo.toLowerCase())}, creator of <a data-ir="kezpedia.org/wiki/aluOS">aluOS</a> and keeper of at least one <a data-ir="kezpedia.org/wiki/Pato_roxo">purple duck</a>.</p>
+      <h2>Career</h2><p>${esc(P.bio.join(" "))}</p>
+      <h2>Notable projects</h2><ul>${PROJ.map((p) => `<li><a data-ir="doghub.com/aluisiodev/${repoDe(p)}">${esc(p.nome)}</a>: ${esc(p.resumo)}</li>`).join("")}</ul>
+      <h2>Personal life</h2><p>Loves Kezia. Lives in a pink bedroom with late-afternoon light, a teal guitar and a shelf with more ninjas than books. Listens to Arctic Monkeys while coding.<sup>[citation needed]</sup></p>`,
+    aluOS: () => `<p><b>aluOS</b> is a fictional operating system that runs inside a web page and serves as the portfolio of <a data-ir="kezpedia.org/wiki/Aluisio">${esc(P.nome)}</a>. It was inspired by 2000s computers and old messenger games.</p>
+      <h2>Components</h2><ul><li><b>Kez(i)avana</b>: the browser of the <a data-ir="kezpedia.org/wiki/Savana">savanna</a>.</li><li><b>Peep Studio</b>: an IDE that runs Python, JavaScript and pocket C#.</li><li><b>MessagerTale</b>: a messenger with a bot that learns phrases.</li><li><b>Zizi</b>: a blue-haired virtual assistant who lives on the desktop and guides visitors.</li></ul>
+      <h2>Trivia</h2><p>There are achievements hidden throughout the system. The exact number is a state secret.<sup>[citation needed]</sup></p>`,
+    Pato_roxo: () => `<p>The <b>purple duck</b> (<i>Anas peepstudiensis</i>) is the mascot of Peep Studio. It communicates exclusively in quacks.</p><h2>Evolution</h2><p>Reports indicate that after five code runs in a row, the duck evolves and starts reviewing pull requests.</p>`,
+    Savana: () => `<p>The <b>savanna</b> is the biome where the aluOS internet lives. It is inhabited by giraffes who guard 404 pages, zebras, and a lion that roars when someone types its own name.</p>`,
+  };
+  if (EN) { Object.keys(WIKI_EN).forEach((k) => (WIKI[k].txt = WIKI_EN[k])); WIKI.Pato_roxo.t = "Purple duck"; WIKI.Savana.t = "Savanna"; }
   ALU.kezSites.push({
-    re: /^kezpedia\.org\/wiki\/([\w-]+)\/?$/, titulo: (m) => ((WIKI[m[1]] || {}).t || "Artigo") + " – Kezpédia",
+    re: /^kezpedia\.org\/wiki\/([\w-]+)\/?$/, titulo: (m) => ((WIKI[m[1]] || {}).t || T("Artigo", "Article")) + " – Kezpédia",
     html: (m) => {
       const a = WIKI[m[1]];
-      const corpo = a ? a.txt() : `<p>A Kezpédia ainda não tem um artigo com este nome. <a data-ir="kezpedia.org/wiki/Aluisio">Que tal ler sobre o Aluísio?</a></p>`;
+      const corpo = a ? a.txt() : T(`<p>A Kezpédia ainda não tem um artigo com este nome. <a data-ir="kezpedia.org/wiki/Aluisio">Que tal ler sobre o Aluísio?</a></p>`, `<p>Kezpédia does not have an article with this exact name yet. <a data-ir="kezpedia.org/wiki/Aluisio">How about reading about Aluísio?</a></p>`);
       return `<div class="wk">
-        <aside class="wk-side">${icWk}<b>Kezpédia</b><small>a enciclopédia livre da savana</small>
-          <a data-ir="kezpedia.org/wiki/Aluisio">Página principal</a><a data-ir="kezpedia.org/wiki/${Object.keys(WIKI)[Math.floor(Math.random() * 4)]}">Artigo aleatório</a><a data-ir="kezpedia.org/wiki/aluOS">aluOS</a><a data-ir="kezpedia.org/wiki/Savana">Savana</a></aside>
-        <article class="wk-art"><div class="wk-abas"><span class="on">Artigo</span><span>Discussão</span><span>Editar</span><span>Ver histórico</span></div>
-          <h1>${esc(a ? a.t : m[1].replace(/_/g, " "))}</h1><small class="muted">Origem: Kezpédia, a enciclopédia livre da savana.</small>
-          ${a && a.ib ? `<table class="wk-ib"><caption>${esc(P.nome)}</caption><tr><td colspan="2"><img src="${esc(P.foto)}" alt=""></td></tr><tr><th>Ocupação</th><td>${esc(P.cargo)}</td></tr><tr><th>Local</th><td>${esc(P.local)}</td></tr><tr><th>Conhecido por</th><td>aluOS, ${esc(PROJ.map((p) => p.curto).join(", "))}</td></tr><tr><th>Mascote</th><td>pato roxo</td></tr></table>` : ""}
+        <aside class="wk-side">${icWk}<b>Kezpédia</b><small>${T("a enciclopédia livre da savana", "the free savanna encyclopedia")}</small>
+          <a data-ir="kezpedia.org/wiki/Aluisio">${T("Página principal", "Main page")}</a><a data-ir="kezpedia.org/wiki/${Object.keys(WIKI)[Math.floor(Math.random() * 4)]}">${T("Artigo aleatório", "Random article")}</a><a data-ir="kezpedia.org/wiki/aluOS">aluOS</a><a data-ir="kezpedia.org/wiki/Savana">Savana</a></aside>
+        <article class="wk-art"><div class="wk-abas"><span class="on">${T("Artigo", "Article")}</span><span>${T("Discussão", "Talk")}</span><span>${T("Editar", "Edit")}</span><span>${T("Ver histórico", "View history")}</span></div>
+          <h1>${esc(a ? a.t : m[1].replace(/_/g, " "))}</h1><small class="muted">${T("Origem: Kezpédia, a enciclopédia livre da savana.", "From Kezpédia, the free savanna encyclopedia.")}</small>
+          ${a && a.ib ? `<table class="wk-ib"><caption>${esc(P.nome)}</caption><tr><td colspan="2"><img src="${esc(P.foto)}" alt=""></td></tr><tr><th>${T("Ocupação", "Occupation")}</th><td>${esc(P.cargo)}</td></tr><tr><th>${T("Local", "Location")}</th><td>${esc(P.local)}</td></tr><tr><th>${T("Conhecido por", "Known for")}</th><td>aluOS, ${esc(PROJ.map((p) => p.curto).join(", "))}</td></tr><tr><th>${T("Mascote", "Mascot")}</th><td>${T("pato roxo", "purple duck")}</td></tr></table>` : ""}
           ${corpo}</article></div>`;
     },
   });
-  ALU.kezSites.push({ re: /^kezpedia\.org\/?$/, titulo: () => "Kezpédia", html: () => `<div class="kz-404"><p>Redirecionando…</p></div>`, init: (v, c, m, ir) => { setTimeout(() => ir("kezpedia.org/wiki/Aluisio"), 10); } });
+  ALU.kezSites.push({ re: /^kezpedia\.org\/?$/, titulo: () => "Kezpédia", html: () => `<div class="kz-404"><p>${T("Redirecionando…", "Redirecting…")}</p></div>`, init: (v, c, m, ir) => { setTimeout(() => ir("kezpedia.org/wiki/Aluisio"), 10); } });
 
   ALU.siteIcones = { alulugle: icAlu, musikzify: icMz, ebaa: icEb, clima: icCl, yakurt: icYk, kezpedia: icWk };
 })();
