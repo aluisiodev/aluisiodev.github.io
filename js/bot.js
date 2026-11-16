@@ -1,6 +1,6 @@
 // "aluisio.dev de bolso": um bot no estilo SimSimi para o MessagerTale.
 // Funciona sem servidor (regras + coisas que o visitante ensina). Se ALU.CONFIG.chatApi
-// apontar para um Worker (Cloudflare + Groq/Gemini, por exemplo), ele usa a IA e cai nas regras se falhar.
+// apontar para um Worker (worker/aluos-worker.js, com Gemini), ele usa a IA e cai nas regras se falhar.
 (function () {
   const ALU = window.ALU;
   const P = window.PERFIL, PROJ = window.PROJETOS;

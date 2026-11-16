@@ -2,7 +2,7 @@
 //   • o placar global do Jogo da velha ("All users" × "Zizi")
 //   • o ranking dos jogos (nome que a pessoa escolher + pontos)
 //   • o livro de visitas (quem quis se identificar pelo commit no Peep Studio)
-//   • e, se você quiser, o chat com IA do MessagerTale (Groq).
+//   • e, se você quiser, o chat com IA do MessagerTale (Google Gemini, plano gratuito).
 //
 // Como colocar no ar (uns 10 minutos):
 //   1. Crie uma conta grátis em https://dash.cloudflare.com
@@ -12,7 +12,9 @@
 //   5. Settings > Variables and secrets:
 //        ORIGEM       = https://aluisiodev.github.io        (só esse site pode usar o servidor)
 //        CHAVE_ADMIN  = uma senha sua (Secret)              (para ler o livro de visitas)
-//        GROQ_API_KEY = sua chave da Groq (Secret, opcional) (para o chat com IA)
+//        GEMINI_API_KEY = sua chave do Gemini (Secret, opcional) (para o chat com IA)
+//        GEMINI_MODEL   = gemini-2.5-flash (Text, opcional; é o padrão se você não criar)
+//      A chave do Gemini é grátis: https://aistudio.google.com/apikey > Create API key.
 //   6. Copie a URL do Worker (ex.: https://aluos.SEU-USUARIO.workers.dev) para ALU.CONFIG.api em js/data.js.
 //
 // Para ler quem assinou o livro de visitas, abra no navegador:
@@ -84,18 +86,30 @@ export default {
       return json(await ler("visitas", []));
     }
 
-    // ---------- chat com IA (opcional) ----------
+    // ---------- chat com IA (opcional, Google Gemini) ----------
     if ((rota === "/" || rota === "/chat") && req.method === "POST") {
-      if (!env.GROQ_API_KEY) return json({ resposta: "" }, 501);
+      if (!env.GEMINI_API_KEY) return json({ resposta: "" }, 501);
+      const modelo = env.GEMINI_MODEL || "gemini-2.5-flash";
       const msg = limpa(corpo.mensagem, 500);
-      const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-10).map((m) => ({ role: m.de === "visitante" ? "user" : "assistant", content: limpa(m.texto, 500) }));
-      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "llama-3.1-8b-instant", max_tokens: 200, temperature: 0.8, messages: [{ role: "system", content: PERSONA }, ...hist, { role: "user", content: msg }] }),
+      const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-10)
+        .map((m) => ({ role: m.de === "visitante" ? "user" : "model", parts: [{ text: limpa(m.texto, 500) }] }))
+        .filter((m) => m.parts[0].text);
+      // o Gemini exige que a conversa comece com "user"
+      while (hist.length && hist[0].role !== "user") hist.shift();
+      const config = { maxOutputTokens: 300, temperature: 0.8 };
+      if (modelo.startsWith("gemini-2.5")) config.thinkingConfig = { thinkingBudget: 0 }; // sem "pensar": resposta rápida e não gasta a cota
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
+        method: "POST", headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: PERSONA }] },
+          contents: [...hist, { role: "user", parts: [{ text: msg }] }],
+          generationConfig: config,
+        }),
       });
-      if (!r.ok) return json({ resposta: "" }, 502);
+      if (!r.ok) return json({ resposta: "", erro: r.status }, 502);
       const j = await r.json();
-      return json({ resposta: j.choices?.[0]?.message?.content?.trim() || "" });
+      const resposta = (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
+      return json({ resposta });
     }
     return json({ ok: true, servico: "aluOS" });
   },
