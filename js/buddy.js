@@ -84,7 +84,7 @@
     const pose = (p) => { poseAtual = p; corpo.innerHTML = svg(p); };
     function falar(html, botoes, ms = 7000) {
       balao.innerHTML = `<p>${html}</p>${botoes ? `<div class="urso-ops">${botoes.map(([t], i) => `<button data-i="${i}">${esc(t)}</button>`).join("")}</div>` : ""}<button class="urso-x" aria-label="Fechar">✕</button>`;
-      balao.hidden = false;
+      balao.hidden = false; balao.classList.remove("longo");
       balao.querySelector(".urso-x").onclick = (e) => { e.stopPropagation(); balao.hidden = true; };
       if (botoes) balao.querySelectorAll(".urso-ops button").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); botoes[+b.dataset.i][1](); }));
       clearTimeout(tFecha); if (ms) tFecha = setTimeout(() => (balao.hidden = true), ms);
@@ -97,11 +97,12 @@
         [T("Quero deixar meu nome ✍️", "I want to leave my name ✍️"), () => guia("inicio")],
         [T("Me mostra o aluOS", "Show me around"), tour],
         ["Me dá uma dica", () => falar(um(DICAS), [["Outra!", () => falar(um(DICAS), null)], ["Valeu", () => (balao.hidden = true)]], 12000)],
+        [T("Conta uma história", "Tell me a story"), historia],
         ["Conta uma piada", () => { const [a, b] = um(ALU.lang === "en" ? PIADAS_EN : PIADAS); falar(esc(a), null, 0); setTimeout(() => { pose("ri"); falar(esc(b), [[ALU.T("kkkk", "lol"), () => (balao.hidden = true)]], 8000); setTimeout(() => pose("normal"), 1500); }, 2200); }],
         ["Bora jogar da velha", () => { balao.hidden = true; ALU.abrirApp && ALU.abrirApp("kez", "clicajogos.com/velha"); }],
         ["Dança!", () => { balao.hidden = true; u.classList.remove("danca"); void u.offsetWidth; u.classList.add("danca"); pose("ri"); setTimeout(() => pose("normal"), 1600); }],
         ["Falar com o Aluísio", () => { balao.hidden = true; ALU.abrirApp && ALU.abrirApp("chat"); }],
-        ["Vai descansar", () => { falar("Tá bom! Se sentir saudade, clique no meu ícone ao lado do relógio. 💤", null, 3000); setTimeout(esconder, 3000); }],
+        ["Vai descansar", () => { falar(document.body.dataset.modo === "mobile" ? T("Tá bom! Se sentir saudade, toque no meu ícone na segunda tela. 💤", "Okay! If you miss me, tap my icon on the second screen. 💤") : T("Tá bom! Se sentir saudade, clique no meu ícone ao lado do relógio. 💤", "Okay! If you miss me, click my icon next to the clock. 💤"), null, 3000); setTimeout(esconder, 3000); }],
       ], 0);
     }
     corpo.onclick = () => {
@@ -148,7 +149,9 @@
     function esconder() { u.hidden = true; balao.hidden = true; if (btTray) btTray.hidden = false; }
     // ---------- assistente: chega perto de uma janela e explica ----------
     function irPara(sel) {
-      const w = document.querySelector(sel); if (!w || u.hidden) return;
+      if (u.hidden) return;
+      if (document.body.dataset.modo === "mobile") { u.classList.remove("guia"); void u.offsetWidth; u.classList.add("guia"); return; }
+      const w = document.querySelector(sel); if (!w) return;
       const r = w.getBoundingClientRect(), L = Math.min(innerWidth - u.offsetWidth - 8, r.right + 8 > innerWidth - u.offsetWidth ? r.right - u.offsetWidth - 10 : r.right + 4);
       u.style.left = Math.max(0, L) + "px"; u.style.top = Math.max(170, Math.min(innerHeight - u.offsetHeight - 44, r.top + 150)) + "px";
       u.style.right = "auto"; u.style.bottom = "auto";
@@ -175,6 +178,22 @@
         assinou = true; pose("ri"); u.classList.remove("danca"); void u.offsetWidth; u.classList.add("danca"); setTimeout(() => pose("normal"), 1800);
         falar(T(`Commit feito! ✨ O Aluísio vai saber que ${quem} passou por aqui. Obrigada pela visita!`, `Commit done! ✨ Aluísio will know ${quem} stopped by. Thanks for visiting!`), null, 9000);
       }
+    }
+    // história em capítulos curtos, um balão por vez
+    function historia() {
+      const H = window.HISTORIA_ZIZI; if (!H) return;
+      const txt = H[ALU.lang === "en" ? "en" : "pt"], partes = [];
+      let atual = "";
+      txt.split(/(?<=[.!?]["”]?)\s+/).forEach((f) => { if ((atual + " " + f).length > 300 && atual) { partes.push(atual); atual = f; } else atual = atual ? atual + " " + f : f; });
+      if (atual) partes.push(atual);
+      let i = 0;
+      const mostrar = () => {
+        const fim = i === partes.length - 1;
+        if (fim) { pose("ri"); setTimeout(() => pose("normal"), 1600); }
+        falar(esc(partes[i]) + `<small class="zz-pag">${i + 1}/${partes.length}</small>`, fim ? [[T("Que história! 🧂", "What a story! 🧂"), () => (balao.hidden = true)]] : [[T("Continua →", "Go on →"), () => { i++; mostrar(); }], [T("Parar", "Stop"), () => (balao.hidden = true)]], 0);
+        balao.classList.add("longo");
+      };
+      mostrar();
     }
     // tour rápido: abre cada parte do sistema e explica
     function tour() {

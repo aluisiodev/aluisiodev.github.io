@@ -96,7 +96,7 @@
       const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
       const r = await fetch(urlIA(), { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagem: texto, historico: (historico || []).slice(-10), idioma: ALU.lang || "pt" }) });
       clearTimeout(t);
-      if (r.ok) { const j = await r.json(); const linhas = String(j.resposta || "").split(/\n+/).map((x) => x.trim()).filter(Boolean); if (linhas.length) return linhas.slice(0, 5); }
+      if (r.ok) { const j = await r.json(); const linhas = String(j.resposta || "").replace(/```\w*/g, "").split(/\n+/).map((x) => x.replace(/\s+$/, "")).filter(Boolean); if (linhas.length) return linhas.slice(0, 10); }
     } catch {}
     cair();
     return null;

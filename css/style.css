@@ -826,3 +826,21 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 @keyframes zzpula { 50% { transform: translateY(-6px); } }
 .im-pastas button { text-align: left; padding: 3px 6px; background: none; font: 13px var(--ui); }
 .im-pastas button.on { background: #ffd9c9; font-weight: 700; } .im-pastas button:hover { background: #ffeadf; }
+/* Peep Studio com CodeMirror */
+.peep-code.cm { display: block; overflow: hidden; position: relative; }
+.peep-code.cm .CodeMirror { height: 100%; font: 19px/20px var(--txt); background: #1e1b2e; color: #e6e1ff; user-select: text; }
+.cm-s-peep .CodeMirror-gutters { background: #1e1b2e; border-right: 0; }
+.cm-s-peep .CodeMirror-linenumber { color: #5c557d; padding: 0 6px 0 8px; }
+.cm-s-peep .CodeMirror-cursor { border-left: 2px solid #fff; }
+.cm-s-peep .CodeMirror-selected, .cm-s-peep.CodeMirror-focused .CodeMirror-selected { background: rgba(155, 107, 255, .45); }
+.cm-s-peep .CodeMirror-line::selection, .cm-s-peep .CodeMirror-line > span::selection, .cm-s-peep .CodeMirror-line > span > span::selection { background: rgba(155, 107, 255, .45); }
+.cm-s-peep .CodeMirror-activeline-background { background: #26223a; }
+.cm-s-peep .cm-keyword, .cm-s-peep .cm-builtin { color: #c792ea; } .cm-s-peep .cm-string, .cm-s-peep .cm-string-2 { color: #f7c977; }
+.cm-s-peep .cm-comment { color: #7f78a8; } .cm-s-peep .cm-number { color: #f78c6c; } .cm-s-peep .cm-def, .cm-s-peep .cm-variable-2 { color: #82aaff; }
+.cm-s-peep .cm-type, .cm-s-peep .cm-variable-3 { color: #4fd1c5; } .cm-s-peep .cm-atom { color: #f78c6c; } .cm-s-peep .cm-operator { color: #89ddff; }
+.cm-s-peep .cm-header { color: #c792ea; font-weight: 400; } .cm-s-peep .cm-quote { color: #7f78a8; } .cm-s-peep .cm-link, .cm-s-peep .cm-url { color: #82aaff; }
+.cm-s-peep .cm-variable, .cm-s-peep .cm-property { color: #e6e1ff; }
+.chat-log .msg { white-space: pre-wrap; }
+.mz-lista button:has(.mz-mini) { grid-template-columns: 36px 40px 1fr auto; }
+.mz-mini { width: 40px; height: 40px; object-fit: cover; }
+.urso-balao.longo { width: 300px; } .zz-pag { display: block; text-align: right; opacity: .6; font-size: 11px; margin-top: 4px; }

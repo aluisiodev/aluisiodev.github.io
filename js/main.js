@@ -16,6 +16,11 @@
     const wp = document.getElementById("wallpaper");
     wp.className = "wallpaper " + ALU.WALLPAPERS[i].cls;
   };
+  // temas: pixel (padrão), aero (Frutiger Aero) e metro (Frutiger Metro)
+  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"]];
+  ALU.estado.tema = ALU.TEMAS.some(([t]) => t === ls.get("alu.tema")) ? ls.get("alu.tema") : "pixel";
+  ALU.setTema = (t) => { ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; };
+  document.documentElement.dataset.tema = ALU.estado.tema;
   ALU.setAccent = (c) => { ALU.estado.accent = c; ls.set("alu.v2.accent", c); document.documentElement.style.setProperty("--accent", c); };
 
   const isMobile = () => matchMedia("(max-width: 760px), (pointer: coarse) and (max-width: 1024px)").matches;

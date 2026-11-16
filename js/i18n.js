@@ -30,7 +30,7 @@
     claude101: [null, "Claude 101 course from Claude Academy (Anthropic)."],
     cyber: [null, "Introduction to cybersecurity, by Cisco Networking Academy."],
     efset: ["EF SET official certificate 55/100 (B2 Upper Intermediate)", "English level B2, score 55/100 on EF SET."],
-    linux: [null, "Linux fundamentals."],
+    linux: [null, "Linux fundamentals, by TCM Security."],
     one: ["Beginner Programming Program T6 - ONE", "Beginner Programming Program, class 6 of the ONE program (Oracle Next Education)."],
   };
   (window.CERTIFICADOS || []).forEach((c) => { const t = CE[c.id]; if (t) { if (t[0]) c.nome = t[0]; c.detalhe = t[1]; } });
@@ -69,7 +69,7 @@
     "Arquivo": "File", "Editar": "Edit", "Exibir": "View", "Favoritos": "Favorites", "Ajuda": "Help", "Endereço": "Address", "Formatar": "Format",
     "Tarefas": "Tasks", "Outros locais": "Other places", "Clique duas vezes para abrir.": "Double-click to open.",
     "Minimizar": "Minimize", "Maximizar": "Maximize", "Fechar": "Close", "Voltar": "Back", "Avançar": "Forward", "Ir": "Go", "Pronto": "Done",
-    "Papel de parede": "Wallpaper", "Cor das janelas": "Window color", "Sistema": "System", "Conquistas": "Achievements", "Noite": "Night", "Savana": "Savanna",
+    "Papel de parede": "Wallpaper", "Tema": "Theme", "Cor das janelas": "Window color", "Sistema": "System", "Conquistas": "Achievements", "Noite": "Night", "Savana": "Savanna",
     "aluOS 2.0 · pixel por pixel, em HTML, CSS e JavaScript.": "aluOS 2.0 · pixel by pixel, in HTML, CSS and JavaScript.",
     "4 itens · clique para espiar": "4 items · click to peek", "Esvaziar? Melhor não. Eles me ensinaram muito.": "Empty it? Better not. They taught me a lot.",
     "quarto_360.png - Visualizador 360°": "quarto_360.png - 360° Viewer", "sobre_mim.txt - Bloco de notas": "sobre_mim.txt - Notepad",

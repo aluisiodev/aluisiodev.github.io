@@ -35,7 +35,7 @@ window.CERTIFICADOS = [
   { id: "claude101", nome: "Claude Academy: Claude 101", curto: "Claude 101", emissor: "Anthropic", detalhe: "Curso Claude 101 da Claude Academy (Anthropic)." },
   { id: "cyber", nome: "Introduction to Cybersecurity", curto: "Cybersecurity", emissor: "Cisco Networking Academy", detalhe: "Introdução à cibersegurança, pela Cisco Networking Academy." },
   { id: "efset", nome: "Certificado oficial EF SET 55/100 (B2 Independente)", curto: "EF SET B2", emissor: "EF SET", detalhe: "Inglês nível B2 (Independente), nota 55/100 no EF SET." },
-  { id: "linux", nome: "Linux 100: Fundamentals", curto: "Linux 100", emissor: "", detalhe: "Fundamentos de Linux." }, // TODO: emissor
+  { id: "linux", nome: "Linux 100: Fundamentals", curto: "Linux 100", emissor: "TCM Security", detalhe: "Fundamentos de Linux, pela TCM Security." },
   { id: "one", nome: "Formação Iniciante em Programação T6 - ONE", curto: "ONE T6", emissor: "Oracle Next Education (Alura)", detalhe: "Formação Iniciante em Programação, turma 6 do programa ONE." },
 ];
 

@@ -170,6 +170,8 @@
     const W = ALU.WALLPAPERS;
     el.innerHTML = `
       <div class="pad">
+        <fieldset><legend>Tema</legend>
+          <div class="temas">${(ALU.TEMAS || []).map(([t, n]) => `<button class="btn tema-opt" data-tema="${t}"><span class="tema-prev ${t}"></span><span>${esc(n)}</span></button>`).join("")}</div></fieldset>
         <fieldset><legend>Papel de parede</legend>
           <div class="walls">${W.map((w, i) => `<button class="wall-opt" data-w="${i}"><span class="wall-prev ${w.cls}"></span><span>${esc(w.nome)}</span></button>`).join("")}</div></fieldset>
         <fieldset><legend>Cor das janelas</legend>
@@ -186,9 +188,11 @@
     const marcar = () => {
       el.querySelectorAll(".wall-opt").forEach((b) => b.classList.toggle("on", +b.dataset.w === ALU.estado.wall));
       el.querySelectorAll(".acc").forEach((b) => b.classList.toggle("on", b.dataset.c === ALU.estado.accent));
+      el.querySelectorAll(".tema-opt").forEach((b) => b.classList.toggle("on", b.dataset.tema === ALU.estado.tema));
     };
     el.querySelectorAll(".wall-opt").forEach((b) => (b.onclick = () => { ALU.setWall(+b.dataset.w); marcar(); }));
     el.querySelectorAll(".acc").forEach((b) => (b.onclick = () => { ALU.setAccent(b.dataset.c); marcar(); }));
+    el.querySelectorAll(".tema-opt").forEach((b) => (b.onclick = () => { ALU.setTema(b.dataset.tema); marcar(); ALU.conquista && b.dataset.tema !== "pixel" && ALU.conquista("tema", "Nostalgia de 2009", "Trocou o tema do aluOS."); }));
     el.querySelector('[data-act="reboot"]').onclick = () => ALU.reboot();
     el.querySelectorAll("[data-lang]").forEach((b) => (b.onclick = () => b.dataset.lang !== ALU.lang && ALU.setLang(b.dataset.lang)));
     marcar();

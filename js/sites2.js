@@ -72,6 +72,7 @@
     ["musikzify.com", icMz, "musikzify"], ["ebaa.com.br", icEb, "ebaa!"], ["climaselva.com", icCl, "Clima"], ["yakurt.com/perfil/aluisio", icYk, "yakurt"], ["kezpedia.org/wiki/Aluisio", icWk, "Kezpédia"],
     ...ALU.kezSites.filter((x) => x.atalho).map((x) => [x.atalho.url, x.atalho.icone, x.atalho.nome]),
   ];
+  ALU.kezAtalhos = ATALHOS;
   const logoAlu = (pq) => `<span class="al-logo ${pq ? "pq" : ""}">${"Alulugle".split("").map((c, i) => `<b class="c${i % 5}">${c}</b>`).join("")}</span>`;
   function buscaInit(view, ctx, m, ir) {
     const f = view.querySelector(".al-busca"); if (!f) return;
@@ -143,7 +144,7 @@
           <div class="mz-acoes"><button class="mz-play" aria-label="Tocar">▶</button><a class="btn real" href="https://open.spotify.com/playlist/${PLAYLIST}" target="_blank" rel="noopener">Sair da savana: ouvir no Spotify ↗</a></div>
           <div class="mz-player" hidden><iframe title="Prévia no Spotify" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
           <p class="mz-aviso" hidden>Nesta prévia o navegador não deixa o player do Spotify aparecer. Clique numa música para ouvir no Spotify, ou abra o site publicado.</p>
-          <ol class="mz-lista">${FAIXAS.map((f, i) => `<li><button data-i="${i}"><span class="n">${i + 1}</span><span class="t"><b>${esc(f[0])}</b><small>${esc(f[1])}</small></span><span class="d">${f[2]}</span></button></li>`).join("")}</ol>
+          <ol class="mz-lista"></ol>
         </section>
       </div>`,
     init: (view) => {
@@ -155,13 +156,29 @@
         player.hidden = false; return true;
       };
       view.querySelector(".mz-play").onclick = () => { if (!abrirPlayer()) window.open(`https://open.spotify.com/playlist/${PLAYLIST}`, "_blank", "noopener"); };
-      view.querySelectorAll(".mz-lista button").forEach((b) => (b.onclick = () => {
-        const f = FAIXAS[+b.dataset.i];
-        view.querySelectorAll(".mz-lista button").forEach((x) => x.classList.toggle("on", x === b));
-        if (bloqueado) { aviso.hidden = false; window.open(buscaSpotify(f), "_blank", "noopener"); return; }
-        abrirPlayer();
-        ALU.urso && ALU.urso.falar && ALU.urso.falar(`Boa! ${f[0]} é das boas.`);
-      }));
+      // lista: começa com a cópia salva no site; se o servidor estiver no ar, troca pela playlist atual do Spotify (com capas)
+      let lista = FAIXAS.map(([nome, artista, d]) => ({ nome, artista, d, capa: "", id: "" }));
+      const ol = view.querySelector(".mz-lista"), quem = view.querySelector(".mz-quem");
+      const dur = (ms) => `${Math.floor(ms / 60000)}:${String(Math.round(ms / 1000) % 60).padStart(2, "0")}`;
+      function pintar() {
+        ol.innerHTML = lista.map((f, i) => `<li><button data-i="${i}"><span class="n">${i + 1}</span>${f.capa ? `<img class="mz-mini" src="${esc(f.capa)}" alt="" loading="lazy">` : ""}<span class="t"><b>${esc(f.nome)}</b><small>${esc(f.artista)}</small></span><span class="d">${esc(f.d)}</span></button></li>`).join("");
+        if (quem) quem.innerHTML = `<img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · ${lista.length} músicas`;
+        ol.querySelectorAll("button").forEach((b) => (b.onclick = () => {
+          const f = lista[+b.dataset.i];
+          ol.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+          if (bloqueado) { aviso.hidden = false; window.open(f.id ? `https://open.spotify.com/track/${f.id}` : buscaSpotify([f.nome, f.artista]), "_blank", "noopener"); return; }
+          if (f.id) { fr.src = `https://open.spotify.com/embed/track/${f.id}?utm_source=generator&theme=0`; player.hidden = false; } else abrirPlayer();
+          ALU.urso && ALU.urso.falar && ALU.urso.falar(`Boa! ${f.nome} é das boas.`);
+        }));
+      }
+      pintar();
+      const api = ALU.CONFIG && ALU.CONFIG.api;
+      if (api) fetch(String(api).replace(/\/+$/, "") + "/musicas").then((r) => (r.ok ? r.json() : null)).then((j) => {
+        if (!j || !Array.isArray(j.faixas) || !j.faixas.length || !view.isConnected) return;
+        lista = j.faixas.map((f) => ({ nome: f.nome, artista: f.artista, d: f.ms ? dur(f.ms) : "", capa: f.capa || "", id: f.id || "" }));
+        if (j.capa) { const im = view.querySelector(".mz-capa img"); if (im) im.src = j.capa; }
+        pintar();
+      }).catch(() => {});
       if (!bloqueado) abrirPlayer(); else aviso.hidden = false;
       conq("musikzify", "Trilha sonora", "Abriu a playlist no musikzify.");
     },

@@ -232,7 +232,40 @@ class Programa
       };
     }
 
+    // Editor: CodeMirror (mede o texto que está de fato na tela, então o clique cai sempre no lugar certo).
+    // Se o CodeMirror não carregar (sem internet), volta para o editor simples de textarea.
+    let cm = null;
+    const MODOS = { py: "python", js: "javascript", cs: "text/x-csharp", md: "markdown" };
+    function ligarCM() {
+      if (cm || !window.CodeMirror || !el.isConnected) return;
+      const caixa = $(".peep-code"); caixa.innerHTML = ""; caixa.classList.add("cm");
+      cm = window.CodeMirror(caixa, {
+        lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, smartIndent: true, lineWrapping: false, theme: "peep",
+        extraKeys: {
+          "Ctrl-Enter": () => executar(), "Cmd-Enter": () => executar(),
+          "Ctrl-S": () => salvarAtalho(), "Cmd-S": () => salvarAtalho(),
+          Tab: (c) => (c.somethingSelected() ? c.indentSelection("add") : c.replaceSelection("    ", "end")),
+        },
+      });
+      cm.on("change", (c, ch) => { if (ch.origin !== "setValue") editou(); });
+      new ResizeObserver(() => cm.refresh()).observe(caixa);
+      // a janela abre com animação de escala e a fonte pixel pode chegar depois: remede quando tudo assentar
+      [250, 600].forEach((ms) => setTimeout(() => cm.refresh(), ms));
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => cm.refresh());
+      el.addEventListener("pointerdown", () => { if (!cm.__ok) { cm.__ok = 1; cm.refresh(); } }, true);
+      if (atual) abrir(atual);
+    }
+    // o CodeMirror (≈500 KB) só é baixado quando o Peep Studio abre pela primeira vez
+    if (window.CodeMirror) setTimeout(ligarCM, 0);
+    else if (!document.querySelector("script[data-cm]")) {
+      const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "js/vendor/codemirror/codemirror.css"; document.head.appendChild(css);
+      const sc = document.createElement("script"); sc.src = "js/vendor/codemirror/codemirror.js"; sc.dataset.cm = "1"; sc.onload = ligarCM; document.head.appendChild(sc);
+    } else document.querySelector("script[data-cm]").addEventListener("load", ligarCM);
+    const valor = () => (cm ? cm.getValue() : ta.value);
+    function salvarAtalho() { salvar(); psf.textContent = psf.textContent.replace(/ · salvo$/, "") + " · salvo"; }
+
     function pintarCodigo() {
+      if (cm) return;
       const txt = ta.value;
       src.innerHTML = realce(atual, txt) + "\n ";
       ln.textContent = txt.split("\n").map((_, i) => i + 1).join("\n");
@@ -244,7 +277,8 @@ class Programa
       if (!abertos.includes(id)) abertos.push(id);
       tabs.innerHTML = abertos.map((n) => `<button class="pt-tab ${n === id ? "on" : ""}" data-f="${esc(n)}">${esc(n.split("/").pop())}</button>`).join("");
       tabs.querySelectorAll("[data-f]").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
-      ta.value = conteudo(id); ta.readOnly = !editavel(id);
+      if (cm) { cm.setOption("mode", MODOS[extDe(id)] || null); cm.setOption("readOnly", !editavel(id)); cm.setValue(conteudo(id)); cm.clearHistory(); setTimeout(() => cm.refresh(), 0); }
+      else { ta.value = conteudo(id); ta.readOnly = !editavel(id); }
       pintarCodigo(); pintarArvore();
       const ext = extDe(id), L = LINGUAS[ext];
       psf.textContent = id + " · " + (L ? L.nome : ext === "md" ? "Markdown" : ext.toUpperCase()) + (editavel(id) ? "" : " · só leitura");
@@ -255,20 +289,21 @@ class Programa
     // ---------- edição ----------
     let tSalvar = null;
     let avisouNome = false;
-    ta.addEventListener("input", () => {
+    function editou() {
       if (!editavel(atual)) return;
       if (atual === LIVRO) {
-        livro = ta.value;
+        livro = valor();
         const n = ALU.lerLivro(livro).nome;
         if (n && !avisouNome) { avisouNome = true; ALU.zizi && ALU.zizi.guia && setTimeout(() => ALU.zizi.guia("nome", n), 900); }
-      } else meus[atual.slice(13)] = ta.value;
+      } else meus[atual.slice(13)] = valor();
       pintarCodigo();
       clearTimeout(tSalvar); tSalvar = setTimeout(salvar, 400);
-    });
+    }
+    ta.addEventListener("input", editou);
     ta.addEventListener("scroll", () => { ta.scrollTop = 0; ta.scrollLeft = 0; });
     ta.addEventListener("keydown", (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); executar(); return; }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); salvar(); psf.textContent = psf.textContent.replace(/ · salvo$/, "") + " · salvo"; return; }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); salvarAtalho(); return; }
       if (ta.readOnly) return;
       const ini = ta.selectionStart, fim = ta.selectionEnd, v = ta.value;
       if (e.key === "Tab") {
@@ -310,7 +345,7 @@ class Programa
         setTimeout(() => escrever(`Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)\n`), 600);
         return;
       }
-      const ext = extDe(atual), codigo = ta.value, stdin = stdinEl.value;
+      const ext = extDe(atual), codigo = valor(), stdin = stdinEl.value;
       if (!LINGUAS[ext]) return;
       rodando = true; btnRun.disabled = true; btnStop.hidden = false;
       escrever(`▶ ${atual.split("/").pop()} · ${LINGUAS[ext].nome}\n`, "info");

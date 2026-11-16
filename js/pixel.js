@@ -129,6 +129,26 @@
       c.oval(8, 7, 3, 3, "#5b6475").px(8, 7, "#9cc3ff").px(7, 7, "#9cc3ff").rect(7, 3, 2, 1, "#5b6475").rect(7, 10, 2, 1, "#5b6475").rect(4, 6, 1, 2, "#5b6475").rect(11, 6, 1, 2, "#5b6475");
       return c.outline(K);
     },
+    sms() {
+      const c = new Px();
+      c.rect(0, 0, 16, 16, "#2fb344").cantos().rect(1, 1, 14, 2, "#5fd86f");
+      c.oval(8, 7.5, 6, 4.5, "#ffffff").grid(3, 11, ["ww..", ".w.."], { w: "#ffffff" });
+      c.rect(5, 7, 1, 1, "#2fb344").rect(8, 7, 1, 1, "#2fb344").rect(11, 7, 1, 1, "#2fb344");
+      return c;
+    },
+    banco() {
+      const c = new Px();
+      c.rect(0, 0, 16, 16, "#7a2ff0").cantos().rect(1, 1, 14, 2, "#9a5cff");
+      c.rect(2, 5, 12, 8, "#ffd23f").rect(2, 7, 12, 2, "#3b1a6b").rect(3, 10, 4, 1, "#b38a00").rect(10, 10, 3, 2, "#fff3b0");
+      return c.outline("#3b1a6b").cantos();
+    },
+    toque() {
+      const c = new Px();
+      c.rect(0, 0, 16, 16, "#ff6a3d").cantos().rect(1, 1, 14, 2, "#ff9470");
+      c.rect(9, 3, 1, 9, "#ffffff").rect(10, 3, 3, 1, "#ffffff").rect(12, 4, 1, 2, "#ffffff").oval(7, 11.5, 2.6, 2, "#ffffff");
+      c.grid(2, 4, ["w.", ".w", "w."], { w: "#ffe0d4" });
+      return c;
+    },
     visitante() {
       const c = new Px();
       c.rect(0, 0, 16, 16, "#cfe3ff").oval(8, 6, 3.5, 3.5, "#8aa6cf").oval(8, 15, 6, 4.5, "#8aa6cf");

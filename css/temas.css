@@ -1,0 +1,150 @@
+/* =====================================================================
+   Temas do aluOS: Pixel (padrão, style.css), Frutiger Aero e Frutiger Metro.
+   O tema fica em <html data-tema="...">. Escolha no Painel de controle.
+   ===================================================================== */
+
+/* ---------- base comum aos dois Frutiger: fonte lisa e cantos de verdade ---------- */
+:root[data-tema="aero"], :root[data-tema="metro"] {
+  --ui: "Segoe UI", "Frutiger", "Myriad Pro", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --txt: "Segoe UI", "Frutiger", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --corner: none;
+}
+:root[data-tema="aero"] body, :root[data-tema="metro"] body { -webkit-font-smoothing: antialiased; }
+/* os textos foram dimensionados para fontes pixel (que são "baixinhas"); isto equilibra o tamanho */
+:root[data-tema="aero"] *, :root[data-tema="metro"] * { font-size-adjust: 0.43; }
+:root[data-tema="aero"] .peep, :root[data-tema="metro"] .peep, :root[data-tema="aero"] .peep *, :root[data-tema="metro"] .peep * { font-size-adjust: none; }
+:root[data-tema="aero"] .peep-code .CodeMirror, :root[data-tema="metro"] .peep-code .CodeMirror,
+:root[data-tema="aero"] .term, :root[data-tema="metro"] .term { font-family: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace; font-size: 15px; line-height: 20px; }
+:root[data-tema="aero"] .wallpaper, :root[data-tema="metro"] .wallpaper { image-rendering: auto; }
+
+/* =====================================================================
+   FRUTIGER AERO: céu, bolhas, vidro, brilho e verde
+   ===================================================================== */
+:root[data-tema="aero"] { --face: #f4f9fd; --face2: #ffffff; --line: #b9d3e8; --dark: #8fb1cc; --muted: #4f6b82; --bg: #0b5fa5; }
+:root[data-tema="aero"] .wallpaper {
+  background:
+    radial-gradient(circle at 18% 30%, rgba(255,255,255,.55) 0 2.2%, rgba(255,255,255,.12) 2.4% 3.4%, transparent 3.6%),
+    radial-gradient(circle at 72% 22%, rgba(255,255,255,.5) 0 1.4%, rgba(255,255,255,.1) 1.6% 2.4%, transparent 2.6%),
+    radial-gradient(circle at 84% 48%, rgba(255,255,255,.45) 0 3%, rgba(255,255,255,.08) 3.2% 4.6%, transparent 4.8%),
+    radial-gradient(circle at 40% 62%, rgba(255,255,255,.35) 0 1%, transparent 1.4%),
+    radial-gradient(circle at 60% 40%, rgba(255,255,255,.3) 0 .7%, transparent 1%),
+    radial-gradient(ellipse 80% 40% at 50% 112%, #7ed957 0 40%, #3fae3a 60%, transparent 61%),
+    radial-gradient(ellipse 70% 30% at 15% 108%, #a6ec6a 0 50%, transparent 51%),
+    radial-gradient(ellipse 120% 70% at 50% 0%, #e8f8ff 0 15%, transparent 60%),
+    linear-gradient(180deg, #2b9be8 0%, #6cc6f5 45%, #bfe9ff 72%, #e9fbff 100%) !important;
+  background-size: cover !important;
+}
+:root[data-tema="aero"] .wallpaper::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 25% at 70% 80%, rgba(255,255,255,.35), transparent 70%); pointer-events: none; }
+
+/* janelas de vidro */
+:root[data-tema="aero"] .win { clip-path: none; padding: 0 6px 6px; border-radius: 9px; background: linear-gradient(180deg, rgba(190,226,255,.62), rgba(120,180,230,.5));
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 0 0 1px rgba(10,40,80,.55), inset 0 0 0 1px rgba(255,255,255,.7), 0 14px 34px rgba(0,30,70,.45); filter: none; }
+:root[data-tema="aero"] .win::after { clip-path: none; border-radius: 9px; box-shadow: none; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 32px); }
+:root[data-tema="aero"] .win:not(.focus) { background: linear-gradient(180deg, rgba(220,235,248,.6), rgba(190,210,230,.5)); box-shadow: 0 0 0 1px rgba(10,40,80,.35), 0 8px 20px rgba(0,30,70,.25); }
+:root[data-tema="aero"] .win-bar, :root[data-tema="aero"] .win:not(.focus) .win-bar { background: transparent; color: #0b2a4a; height: 32px; margin: 0; }
+:root[data-tema="aero"] .win-title { text-shadow: 0 0 10px #fff, 0 0 4px #fff; font-weight: 600; }
+:root[data-tema="aero"] .win-btns { gap: 0; border-radius: 0 0 6px 6px; overflow: hidden; align-self: flex-start; box-shadow: 0 0 0 1px rgba(10,40,80,.5), inset 0 1px 0 rgba(255,255,255,.7); }
+:root[data-tema="aero"] .win-btns button { width: 28px; height: 20px; background: linear-gradient(rgba(255,255,255,.75), rgba(255,255,255,.25) 50%, rgba(160,200,235,.45) 51%, rgba(220,240,255,.7)); box-shadow: inset -1px 0 0 rgba(10,40,80,.3); }
+:root[data-tema="aero"] .win-btns button[data-b="close"] { width: 44px; background: linear-gradient(#f3b3a6, #e2735a 50%, #c7351c 51%, #e88a6a); }
+:root[data-tema="aero"] .win-btns i { filter: drop-shadow(0 0 1px #0b2a4a); }
+:root[data-tema="aero"] .win-body { border-radius: 3px; box-shadow: 0 0 0 1px rgba(10,40,80,.45); }
+:root[data-tema="aero"] .win.max { border-radius: 0; }
+
+/* barra de tarefas, iniciar e bandeja */
+:root[data-tema="aero"] .taskbar { height: 40px; background: linear-gradient(180deg, rgba(120,180,225,.55), rgba(20,60,110,.75) 50%, rgba(5,30,70,.85) 51%, rgba(30,80,140,.8));
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 -1px 0 rgba(0,20,50,.6); }
+:root[data-tema="aero"] .tb-start { clip-path: none; padding: 0 12px 0 4px; background: none; text-shadow: 0 1px 2px #000; font-weight: 600; }
+:root[data-tema="aero"] .orb { width: 34px; height: 34px; clip-path: none; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #fff 0 18%, #9fe3ff 30%, #1e8fe0 62%, #0a3d7a 100%);
+  box-shadow: 0 0 0 1px #0a2d55, 0 0 12px rgba(120,220,255,.9); }
+:root[data-tema="aero"] .orb::after { inset: 9px; border-radius: 3px; opacity: .95; }
+:root[data-tema="aero"] .tb-quick { border-right: 1px solid rgba(255,255,255,.25); box-shadow: none; }
+:root[data-tema="aero"] .tb-app { border-radius: 4px; background: linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.1) 50%, rgba(255,255,255,.04) 51%, rgba(255,255,255,.15)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), 0 0 0 1px rgba(0,20,50,.5); }
+:root[data-tema="aero"] .tb-app.on { background: linear-gradient(rgba(170,230,255,.6), rgba(80,170,230,.45) 50%, rgba(30,120,200,.5) 51%, rgba(120,210,255,.6)); }
+:root[data-tema="aero"] .tb-tray { background: rgba(0,20,50,.25); box-shadow: inset 1px 0 0 rgba(255,255,255,.25); }
+:root[data-tema="aero"] .launcher { clip-path: none; border-radius: 8px 8px 0 0; padding: 0 6px 6px; background: linear-gradient(rgba(150,205,245,.75), rgba(40,100,170,.75));
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 0 0 1px rgba(0,20,50,.6), inset 0 0 0 1px rgba(255,255,255,.5), 0 10px 30px rgba(0,0,0,.4); filter: none; }
+:root[data-tema="aero"] .la-head { background: transparent; text-shadow: 0 1px 3px rgba(0,0,0,.6); margin: 0; }
+:root[data-tema="aero"] .la-head img { border-radius: 6px; box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0,0,0,.4); }
+:root[data-tema="aero"] .la-body { border-radius: 4px; overflow: hidden; }
+:root[data-tema="aero"] .la-side { background: rgba(225,240,252,.9); box-shadow: inset 1px 0 0 #b6d4ee; }
+:root[data-tema="aero"] .la-foot { background: transparent; }
+:root[data-tema="aero"] .la-foot button { border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.6), 0 0 0 1px rgba(0,0,0,.3); }
+
+/* controles: botões de gel */
+:root[data-tema="aero"] .btn { border-radius: 4px; background: linear-gradient(#ffffff, #eef6fc 49%, #d8e9f7 50%, #e9f4fd); box-shadow: 0 0 0 1px #6f97bb, inset 0 1px 0 #fff; }
+:root[data-tema="aero"] .btn:hover { background: linear-gradient(#f2fbff, #d7efff 49%, #a9dcfa 50%, #cdeefe); box-shadow: 0 0 0 1px #3c7fb1, inset 0 1px 0 #fff; }
+:root[data-tema="aero"] .btn.real { color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.4); background: linear-gradient(#8fd3ff, #3ba3ea 49%, #1478c8 50%, #47aef0); box-shadow: 0 0 0 1px #0d5a9a, inset 0 1px 0 rgba(255,255,255,.6); }
+:root[data-tema="aero"] .menubar { background: linear-gradient(#fbfdff, #e6f0f8); border-bottom: 1px solid #c3d8ea; }
+:root[data-tema="aero"] fieldset { border-radius: 6px; box-shadow: inset 0 0 0 1px #b9d3e8; }
+:root[data-tema="aero"] legend { color: #1a6aa8; }
+:root[data-tema="aero"] .d-icon .lbl { text-shadow: 0 1px 3px #000, 0 0 2px #000; }
+:root[data-tema="aero"] .d-icon.sel .lbl { background: rgba(80,170,240,.45); border-radius: 3px; outline: 1px solid rgba(255,255,255,.6); }
+:root[data-tema="aero"] .d-icon.sel .pxi { filter: drop-shadow(0 0 6px #8fd8ff); }
+:root[data-tema="aero"] .toast, :root[data-tema="aero"] .ctx-menu, :root[data-tema="aero"] .urso-balao, :root[data-tema="aero"] .zv-balao {
+  border-radius: 8px; background: linear-gradient(#ffffff, #eaf5fd); box-shadow: 0 0 0 1px #7aa6cc, 0 6px 18px rgba(0,40,90,.3); }
+:root[data-tema="aero"] .toast-bar { border-radius: 8px 8px 0 0; background: linear-gradient(#a8e4ff, #3fb0ea 50%, #1890d6 51%, #4cc0f3); }
+
+/* =====================================================================
+   FRUTIGER METRO: chapado, tipografia grande, blocos de cor, zero brilho
+   ===================================================================== */
+:root[data-tema="metro"] { --face: #ffffff; --face2: #ffffff; --line: #d6d6d6; --dark: #9a9a9a; --muted: #5c5c5c; --bg: #1d1d1d; }
+:root[data-tema="metro"] .wallpaper {
+  background:
+    linear-gradient(115deg, transparent 0 58%, rgba(255,255,255,.07) 58% 70%, transparent 70%),
+    linear-gradient(115deg, transparent 0 74%, rgba(255,255,255,.05) 74% 82%, transparent 82%),
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 75%, #000) 0%, var(--accent) 60%, color-mix(in srgb, var(--accent) 70%, #fff) 100%) !important;
+}
+:root[data-tema="metro"] .win { clip-path: none; padding: 0 1px 1px; background: var(--accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 70%, #000), 0 10px 30px rgba(0,0,0,.35); filter: none; }
+:root[data-tema="metro"] .win::after { display: none; }
+:root[data-tema="metro"] .win:not(.focus) { background: #8a8a8a; }
+:root[data-tema="metro"] .win-bar, :root[data-tema="metro"] .win:not(.focus) .win-bar { background: transparent; color: #fff; height: 32px; margin: 0; }
+:root[data-tema="metro"] .win-title { text-shadow: none; font-weight: 400; font-size: 15px; letter-spacing: .3px; }
+:root[data-tema="metro"] .win-btns button { width: 40px; height: 32px; background: transparent; box-shadow: none; }
+:root[data-tema="metro"] .win-btns button:hover { background: rgba(255,255,255,.2); filter: none; }
+:root[data-tema="metro"] .win-btns button[data-b="close"] { background: transparent; } :root[data-tema="metro"] .win-btns button[data-b="close"]:hover { background: #e81123; }
+:root[data-tema="metro"] .win-btns { align-self: flex-start; }
+:root[data-tema="metro"] .taskbar { background: rgba(20,20,20,.92); box-shadow: none; }
+:root[data-tema="metro"] .tb-start { clip-path: none; background: var(--accent); padding: 0 16px; font-weight: 300; font-size: 20px; letter-spacing: .5px; text-shadow: none; text-transform: lowercase; }
+:root[data-tema="metro"] .orb { clip-path: none; width: 20px; height: 20px; background: none; }
+:root[data-tema="metro"] .orb::after { inset: 0; background: linear-gradient(#fff 0 0) 0 0 / 9px 9px no-repeat, linear-gradient(#fff 0 0) 11px 0 / 9px 9px no-repeat, linear-gradient(#fff 0 0) 0 11px / 9px 9px no-repeat, linear-gradient(#fff 0 0) 11px 11px / 9px 9px no-repeat; }
+:root[data-tema="metro"] .tb-quick { border-right: 1px solid #333; box-shadow: none; }
+:root[data-tema="metro"] .tb-app { background: transparent; box-shadow: inset 0 -2px 0 #666; }
+:root[data-tema="metro"] .tb-app.on { background: rgba(255,255,255,.12); box-shadow: inset 0 -3px 0 var(--accent); }
+:root[data-tema="metro"] .tb-app span { text-shadow: none; }
+:root[data-tema="metro"] .tb-tray { background: transparent; box-shadow: none; text-shadow: none; }
+:root[data-tema="metro"] .launcher { clip-path: none; padding: 0; background: #1f1f1f; filter: none; box-shadow: 0 0 0 1px #000, 0 10px 30px rgba(0,0,0,.5); }
+:root[data-tema="metro"] .la-head { background: var(--accent); margin: 0; font-weight: 300; font-size: 24px; text-shadow: none; }
+:root[data-tema="metro"] .la-head img { box-shadow: none; }
+:root[data-tema="metro"] .la-body { background: #1f1f1f; color: #fff; }
+:root[data-tema="metro"] .la-list button { color: #fff; }
+:root[data-tema="metro"] .la-side { background: #2b2b2b; box-shadow: none; }
+:root[data-tema="metro"] .la-side button { color: #fff; font-weight: 400; }
+:root[data-tema="metro"] .la-search { background: #2b2b2b; color: #fff; box-shadow: none; }
+:root[data-tema="metro"] .la-foot { background: #1f1f1f; margin: 0; }
+:root[data-tema="metro"] .la-foot button { background: #333; box-shadow: none; }
+:root[data-tema="metro"] .btn { background: #fff; box-shadow: inset 0 0 0 2px #1d1d1d; border-radius: 0; }
+:root[data-tema="metro"] .btn:hover { background: #ececec; }
+:root[data-tema="metro"] .btn.real { background: var(--accent); color: #fff; box-shadow: inset 0 0 0 2px var(--accent); }
+:root[data-tema="metro"] .btn.real:hover { filter: brightness(1.1); }
+:root[data-tema="metro"] .menubar { background: #fff; border-bottom: 1px solid #e3e3e3; }
+:root[data-tema="metro"] fieldset { box-shadow: none; border-top: 1px solid #e3e3e3; padding: 12px 0; }
+:root[data-tema="metro"] legend { color: var(--accent); font-weight: 300; font-size: 20px; padding: 0 6px 0 0; }
+:root[data-tema="metro"] .d-icon .pxi { background: rgba(255,255,255,.12); padding: 6px; width: 56px; height: 56px; }
+:root[data-tema="metro"] .d-icon .lbl { text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+:root[data-tema="metro"] .d-icon.sel .lbl { background: rgba(255,255,255,.25); outline: none; }
+:root[data-tema="metro"] .d-icon.sel .pxi { filter: none; background: rgba(255,255,255,.3); }
+:root[data-tema="metro"] .toast, :root[data-tema="metro"] .ctx-menu, :root[data-tema="metro"] .urso-balao, :root[data-tema="metro"] .zv-balao { background: #fff; box-shadow: 0 0 0 1px #c8c8c8, 0 6px 18px rgba(0,0,0,.25); }
+:root[data-tema="metro"] .toast-bar { background: var(--accent); }
+
+/* seletor de tema no Painel de controle */
+.temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tema-opt { display: flex; flex-direction: column; gap: 4px; align-items: center; padding: 6px; font-size: 13px; }
+.tema-opt.on { outline: 2px solid var(--accent); }
+.tema-prev { width: 100%; height: 54px; display: block; }
+.tema-prev.pixel { background: linear-gradient(#2f6bff 0 12px, #ece9d8 12px) 10px 10px / 60% 34px no-repeat, url(../img/wp-aurora.png) center / cover; image-rendering: pixelated; }
+.tema-prev.aero { background: radial-gradient(circle at 25% 35%, rgba(255,255,255,.7) 0 6%, transparent 7%), radial-gradient(ellipse 90% 40% at 50% 115%, #6fd14f 0 60%, transparent 61%), linear-gradient(#2b9be8, #bfe9ff); border-radius: 6px; }
+.tema-prev.metro { background: linear-gradient(#2f6bff 0 0) 10px 10px / 26px 26px no-repeat, linear-gradient(#e07b12 0 0) 40px 10px / 26px 26px no-repeat, linear-gradient(#0e9f6e 0 0) 70px 10px / 56px 26px no-repeat, #1d1d1d; }
+
+/* a IDE mantém o visual escuro em qualquer tema */
+:root[data-tema="aero"] .peep .menubar, :root[data-tema="metro"] .peep .menubar { background: #2a2540; border-bottom: 1px solid #120f1e; }
