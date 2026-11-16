@@ -9,7 +9,8 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 - **Sobre mim:** `sobre_mim.txt` (bloco de notas) e `quarto_360.png`, um quarto panorâmico 360° com objetos clicáveis.
 - **MessagerTale:** messenger que começa com notificações no canto da tela. O visitante escolhe as respostas,
   a frase é "digitada" (qualquer tecla acelera) e o `aluisio.dev` responde.
-- **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub. Os botões "Sair da savana" levam aos perfis reais.
+- **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub (os botões "Sair da savana" levam aos perfis reais), o YouInTheScreenOfComputerOrPhone, o e-mail imaíu e o clicajogos, com Cobrinha, Jogo da velha, Pato Clicker e Memória.
+- **Segredos:** 22 conquistas escondidas pelo sistema. O Painel de controle mostra quantas você já achou.
 - **Peep Studio:** IDE do patinho roxo, com `Aluisio.cs` e um README de cada projeto. O botão ▶ Executar "roda" o código.
 - **Terminal**, **Painel de controle** (papel de parede e cor das janelas) e **Lixeira**.
 
@@ -45,6 +46,9 @@ js/pixel.js       ícones em pixel art, desenhados em código
 js/apps.js        registro de apps, pastas, bloco de notas, propriedades
 js/chat.js        MessagerTale: roteiro da conversa e sons
 js/kez.js         navegador Kez(i)avana e suas páginas
+js/sites.js       sites do Kez(i)avana (vídeos, e-mail, jogos)
+js/jogos.js       joguinhos do clicajogos
+js/eggs.js        easter eggs e conquistas
 js/peep.js        IDE Peep Studio
 js/quarto.js      visualizador 360°
 js/terminal.js    terminal

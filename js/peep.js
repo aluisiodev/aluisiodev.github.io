@@ -100,8 +100,11 @@
       psf.textContent = nome + (nome.endsWith(".cs") ? " · C#" : " · Markdown");
     }
     el.querySelectorAll(".pt-f").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
+    let runs = 0;
     el.querySelector(".peep-run").onclick = () => {
+      runs++;
       out.textContent = "Compilando Aluisio.cs…";
+      if (runs === 5) { setTimeout(() => { out.textContent += "\n\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs."; ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 650); }
       setTimeout(() => {
         out.textContent += `\nCompilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)`;
       }, 600);

@@ -80,7 +80,7 @@
         <div class="chat-ops"></div>
         <div class="chat-bottom">
           <div class="chat-col">
-            <div class="fmt"><b>A</b><b class="i">A</b><b class="u">A</b><span>☺</span></div>
+            <div class="fmt"><b>A</b><b class="i">A</b><b class="u">A</b><span>☺</span><button class="chat-nudge" title="Chamar atenção">📳</button></div>
             <div class="chat-input">
               <div class="chat-box" aria-hidden="true"><span class="txt"></span><span class="caret"></span></div>
               <button class="chat-send" disabled>Enviar</button>
@@ -99,6 +99,12 @@
 
     const pintarSom = () => { som.textContent = mudo ? "🔇" : "🔊"; som.title = mudo ? "Ligar som" : "Desligar som"; };
     pintarSom();
+    el.querySelector(".chat-nudge").onclick = () => {
+      const w = el.closest(".win") || el; w.classList.remove("treme"); void w.offsetWidth; w.classList.add("treme");
+      ALU.bip && ALU.bip("in"); linha("", "Você chamou a atenção de " + eu + "!", true);
+      later(() => linha(eu, "opa, tô aqui! não precisa tremer a tela 😅"), 900);
+      ALU.conquista && ALU.conquista("nudge", "Chamando atenção", "Tremeu a janela do MessagerTale.");
+    };
     som.onclick = () => { mudo = !mudo; try { localStorage.setItem("alu.mudo", mudo ? "1" : "0"); } catch {} pintarSom(); };
 
     function linha(quem, texto, sistema, h) {

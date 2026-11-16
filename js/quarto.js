@@ -15,7 +15,7 @@
       <div class="qt">
         <div class="qt-view"><div class="qt-msg">Carregando o quarto…</div></div>
         <div class="qt-hint">Arraste para olhar em volta · role para aproximar · clique nos <b>!</b></div>
-        <div class="qt-lista">${Q.pontos.map((p) => `<button data-p="${p.id}">${esc(p.titulo.split("·")[0].trim())}</button>`).join("")}</div>
+        <div class="qt-lista">${Q.pontos.filter((p) => !p.escondido).map((p) => `<button data-p="${p.id}">${esc(p.titulo.split("·")[0].trim())}</button>`).join("")}</div>
         <div class="qt-card" hidden><div class="qt-card-bar"><span></span><button aria-label="Fechar">✕</button></div><p></p></div>
       </div>`;
     const view = el.querySelector(".qt-view"), card = el.querySelector(".qt-card");
@@ -28,7 +28,11 @@
       card.querySelector("span").textContent = p.titulo;
       card.querySelector("p").textContent = p.texto;
       el.querySelectorAll(".qt-lista button").forEach((b) => b.classList.toggle("on", b.dataset.p === p.id));
+      vistos.add(p.id);
+      if (p.id === "luminaria") ALU.conquista && ALU.conquista("luminaria", "Iluminado", "Achou o ponto escondido do quarto.");
+      if (Q.pontos.filter((x) => !x.escondido).every((x) => vistos.has(x.id))) ALU.conquista && ALU.conquista("turista", "Turista do quarto", "Olhou todos os objetos do quarto.");
     }
+    const vistos = new Set();
     card.querySelector("button").onclick = () => { card.hidden = true; el.querySelectorAll(".qt-lista button").forEach((b) => b.classList.remove("on")); };
     el.querySelectorAll(".qt-lista button").forEach((b) => (b.onclick = () => { const p = Q.pontos.find((x) => x.id === b.dataset.p); api.olhar && api.olhar(p); mostrarCard(p); }));
 
@@ -36,21 +40,21 @@
       if (!vivo) return;
       const T = window.THREE;
       view.querySelector(".qt-msg").remove();
-      const renderer = new T.WebGLRenderer({ antialias: false });
+      const renderer = new T.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       view.appendChild(renderer.domElement);
       const scene = new T.Scene();
       const cam = new T.PerspectiveCamera(75, 1, 0.1, 1000);
       const geo = new T.SphereGeometry(500, 64, 40); geo.scale(-1, 1, 1);
       const tex = new T.TextureLoader().load(Q.imagem, () => render());
-      tex.magFilter = T.NearestFilter; tex.minFilter = T.LinearFilter; tex.generateMipmaps = false;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
       scene.add(new T.Mesh(geo, new T.MeshBasicMaterial({ map: tex })));
 
       // posição 3D de um ponto (u, v) da imagem, igual ao mapeamento da esfera
       const pos3 = (u, v) => new T.Vector3(Math.cos(2 * Math.PI * u) * Math.sin(Math.PI * v), Math.cos(Math.PI * v), Math.sin(2 * Math.PI * u) * Math.sin(Math.PI * v)).multiplyScalar(400);
       const pinos = Q.pontos.map((p) => {
         const b = document.createElement("button");
-        b.className = "qt-pin"; b.innerHTML = `<i>!</i><span>${esc(p.titulo)}</span>`;
+        b.className = "qt-pin" + (p.escondido ? " escondido" : ""); b.innerHTML = `<i>${p.escondido ? "?" : "!"}</i><span>${esc(p.titulo)}</span>`;
         b.onclick = (e) => { e.stopPropagation(); mostrarCard(p); };
         view.appendChild(b);
         return { p, b, v: pos3(p.u, p.v) };

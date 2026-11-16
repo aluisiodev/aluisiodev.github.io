@@ -1,6 +1,6 @@
 // Terminal interativo do aluOS.
 (function () {
-  const esc = (s) => window.ALU.esc(s);
+  const ALU = window.ALU, esc = (s) => ALU.esc(s);
   window.ALU.terminal = function (el, ctx) {
     const P = window.PERFIL, PROJ = window.PROJETOS;
     el.innerHTML = `<div class="term" tabindex="-1"><div class="term-out"></div>
@@ -12,7 +12,7 @@
     const CMDS = {
       ajuda: () => print(
         [["sobre", "quem sou eu"], ["projetos", "lista os projetos"], ["abrir &lt;projeto&gt;", "abre um projeto (ex.: abrir nexo)"], ["skills", "skills e certificações"], ["abrir kez | peep | quarto", "abre um app"],
-         ["contato", "onde me encontrar"], ["neofetch", "informações do sistema"], ["tema &lt;1-5&gt;", "troca o papel de parede"], ["limpar", "limpa a tela"], ["sair", "fecha o terminal"]]
+         ["contato", "onde me encontrar"], ["neofetch", "informações do sistema"], ["tema &lt;1-5&gt;", "troca o papel de parede"], ["limpar", "limpa a tela"], ["conquistas", "o que você já achou"], ["sair", "fecha o terminal"]]
           .map(([c, d]) => `<span class="k">${c}</span> <span class="muted">— ${d}</span>`).join("<br>")),
       sobre: () => print(P.bio.map(esc).join("<br><br>")),
       whoami: () => print("visitante (mas pode ficar à vontade)"),
@@ -51,6 +51,16 @@ Autor ..... ${esc(P.nome)}`, "pre"),
       sair: () => ctx.fechar && ctx.fechar(),
       exit: () => CMDS.sair(),
       help: () => CMDS.ajuda(),
+      quack: () => { print("🦆 quack."); ALU.conquista && ALU.conquista("terminal", "Hacker de verdade", "Achou um comando secreto no terminal."); },
+      hack: () => { const l = ["acessando mainframe da savana…", "burlando o firewall do pato…", "baixando mais RAM…", "pronto. você agora é admin de nada. 😎"]; l.forEach((t, i) => setTimeout(() => print(t, i === 3 ? "" : "muted"), i * 450)); ALU.conquista && ALU.conquista("terminal", "Hacker de verdade", "Achou um comando secreto no terminal."); },
+      matrix: () => CMDS.hack(),
+      girafa: () => print(`<span class="logo">   ▟▙
+   ▐▌   oi.
+   ▐▌
+  ▟██▙▄▄
+  ▐▌▐▌▐▌</span>`, "pre"),
+      conquistas: () => { const F = ALU.conquistasFeitas ? ALU.conquistasFeitas() : {}, T = ALU.CONQUISTAS || []; print(`${Object.keys(F).length}/${T.length} conquistas<br>` + T.map(([id, n]) => F[id] ? `<span class="k">[x] ${esc(n)}</span>` : `<span class="muted">[ ] ???</span>`).join("<br>")); },
+      desligar: () => ALU.desligar && ALU.desligar(),
     };
 
     function run(line) {
@@ -68,7 +78,7 @@ Autor ..... ${esc(P.nome)}`, "pre"),
       else if (e.key === "Tab") {
         e.preventDefault();
         const parts = inp.value.split(" ");
-        const pool = parts.length > 1 ? PROJ.map((p) => p.id) : Object.keys(CMDS);
+        const pool = parts.length > 1 ? PROJ.map((p) => p.id) : Object.keys(CMDS).filter((c) => !["quack", "hack", "matrix", "girafa"].includes(c));
         const m = pool.filter((c) => c.startsWith(parts[parts.length - 1]));
         if (m.length === 1) { parts[parts.length - 1] = m[0]; inp.value = parts.join(" ") + (parts.length === 1 ? " " : ""); }
         else if (m.length > 1) print(m.join("  "), "muted");

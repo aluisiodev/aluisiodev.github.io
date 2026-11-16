@@ -145,7 +145,7 @@
         <div class="la-side">${["pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", "ajustes"].map((id) => `<button data-app="${id}">${esc(ALU.APPS[id].titulo)}</button>`).join("")}</div>
       </div>
       <input class="la-search" placeholder="Iniciar pesquisa" aria-label="Pesquisar">
-      <div class="la-foot"><button data-act="reboot">⏻ Reiniciar</button></div>`;
+      <div class="la-foot"><button data-act="reboot">↻ Reiniciar</button><button data-act="desligar">⏻ Desligar</button></div>`;
     const laList = launcher.querySelector(".la-list");
     const desenhar = (q = "") => {
       const f = todos.filter((id) => ALU.APPS[id].titulo.toLowerCase().includes(q.toLowerCase()));
@@ -158,6 +158,7 @@
     busca.addEventListener("input", (e) => desenhar(e.target.value));
     busca.addEventListener("keydown", (e) => { if (e.key === "Enter") { const b = laList.querySelector("button"); b && b.click(); } if (e.key === "Escape") launcher.hidden = true; });
     launcher.querySelector('[data-act="reboot"]').onclick = () => ALU.reboot();
+    launcher.querySelector('[data-act="desligar"]').onclick = () => { launcher.hidden = true; ALU.desligar && ALU.desligar(); };
 
     // ---- menu de contexto ----
     desk.addEventListener("contextmenu", (e) => {

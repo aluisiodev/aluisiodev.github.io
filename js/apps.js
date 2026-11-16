@@ -147,11 +147,23 @@
     const li = el.querySelector('[data-a="li"]'); if (li) li.onclick = () => ctx.abrir("kez", "ligadin.com/in/aluisio-alves");
   }
 
+  const LIXO = [
+    ["bugs-de-ontem.txt", "1. botão não clica\n2. botão clica duas vezes\n3. botão clica sozinho às 3h da manhã\n\nstatus: virou feature."],
+    ["TODO-final-final-v3.md", "- [x] terminar o portfolio\n- [ ] terminar o portfolio de verdade\n- [ ] parar de mexer no portfolio"],
+    ['console.log("aqui").js', 'console.log("aqui");\nconsole.log("aqui 2");\nconsole.log("AQUI PELO AMOR");\n// funcionou e eu não sei por quê'],
+    ["segredo.txt", "Se você chegou até aqui, tenta digitar quack em qualquer lugar.\nOu savana.\nOu aquele código antigo com as setas…"],
+  ];
   function renderLixeira(el) {
     el.innerHTML = `<div class="pad">
-      <p>3 itens</p>
-      <ul class="lixo"><li>${ALU.pix("notas")} bugs-de-ontem.txt</li><li>${ALU.pix("notas")} TODO-final-final-v3.md</li><li>${ALU.pix("notas")} console.log("aqui").js</li></ul>
+      <p>${LIXO.length} itens · clique para espiar</p>
+      <ul class="lixo">${LIXO.map(([n], i) => `<li><button data-i="${i}">${ALU.pix("notas")} ${esc(n)}</button></li>`).join("")}</ul>
+      <pre class="lixo-txt" hidden></pre>
       <p class="muted">Esvaziar? Melhor não. Eles me ensinaram muito.</p></div>`;
+    const txt = el.querySelector(".lixo-txt");
+    el.querySelectorAll(".lixo button").forEach((b) => (b.onclick = () => {
+      txt.hidden = false; txt.textContent = LIXO[+b.dataset.i][1];
+      ALU.conquista && ALU.conquista("lixeira", "Revirando o lixo", "Abriu um arquivo da Lixeira.");
+    }));
   }
 
   function renderAjustes(el) {
@@ -164,8 +176,12 @@
           <div class="accents">${ALU.CORES.map((c) => `<button class="acc" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join("")}</div></fieldset>
         <fieldset><legend>Sistema</legend>
           <p class="muted">aluOS 2.0 · pixel por pixel, em HTML, CSS e JavaScript.</p>
-          <button class="btn" data-act="reboot">Reiniciar</button></fieldset>
+          <button class="btn" data-act="reboot">Reiniciar</button> <button class="btn" data-act="desligar">Desligar</button></fieldset>
+        <fieldset><legend>Conquistas</legend><div class="conq-lista"></div></fieldset>
       </div>`;
+    const F = ALU.conquistasFeitas ? ALU.conquistasFeitas() : {}, T = ALU.CONQUISTAS || [];
+    el.querySelector(".conq-lista").innerHTML = `<p>${Object.keys(F).length} de ${T.length} encontradas</p><ul>${T.map(([id, n]) => F[id] ? `<li class="ok">🏆 ${esc(n)}</li>` : `<li>🔒 ???</li>`).join("")}</ul>`;
+    el.querySelector('[data-act="desligar"]').onclick = () => ALU.desligar && ALU.desligar();
     const marcar = () => {
       el.querySelectorAll(".wall-opt").forEach((b) => b.classList.toggle("on", +b.dataset.w === ALU.estado.wall));
       el.querySelectorAll(".acc").forEach((b) => b.classList.toggle("on", b.dataset.c === ALU.estado.accent));

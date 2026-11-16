@@ -17,6 +17,7 @@
           <div class="kz-atalhos">
             <button data-ir="ligadin.com/in/aluisio-alves">${ALU.pix("ligadin")}<span>LigadIn</span></button>
             <button data-ir="doghub.com/aluisiodev">${ALU.pix("doghub")}<span>DogHub</span></button>
+            ${ALU.kezSites.filter((x) => x.atalho).map((x) => `<button data-ir="${x.atalho.url}">${x.atalho.icone}<span>${esc(x.atalho.nome)}</span></button>`).join("")}
             ${PROJ.map((p) => `<button data-ir="doghub.com/aluisiodev/${repoDe(p)}">${ALU.iconeHTML("proj:" + p.id)}<span>${esc(p.curto)}</span></button>`).join("")}
           </div>
         </div>`,
@@ -79,6 +80,10 @@
     },
   ];
 
+  // sites extras (js/sites.js) entram aqui
+  ALU.kezSites = ALU.kezSites || [];
+  const todas = () => [...PAGINAS.slice(0, 1), ...ALU.kezSites, ...PAGINAS.slice(1)];
+
   const norm = (u) => String(u || "").trim().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/#.*$/, "");
 
   ALU.kez = function (el, ctx, inicial) {
@@ -94,17 +99,22 @@
         <div class="kz-status">Pronto</div>
       </div>`;
     const view = el.querySelector(".kz-view"), input = el.querySelector(".kz-url input"), tt = el.querySelector(".kz-tt"), status = el.querySelector(".kz-status");
-    const hist = []; let pos = -1;
+    const hist = []; let pos = -1; let limpar = null;
+    const obsK = new MutationObserver(() => { if (!el.isConnected) { obsK.disconnect(); if (limpar) try { limpar(); } catch {} } });
+    obsK.observe(document.body, { childList: true, subtree: true });
 
     function mostrar(url) {
       url = norm(url);
       input.value = url ? "kez://" + url.replace(/^kez:\/\//, "") : "kez://inicio";
-      let html = null, titulo = "Página não encontrada";
-      for (const pg of PAGINAS) { const m = url.match(pg.re); if (m) { html = pg.html(m); if (html) { titulo = pg.titulo(m); break; } } }
+      let html = null, titulo = "Página não encontrada", achou = null, mm = null;
+      for (const pg of todas()) { const m = url.match(pg.re); if (m) { html = pg.html(m); if (html) { titulo = pg.titulo(m); achou = pg; mm = m; break; } } }
+      if (limpar) { try { limpar(); } catch {} limpar = null; }
       if (!html) html = `<div class="kz-404"><div class="kz-girafa">🦒</div><h1>A savana não encontrou essa página</h1><p>Nenhum leão, nenhuma zebra, nenhum <code>${esc(url)}</code>.</p><button class="btn" data-ir="inicio">Voltar para o início</button></div>`;
       status.textContent = "Carregando…"; view.classList.add("loading");
       setTimeout(() => {
         view.innerHTML = html; view.scrollTop = 0; tt.textContent = titulo; view.classList.remove("loading"); status.textContent = "Pronto";
+        if (achou && achou.init) limpar = achou.init(view, ctx, mm, ir) || null;
+        if (!achou && ALU.conquista) ALU.conquista("404", "Perdido na savana", "Você achou a girafa da página 404.");
         view.querySelectorAll("[data-ir]").forEach((b) => (b.onclick = (e) => { e.preventDefault(); b.dataset.ir === "chat" ? ctx.abrir("chat") : ir(b.dataset.ir); }));
         view.querySelectorAll("[data-proj]").forEach((b) => (b.onclick = () => ctx.abrir("peep", "projetos/" + b.dataset.proj + ".md")));
         const busca = view.querySelector(".kz-busca");
@@ -116,6 +126,9 @@
           const p = PROJ.find((x) => x.nome.toLowerCase().includes(q) || x.id.includes(q) || repoDe(x).toLowerCase().includes(q));
           if (p) return ir("doghub.com/aluisiodev/" + repoDe(p));
           if (/dog|git/.test(q)) return ir("doghub.com/aluisiodev");
+          if (/you|video|vídeo|tube/.test(q)) return ir("youinthescreenofcomputerorphone.com");
+          if (/mail|imai|email/.test(q)) return ir("imaiu.com");
+          if (/jogo|game|clica/.test(q)) return ir("clicajogos.com");
           ir(q);
         };
         const ancora = url.includes("ligadin") && inicial && String(inicial).includes("#certs") && view.querySelector("#certs");

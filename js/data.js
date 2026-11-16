@@ -30,7 +30,7 @@ window.SKILLS = [
 // Certificações (aparecem na pasta Skills e no perfil do LigadIn).
 // TODO: confirme nome exato, nível e ano de cada uma.
 window.CERTIFICADOS = [
-  { id: "efset", nome: "EF SET English Certificate", emissor: "EF SET", detalhe: "Certificado de proficiência em inglês." },
+  { id: "efset", nome: "Certificado de proficiência em inglês B2", emissor: "EF SET", detalhe: "Proficiência em inglês, nível B2 (EF SET)." },
   { id: "cisco", nome: "Certificação Cisco", emissor: "Cisco Networking Academy", detalhe: "Curso da Cisco Networking Academy." },
   { id: "anthropic", nome: "Certificação Anthropic", emissor: "Anthropic", detalhe: "Curso da Anthropic sobre Claude e IA." },
 ];
@@ -39,13 +39,20 @@ window.CERTIFICADOS = [
 // u e v são a posição do objeto na imagem, de 0 a 1 (u = horizontal, v = vertical).
 // Se trocar a imagem, abra-a num editor, veja a posição do objeto e divida pela largura/altura.
 window.QUARTO = {
-  imagem: "img/quarto.png",
+  imagem: "img/quarto.jpg",
   pontos: [
-    { id: "pc", u: 0.5, v: 0.463, titulo: "PC · o que eu faço", texto: "Aqui é onde eu passo boa parte do dia: construindo sites, APIs e agentes de IA. Hoje trabalho principalmente com TypeScript, Next.js, Node, Go e C#/.NET." },
-    { id: "estante", u: 0.75, v: 0.5, titulo: "Estante · interesses", texto: "TODO: conte o que você gosta de ler, estudar e fazer fora do código." },
-    { id: "tv", u: 0.999, v: 0.508, titulo: "TV · jogos favoritos", texto: "TODO: seus jogos favoritos. (Emily is Away e Killer Frequency inspiraram este portfolio!)" },
-    { id: "poster", u: 0.3042, v: 0.4383, titulo: "Pôster · referências", texto: "TODO: artistas, filmes, músicas e designers que te inspiram." },
-    { id: "janela", u: 0.1988, v: 0.4476, titulo: "Janela · onde estou", texto: "Moro no Brasil e trabalho remoto. TODO: cidade, se quiser contar." },
+    { id: "pc", u: 0.5, v: 0.5134, titulo: "PC · o que eu faço", texto: "Meu setup: Spotify num monitor e LeetCode no outro. É aqui que eu construo sites, APIs e agentes de IA, com TypeScript, Next.js, Node, Go e C#/.NET." },
+    { id: "estante", u: 0.6638, v: 0.4251, titulo: "Estante · coisas que eu amo", texto: "Sonic em miniatura, os animatrônicos de FNAF e uma pequena tropa de ninjas. Cada um tem uma história." },
+    { id: "mangas", u: 0.7004, v: 0.4846, titulo: "Mangás", texto: "Chainsaw Man, Jujutsu Kaisen e Berserk. TODO: qual é o seu favorito e por quê?" },
+    { id: "sekiro", u: 0.7233, v: 0.5592, titulo: "Sekiro", texto: "Uma katana e um shinobi de braço prostético. Hesitation is defeat. TODO: conte sua relação com o jogo." },
+    { id: "hq", u: 0.6672, v: 0.5457, titulo: "HQ Nostalgia", texto: "Nostalgia, de Alexandre Linck, Jean Segovia e P. R. Soliver. TODO: por que ela está na estante?" },
+    { id: "tv", u: 0.9232, v: 0.5317, titulo: "TV · Hora de Aventura", texto: "Passando Fionna and Cake, com o Marshall Lee. TODO: seus desenhos e séries favoritos." },
+    { id: "ps5", u: 0.8841, v: 0.5488, titulo: "PS5 · jogos", texto: "TODO: os jogos que você mais jogou ou recomenda." },
+    { id: "posteres", u: 0.0782, v: 0.444, titulo: "Pôsteres · música", texto: "OK Computer (Radiohead), Nectar (Joji) e Humbug (Arctic Monkeys). TODO: o que esses discos significam para você." },
+    { id: "violao", u: 0.3961, v: 0.5611, titulo: "Violão", texto: "Meu violão azul-esverdeado. TODO: o que você gosta de tocar?" },
+    { id: "foto", u: 0.2236, v: 0.4587, titulo: "Foto na roda-gigante", texto: "TODO: conte sobre essa foto (ou deixe só a lembrança)." },
+    { id: "luminaria", u: 0.621, v: 0.4608, titulo: "Luminária · achou!", texto: "Luminária de papel. Quase ninguém repara nela, mas é ela que deixa o quarto com essa cor à noite.", escondido: true },
+    { id: "janela", u: 0.3078, v: 0.4527, titulo: "Janela · fim de tarde", texto: "O melhor horário do dia. Moro no Brasil e trabalho remoto." },
   ],
 };
 
