@@ -9,7 +9,10 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 - **Sobre mim:** `sobre_mim.txt` (bloco de notas) e `quarto_360.png`, um quarto panorâmico 360° com objetos clicáveis.
 - **MessagerTale:** messenger que começa com notificações no canto da tela. O visitante escolhe as respostas,
   a frase é "digitada" (qualquer tecla acelera) e o `aluisio.dev` responde.
-- **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub (os botões "Sair da savana" levam aos perfis reais), o YouInTheScreenOfComputerOrPhone, o e-mail imaíu e o clicajogos, com Cobrinha, Jogo da velha, Pato Clicker e Memória.
+- **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub (os botões "Sair da savana" levam aos perfis reais), o buscador Alulugle (página inicial), o YouInTheScreenOfComputerOrPhone, o e-mail imaíu, o clicajogos (Cobrinha, Jogo da velha, Pato Clicker e Memória), o musikzify (playlist com prévia pelo player do Spotify), o fórum ebaa!, o Clima da Selva de Pedra (dados reais do Open-Meteo), a rede social yakurt e a Kezpédia.
+- **Peep Studio:** IDE de verdade. Na pasta `meus-codigos` dá pra criar arquivos `.py`, `.js` e `.cs` e executar no navegador: Python pelo Pyodide (em `js/vendor/pyodide`, código aberto), JavaScript num Web Worker e C# pela API do Piston, com um "C# de bolso" (tradução para JavaScript) quando o servidor não responde.
+- **MessagerTale:** além do roteiro, tem conversa livre com um bot no estilo SimSimi, que aprende frases (`ensina: frase = resposta`). Para usar uma IA de verdade, publique `worker/chat-worker.js` no Cloudflare e coloque a URL em `ALU.CONFIG.chatApi`.
+- **Bonzinho:** o urso vermelho que mora na área de trabalho, dá dicas e conta piadas.
 - **Segredos:** 22 conquistas escondidas pelo sistema. O Painel de controle mostra quantas você já achou.
 - **Peep Studio:** IDE do patinho roxo, com `Aluisio.cs` e um README de cada projeto. O botão ▶ Executar "roda" o código.
 - **Terminal**, **Painel de controle** (papel de parede e cor das janelas) e **Lixeira**.
@@ -49,6 +52,11 @@ js/kez.js         navegador Kez(i)avana e suas páginas
 js/sites.js       sites do Kez(i)avana (vídeos, e-mail, jogos)
 js/jogos.js       joguinhos do clicajogos
 js/eggs.js        easter eggs e conquistas
+js/sites2.js      alulugle, musikzify, ebaa!, clima, yakurt e Kezpédia
+js/bot.js         bot do MessagerTale
+js/buddy.js       Bonzinho, o urso
+js/peep*.js       Peep Studio, o executor (worker) e o C# de bolso
+worker/           Cloudflare Worker opcional para a IA do chat
 js/peep.js        IDE Peep Studio
 js/quarto.js      visualizador 360°
 js/terminal.js    terminal

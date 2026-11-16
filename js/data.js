@@ -41,16 +41,9 @@ window.CERTIFICADOS = [
 window.QUARTO = {
   imagem: "img/quarto.jpg",
   pontos: [
-    { id: "pc", u: 0.5, v: 0.5134, titulo: "PC · o que eu faço", texto: "Meu setup: Spotify num monitor e LeetCode no outro. É aqui que eu construo sites, APIs e agentes de IA, com TypeScript, Next.js, Node, Go e C#/.NET." },
-    { id: "estante", u: 0.6638, v: 0.4251, titulo: "Estante · coisas que eu amo", texto: "Sonic em miniatura, os animatrônicos de FNAF e uma pequena tropa de ninjas. Cada um tem uma história." },
-    { id: "mangas", u: 0.7004, v: 0.4846, titulo: "Mangás", texto: "Chainsaw Man, Jujutsu Kaisen e Berserk. TODO: qual é o seu favorito e por quê?" },
-    { id: "sekiro", u: 0.7233, v: 0.5592, titulo: "Sekiro", texto: "Uma katana e um shinobi de braço prostético. Hesitation is defeat. TODO: conte sua relação com o jogo." },
-    { id: "hq", u: 0.6672, v: 0.5457, titulo: "HQ Nostalgia", texto: "Nostalgia, de Alexandre Linck, Jean Segovia e P. R. Soliver. TODO: por que ela está na estante?" },
-    { id: "tv", u: 0.9232, v: 0.5317, titulo: "TV · Hora de Aventura", texto: "Passando Fionna and Cake, com o Marshall Lee. TODO: seus desenhos e séries favoritos." },
-    { id: "ps5", u: 0.8841, v: 0.5488, titulo: "PS5 · jogos", texto: "TODO: os jogos que você mais jogou ou recomenda." },
-    { id: "posteres", u: 0.0782, v: 0.444, titulo: "Pôsteres · música", texto: "OK Computer (Radiohead), Nectar (Joji) e Humbug (Arctic Monkeys). TODO: o que esses discos significam para você." },
+    { id: "spotify", u: 0.4655, v: 0.5105, titulo: "Monitor esquerdo · Spotify", texto: "A trilha sonora de tudo que eu programo. Essa é a minha playlist.", link: "https://open.spotify.com/playlist/6kNcU6KqmK0X4zxYZCuhMq?si=a1e287b503e148f4", linkTexto: "Ouvir no Spotify" },
+    { id: "leetcode", u: 0.5345, v: 0.5105, titulo: "Monitor direito · LeetCode", texto: "Onde eu treino lógica e algoritmos, um problema por vez.", link: "https://leetcode.com/u/aluisios/", linkTexto: "Ver meu LeetCode" },
     { id: "violao", u: 0.3961, v: 0.5611, titulo: "Violão", texto: "Meu violão azul-esverdeado. TODO: o que você gosta de tocar?" },
-    { id: "foto", u: 0.2236, v: 0.4587, titulo: "Foto na roda-gigante", texto: "TODO: conte sobre essa foto (ou deixe só a lembrança)." },
     { id: "luminaria", u: 0.621, v: 0.4608, titulo: "Luminária · achou!", texto: "Luminária de papel. Quase ninguém repara nela, mas é ela que deixa o quarto com essa cor à noite.", escondido: true },
     { id: "janela", u: 0.3078, v: 0.4527, titulo: "Janela · fim de tarde", texto: "O melhor horário do dia. Moro no Brasil e trabalho remoto." },
   ],
@@ -134,3 +127,13 @@ window.PROJETOS = [
     demo: "",
   },
 ];
+
+// Serviços opcionais. Deixe vazio para tudo funcionar só no navegador.
+// chatApi: URL de um Cloudflare Worker que responde { resposta } (veja worker/chat-worker.js).
+// csharpApi: URL compatível com a API do Piston para compilar C# de verdade. Vazio = tenta o Piston público e,
+//            se não der, usa o "C# de bolso" (tradução para JavaScript).
+window.ALU = window.ALU || {};
+window.ALU.CONFIG = {
+  chatApi: "",
+  csharpApi: "",
+};

@@ -83,6 +83,7 @@
             <div class="fmt"><b>A</b><b class="i">A</b><b class="u">A</b><span>☺</span><button class="chat-nudge" title="Chamar atenção">📳</button></div>
             <div class="chat-input">
               <div class="chat-box" aria-hidden="true"><span class="txt"></span><span class="caret"></span></div>
+              <input class="chat-real" hidden maxlength="300" placeholder="Escreva e aperte Enter…" aria-label="Sua mensagem">
               <button class="chat-send" disabled>Enviar</button>
             </div>
           </div>
@@ -134,12 +135,15 @@
     // a frase escolhida é digitada; qualquer tecla acelera, como numa conversa de verdade
     let digitando = null;
     function mostrarOps(ops) {
+      if (!livre) ops = [...ops, ["✎ quero escrever minha própria mensagem", "!livre"]];
       opsEl.innerHTML = ops.map(([txt], i) => `<button class="op" data-i="${i}"><b>${i + 1}</b> ${esc(txt)}</button>`).join("");
       opsEl.querySelectorAll(".op").forEach((b) => (b.onclick = () => escolher(ops[+b.dataset.i])));
       log.scrollTop = log.scrollHeight;
     }
     function escolher([txt, destino]) {
       if (digitando) return;
+      if (destino === "!livre") return entrarLivre();
+      if (destino === "!menu") return sairLivre();
       opsEl.innerHTML = "";
       let i = 0;
       digitando = { avancar: () => { if (i < txt.length) { i = Math.min(txt.length, i + 1 + Math.floor(Math.random() * 2)); box.textContent = txt.slice(0, i); bip("tec"); } if (i >= txt.length) pronto(); } };
@@ -161,6 +165,42 @@
         later(() => { if (digitando && digitando.enviar === enviar) enviar(); }, 900);
       }
     }
+    // ---------- conversa livre (bot estilo SimSimi) ----------
+    let livre = false; const historico = [];
+    const real = el.querySelector(".chat-real"), caixa = el.querySelector(".chat-box");
+    function entrarLivre() {
+      livre = true; caixa.hidden = true; real.hidden = false; send.disabled = false; send.classList.remove("pulse");
+      opsEl.innerHTML = `<button class="op"><b>↩</b> voltar para as opções</button>`;
+      opsEl.querySelector(".op").onclick = sairLivre;
+      send.onclick = enviarLivre;
+      linha("", "Modo conversa livre: escreva o que quiser.", true);
+      later(() => { typing.textContent = `${eu} está digitando...`; }, 200);
+      later(() => { typing.textContent = ""; linha(eu, "manda aí! pode perguntar qualquer coisa (ou me ensinar: ensina: frase = resposta)"); bip("in"); }, 1100);
+      setTimeout(() => real.focus({ preventScroll: true }), 50);
+    }
+    function sairLivre() {
+      livre = false; real.hidden = true; caixa.hidden = false; send.disabled = true; send.onclick = null;
+      falar("menu");
+    }
+    let pensando = false;
+    async function enviarLivre() {
+      const txt = real.value.trim();
+      if (!txt || pensando) return;
+      real.value = ""; linha(voce, txt); bip("out");
+      historico.push({ de: "visitante", texto: txt });
+      pensando = true;
+      later(() => { typing.textContent = `${eu} está digitando...`; }, 350);
+      const resp = await ALU.bot.responder(txt, historico);
+      let t = 350;
+      resp.forEach((frase, i) => {
+        t += Math.min(1800, 450 + frase.length * 18);
+        later(() => { typing.textContent = i < resp.length - 1 ? `${eu} está digitando...` : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t);
+      });
+      later(() => { pensando = false; }, t);
+    }
+    real.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); enviarLivre(); } });
+    NOS.menu = { diz: ["beleza! escolhe aí:"], ops: [["quem é você?", "sobre"], ["quero ver seus projetos", "projetos"], ["como eu falo com você?", "contato"]] };
+
     NOS.contato_ok = { diz: ["abri no Kez(i)avana pra você 😉"], ops: [["quero ver os projetos", "projetos"], ["valeu, até mais!", "tchau"]] };
     NOS.abriu = { diz: ["abri os detalhes pra você!", "quando terminar de ler, volta aqui"], ops: [["mostra outro projeto", "projetos"], ["como te acho?", "contato"], ["valeu, até mais!", "tchau"]] };
 

@@ -1,48 +1,82 @@
-// Peep Studio: a IDE do patinho roxo. Mostra o "código-fonte" do Aluísio.
+// Peep Studio: a IDE do patinho roxo.
+// A pasta "aluisio" é o "código-fonte" do Aluísio (só leitura). A pasta "meus-codigos" é sua:
+// crie arquivos .py, .js ou .cs e rode de verdade no navegador.
 (function () {
   const ALU = window.ALU, esc = (s) => ALU.esc(s);
   const P = window.PERFIL, PROJ = window.PROJETOS;
   const q = (s) => `"${s.replace(/"/g, '\\"')}"`;
+  const LS = "alu.peep.arquivos";
 
-  function arquivos() {
+  const LINGUAS = {
+    py: { nome: "Python", rot: "PY", cor: "py" },
+    js: { nome: "JavaScript", rot: "JS", cor: "js" },
+    cs: { nome: "C#", rot: "C#", cor: "cs" },
+  };
+  const extDe = (n) => (n.match(/\.(\w+)$/) || [])[1] || "";
+  const MODELOS = {
+    py: (n) => `# ${n}.py\nnome = input("Qual é o seu nome? ")\nprint(f"Olá, {nome or 'visitante'}!")\n`,
+    js: (n) => `// ${n}.js\nconst nome = prompt("Qual é o seu nome?") || "visitante";\nconsole.log(\`Olá, \${nome}!\`);\n`,
+    cs: (n) => `// ${n}.cs\nusing System;\n\nclass Programa\n{\n    static void Main()\n    {\n        Console.Write("Qual é o seu nome? ");\n        string nome = Console.ReadLine();\n        Console.WriteLine($"Olá, {nome}!");\n    }\n}\n`,
+  };
+  const EXEMPLOS = {
+    "ola.py": `# Python de verdade, rodando no seu navegador (Pyodide).
+nome = input("Qual é o seu nome? ")
+print(f"Olá, {nome or 'visitante'}! Bem-vindo à savana 🦒")
+
+for i in range(1, 4):
+    print("quack " * i)
+
+bichos = {"girafa": 3, "zebra": 5, "pato roxo": 1}
+maior = max(bichos, key=bichos.get)
+print(f"Tem mais {maior} do que qualquer outro bicho.")
+`,
+    "ola.js": `// JavaScript rodando num worker isolado (um loop infinito não trava o aluOS).
+const bichos = ["girafa", "zebra", "leão", "pato roxo"];
+bichos.forEach((b, i) => console.log(\`\${i + 1}. \${b}\`));
+
+const fib = (n) => (n < 2 ? n : fib(n - 1) + fib(n - 2));
+console.log("fib(20) =", fib(20));
+`,
+    "Ola.cs": `using System;
+using System.Collections.Generic;
+
+class Programa
+{
+    static void Main()
+    {
+        Console.WriteLine("Olá do C#!");
+        var bichos = new List<string> { "girafa", "zebra", "pato" };
+        bichos.Add("leão");
+        foreach (var b in bichos)
+            Console.WriteLine($"- {b.ToUpper()}");
+        Console.WriteLine($"Soma de 1 a 10: {Soma(10)}");
+    }
+
+    static int Soma(int n)
+    {
+        int total = 0;
+        for (int i = 1; i <= n; i++) total += i;
+        return total;
+    }
+}
+`,
+  };
+
+  function arquivosAluisio() {
     const cs = [
-      "using Savana.Dev;",
-      "",
-      "namespace Portfolio;",
-      "",
+      "using Savana.Dev;", "", "namespace Portfolio;", "",
       "// O arquivo mais importante deste computador.",
-      "public class Aluisio : Desenvolvedor",
-      "{",
-      `    public string Nome => ${q(P.nome)};`,
-      `    public string Cargo => ${q(P.cargo)};`,
-      `    public string Local => ${q(P.local)};`,
-      "",
-      "    public string[] Skills =>",
-      `        [${window.SKILLS.map((s) => q(s.nome)).join(", ")}];`,
-      "",
-      "    public string[] Certificacoes =>",
-      "    [",
-      ...window.CERTIFICADOS.map((c) => `        ${q(c.nome)},`),
-      "    ];",
-      "",
-      "    public Projeto[] Projetos =>",
-      "    [",
-      ...PROJ.map((p) => `        new(${q(p.nome)}, ${q(p.stack[0])}),`),
-      "    ];",
-      "",
-      "    public static void Main()",
-      "    {",
-      "        var eu = new Aluisio();",
+      "public class Aluisio : Desenvolvedor", "{",
+      `    public string Nome => ${q(P.nome)};`, `    public string Cargo => ${q(P.cargo)};`, `    public string Local => ${q(P.local)};`, "",
+      "    public string[] Skills =>", `        [${window.SKILLS.map((s) => q(s.nome)).join(", ")}];`, "",
+      "    public string[] Certificacoes =>", "    [", ...window.CERTIFICADOS.map((c) => `        ${q(c.nome)},`), "    ];", "",
+      "    public Projeto[] Projetos =>", "    [", ...PROJ.map((p) => `        new(${q(p.nome)}, ${q(p.stack[0])}),`), "    ];", "",
+      "    public static void Main()", "    {", "        var eu = new Aluisio();",
       '        Console.WriteLine($"Olá! Eu sou o {eu.Nome}.");',
       '        Console.WriteLine($"{eu.Projetos.Length} projetos na pasta, e contando.");',
-      '        Console.WriteLine("Me chama no MessagerTale! :)");',
-      "    }",
-      "}",
+      '        Console.WriteLine("Me chama no MessagerTale! :)");', "    }", "}",
     ].join("\n");
-    const readme = [
-      `# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]),
-      "## Projetos", ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`),
-    ].join("\n");
+    const readme = [`# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]), "## Projetos", ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`)].join("\n");
     const files = { "Aluisio.cs": cs, "README.md": readme };
     PROJ.forEach((p) => {
       files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", p.descricao, "", "## Destaques", ...p.destaques.map((d) => `- ${d}`), "", "## Stack", p.stack.join(" · "), "", `Repositório: ${p.repo}`].join("\n");
@@ -50,65 +84,232 @@
     return files;
   }
 
+  // ---------- realce de sintaxe ----------
+  const KW = {
+    py: "False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield|print|input|range|len|int|str|float|list|dict|set|tuple",
+    js: "const|let|var|function|return|if|else|for|while|do|of|in|new|class|extends|this|null|undefined|true|false|async|await|try|catch|finally|throw|typeof|instanceof|switch|case|break|continue|default|console",
+    cs: "using|namespace|public|private|protected|internal|class|struct|static|void|int|long|double|float|decimal|string|bool|char|var|new|return|if|else|for|foreach|in|while|do|switch|case|break|continue|true|false|null|try|catch|finally|throw|readonly|const|override|virtual|async|await|Console|List|Dictionary|Math",
+  };
   function realce(nome, txt) {
-    let h = esc(txt);
-    if (nome.endsWith(".cs")) {
-      const re = /(\/\/.*$)|(\$?"(?:[^"\\]|\\.)*")|\b(using|namespace|public|class|string|var|new|static|void|return)\b|\b(Aluisio|Desenvolvedor|Projeto|Console)\b/gm;
-      let o = "", last = 0;
-      txt.replace(re, (m, c, s, k, t, off) => { o += esc(txt.slice(last, off)) + `<span class="${c ? "c" : s ? "s" : k ? "k" : "t"}">${esc(m)}</span>`; last = off + m.length; return m; });
-      h = o + esc(txt.slice(last));
-    } else {
-      h = h.replace(/^(#+ .*)$/gm, '<span class="k">$1</span>').replace(/^(&gt; .*)$/gm, '<span class="c">$1</span>').replace(/^(- )/gm, '<span class="t">$1</span>');
+    const ext = extDe(nome);
+    if (ext === "md") return esc(txt).replace(/^(#+ .*)$/gm, '<span class="k">$1</span>').replace(/^(&gt; .*)$/gm, '<span class="c">$1</span>').replace(/^(- )/gm, '<span class="t">$1</span>');
+    if (!KW[ext]) return esc(txt);
+    const com = ext === "py" ? "#[^\\n]*" : "\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/";
+    const str = ext === "py" ? `[fbru]{0,2}"""[\\s\\S]*?"""|[fbru]{0,2}'''[\\s\\S]*?'''|[fbru]{0,2}"(?:[^"\\\\\\n]|\\\\.)*"|[fbru]{0,2}'(?:[^'\\\\\\n]|\\\\.)*'`
+      : ext === "js" ? "`(?:[^`\\\\]|\\\\.)*`|\"(?:[^\"\\\\\\n]|\\\\.)*\"|'(?:[^'\\\\\\n]|\\\\.)*'"
+      : `\\$?@?"(?:[^"\\\\\\n]|\\\\.)*"|'(?:[^'\\\\\\n]|\\\\.)*'`;
+    const re = new RegExp(`(${com})|(${str})|\\b(${KW[ext]})\\b|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([A-Za-z_]\\w*)(?=\\s*\\()`, "g");
+    let o = "", last = 0, m;
+    while ((m = re.exec(txt))) {
+      if (!m[0]) { re.lastIndex++; continue; }
+      const cls = m[1] ? "c" : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "f";
+      o += esc(txt.slice(last, m.index)) + `<span class="${cls}">${esc(m[0])}</span>`; last = m.index + m[0].length;
     }
-    return h;
+    return o + esc(txt.slice(last));
+  }
+
+  // ---------- execução ----------
+  let worker = null;
+  function novoWorker() { if (worker) worker.terminate(); worker = new Worker("js/peep-worker.js"); return worker; }
+
+  async function csharpServidor(codigo, stdin) {
+    const url = (ALU.CONFIG && ALU.CONFIG.csharpApi) || "https://emkc.org/api/v2/piston/execute";
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
+    try {
+      const r = await fetch(url, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: "csharp", version: "*", files: [{ name: "Program.cs", content: codigo }], stdin: stdin || "" }) });
+      if (!r.ok) return null;
+      const j = await r.json();
+      if (!j || !j.run) return null;
+      return j;
+    } catch { return null; } finally { clearTimeout(t); }
   }
 
   ALU.peep = function (el, ctx, inicial) {
-    const F = arquivos();
-    const nomes = Object.keys(F);
+    const RO = arquivosAluisio();
+    let meus;
+    try { meus = JSON.parse(localStorage.getItem(LS)); } catch {}
+    if (!meus || typeof meus !== "object") meus = { ...EXEMPLOS };
+    const salvar = () => { try { localStorage.setItem(LS, JSON.stringify(meus)); } catch {} };
+    const caminho = (n) => "meus-codigos/" + n;
+
     el.innerHTML = `
       <div class="peep">
         <div class="menubar"><span>Arquivo</span><span>Editar</span><span>Exibir</span><span>Projeto</span><span>Depurar</span><span>Ajuda</span>
-          <button class="peep-run">▶ Executar</button></div>
+          <button class="peep-stop" hidden>■ Parar</button><button class="peep-run">▶ Executar</button></div>
         <div class="peep-main">
-          <aside class="peep-tree">
-            <div class="pt-h">GERENCIADOR DE SOLUÇÕES</div>
-            <div class="pt-root">${ALU.pix("peep")} aluisio</div>
-            ${nomes.filter((n) => !n.includes("/")).map((n) => `<button data-f="${n}" class="pt-f">${n.endsWith(".cs") ? '<i class="cs">C#</i>' : '<i class="md">M↓</i>'}${n}</button>`).join("")}
-            <div class="pt-dir">▾ projetos</div>
-            ${nomes.filter((n) => n.includes("/")).map((n) => `<button data-f="${n}" class="pt-f sub"><i class="md">M↓</i>${n.split("/")[1]}</button>`).join("")}
-          </aside>
+          <aside class="peep-tree"></aside>
           <section class="peep-ed">
             <div class="peep-tabs"></div>
-            <div class="peep-code"><pre class="ln"></pre><pre class="src"></pre></div>
-            <div class="peep-out"><div class="po-h">SAÍDA</div><pre></pre></div>
+            <div class="peep-code"><pre class="ln"></pre><div class="ed"><pre class="src"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Editor de código"></textarea></div></div>
+            <div class="peep-out">
+              <div class="po-h"><span>SAÍDA</span><button class="po-limpar" title="Limpar saída">limpar</button></div>
+              <div class="po-body"><pre class="po-txt"></pre><label class="po-in"><span>ENTRADA (stdin) · uma linha por input()</span><textarea spellcheck="false" placeholder="ex.: Ana"></textarea></label></div>
+            </div>
           </section>
         </div>
-        <div class="peep-status"><span>${ALU.pix("peep")} Peep Studio</span><span class="ps-f"></span><span>UTF-8 · quack</span></div>
+        <div class="peep-status"><span>${ALU.pix("peep")} Peep Studio</span><span class="ps-f"></span><span class="ps-l">UTF-8 · quack</span></div>
       </div>`;
-    const tabs = el.querySelector(".peep-tabs"), ln = el.querySelector(".ln"), src = el.querySelector(".src"), out = el.querySelector(".peep-out pre"), psf = el.querySelector(".ps-f");
-    const abertos = [];
-    function abrir(nome) {
-      if (!F[nome]) nome = "Aluisio.cs";
-      if (!abertos.includes(nome)) abertos.push(nome);
-      tabs.innerHTML = abertos.map((n) => `<button class="pt-tab ${n === nome ? "on" : ""}" data-f="${n}">${n.split("/").pop()}</button>`).join("");
-      tabs.querySelectorAll("[data-f]").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
-      el.querySelectorAll(".pt-f").forEach((b) => b.classList.toggle("on", b.dataset.f === nome));
-      const txt = F[nome];
-      src.innerHTML = realce(nome, txt);
-      ln.textContent = txt.split("\n").map((_, i) => i + 1).join("\n");
-      psf.textContent = nome + (nome.endsWith(".cs") ? " · C#" : " · Markdown");
+    const $ = (s) => el.querySelector(s);
+    const tree = $(".peep-tree"), tabs = $(".peep-tabs"), ln = $(".ln"), src = $(".src"), ta = $(".ed textarea"),
+      out = $(".po-txt"), stdinEl = $(".po-in textarea"), psf = $(".ps-f"), btnRun = $(".peep-run"), btnStop = $(".peep-stop");
+    const abertos = []; let atual = null, rodando = false, timerParar = null, runs = 0;
+
+    const conteudo = (id) => (id.startsWith("meus-codigos/") ? meus[id.slice(13)] : RO[id]);
+    const editavel = (id) => id.startsWith("meus-codigos/");
+
+    function pintarArvore() {
+      const nomesRO = Object.keys(RO);
+      const linha = (id, rotulo, extra = "") => {
+        const ext = extDe(id), L = LINGUAS[ext];
+        const ic = L ? `<i class="${L.cor}">${L.rot}</i>` : '<i class="md">M↓</i>';
+        return `<div class="pt-row ${id === atual ? "on" : ""}"><button data-f="${esc(id)}" class="pt-f ${extra}">${ic}${esc(rotulo)}</button>${editavel(id) ? `<button class="pt-x" data-del="${esc(id)}" title="Apagar">✕</button>` : ""}</div>`;
+      };
+      tree.innerHTML = `
+        <div class="pt-h">GERENCIADOR DE SOLUÇÕES</div>
+        <div class="pt-root">${ALU.pix("peep")} aluisio <small>só leitura</small></div>
+        ${nomesRO.filter((n) => !n.includes("/")).map((n) => linha(n, n)).join("")}
+        <div class="pt-dir">▾ projetos</div>
+        ${nomesRO.filter((n) => n.includes("/")).map((n) => linha(n, n.split("/")[1], "sub")).join("")}
+        <div class="pt-root meus">📂 meus-codigos <button class="pt-novo" title="Novo arquivo">+ arquivo</button></div>
+        <form class="pt-form" hidden>
+          <input class="pt-nome" placeholder="nome" maxlength="40" aria-label="Nome do arquivo">
+          <select class="pt-ext" aria-label="Linguagem">${Object.entries(LINGUAS).map(([e, L]) => `<option value="${e}">.${e} · ${L.nome}</option>`).join("")}</select>
+          <div class="pt-form-b"><button class="btn">Criar</button><button type="button" class="btn sec pt-cancel">Cancelar</button></div>
+          <small class="pt-erro"></small>
+        </form>
+        ${Object.keys(meus).sort().map((n) => linha(caminho(n), n)).join("") || '<p class="pt-vazio">Nenhum arquivo. Crie um!</p>'}`;
+      tree.querySelectorAll(".pt-f").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
+      tree.querySelectorAll(".pt-x").forEach((b) => (b.onclick = () => {
+        if (b.dataset.certeza) {
+          const n = b.dataset.del.slice(13); delete meus[n]; salvar();
+          const i = abertos.indexOf(b.dataset.del); if (i >= 0) abertos.splice(i, 1);
+          if (atual === b.dataset.del) atual = null;
+          abrir(abertos[abertos.length - 1] || "Aluisio.cs");
+        } else { b.dataset.certeza = "1"; b.textContent = "apagar?"; setTimeout(() => { if (b.isConnected) { delete b.dataset.certeza; b.textContent = "✕"; } }, 2500); }
+      }));
+      const form = tree.querySelector(".pt-form"), nome = tree.querySelector(".pt-nome"), erro = tree.querySelector(".pt-erro");
+      tree.querySelector(".pt-novo").onclick = () => { form.hidden = false; nome.focus(); };
+      tree.querySelector(".pt-cancel").onclick = () => { form.hidden = true; erro.textContent = ""; };
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const n = nome.value.trim().replace(/\.(py|js|cs)$/i, ""), ext = tree.querySelector(".pt-ext").value;
+        if (!/^[\w\-À-ú]{1,40}$/.test(n)) { erro.textContent = "Use letras, números, - ou _ (sem espaços)."; return; }
+        const arq = `${n}.${ext}`;
+        if (meus[arq] != null) { erro.textContent = "Já existe um arquivo com esse nome."; return; }
+        meus[arq] = MODELOS[ext](n); salvar(); abrir(caminho(arq));
+      };
     }
-    el.querySelectorAll(".pt-f").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
-    let runs = 0;
-    el.querySelector(".peep-run").onclick = () => {
+
+    function pintarCodigo() {
+      const txt = ta.value;
+      src.innerHTML = realce(atual, txt) + "\n ";
+      ln.textContent = txt.split("\n").map((_, i) => i + 1).join("\n");
+    }
+
+    function abrir(id) {
+      if (conteudo(id) == null) id = "Aluisio.cs";
+      atual = id;
+      if (!abertos.includes(id)) abertos.push(id);
+      tabs.innerHTML = abertos.map((n) => `<button class="pt-tab ${n === id ? "on" : ""}" data-f="${esc(n)}">${esc(n.split("/").pop())}</button>`).join("");
+      tabs.querySelectorAll("[data-f]").forEach((b) => (b.onclick = () => abrir(b.dataset.f)));
+      ta.value = conteudo(id); ta.readOnly = !editavel(id);
+      pintarCodigo(); pintarArvore();
+      const ext = extDe(id), L = LINGUAS[ext];
+      psf.textContent = id + " · " + (L ? L.nome : ext === "md" ? "Markdown" : ext.toUpperCase()) + (editavel(id) ? "" : " · só leitura");
+      btnRun.disabled = !(L || id === "Aluisio.cs") || rodando;
+      btnRun.title = btnRun.disabled ? "Nada para executar aqui" : "Executar (Ctrl+Enter)";
+    }
+
+    // ---------- edição ----------
+    let tSalvar = null;
+    ta.addEventListener("input", () => {
+      if (!editavel(atual)) return;
+      meus[atual.slice(13)] = ta.value; pintarCodigo();
+      clearTimeout(tSalvar); tSalvar = setTimeout(salvar, 400);
+    });
+    ta.addEventListener("scroll", () => { ta.scrollTop = 0; ta.scrollLeft = 0; });
+    ta.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); executar(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); salvar(); psf.textContent = psf.textContent.replace(/ · salvo$/, "") + " · salvo"; return; }
+      if (ta.readOnly) return;
+      const ini = ta.selectionStart, fim = ta.selectionEnd, v = ta.value;
+      if (e.key === "Tab") {
+        e.preventDefault();
+        ta.setRangeText("    ", ini, fim, "end"); ta.dispatchEvent(new Event("input"));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const inicioLinha = v.lastIndexOf("\n", ini - 1) + 1, linhaAtual = v.slice(inicioLinha, ini);
+        let ind = (linhaAtual.match(/^\s*/) || [""])[0];
+        if (/[:{(\[]\s*$/.test(linhaAtual)) ind += "    ";
+        ta.setRangeText("\n" + ind, ini, fim, "end"); ta.dispatchEvent(new Event("input"));
+      }
+    });
+
+    // ---------- saída ----------
+    const escrever = (t, tipo = "out") => { const s = document.createElement("span"); s.className = "po-" + tipo; s.textContent = t; out.appendChild(s); out.parentElement.scrollTop = out.parentElement.scrollHeight; out.scrollTop = out.scrollHeight; };
+    $(".po-limpar").onclick = () => { out.textContent = ""; };
+
+    function terminou(ok, ms, extra) {
+      rodando = false; clearTimeout(timerParar);
+      btnStop.hidden = true; btnRun.disabled = false;
+      escrever(`\n${ok ? "✔" : "✖"} ${ok ? "terminou" : "parou com erro"} em ${ms} ms${extra ? " · " + extra : ""}\n`, "info");
+    }
+    function parar(motivo) {
+      if (!rodando) return;
+      if (worker) { worker.terminate(); worker = null; }
+      rodando = false; clearTimeout(timerParar); btnStop.hidden = true; btnRun.disabled = false;
+      escrever(`\n■ ${motivo}\n`, "erro");
+    }
+    btnStop.onclick = () => parar("Execução interrompida.");
+
+    async function executar() {
+      if (rodando || btnRun.disabled) return;
       runs++;
-      out.textContent = "Compilando Aluisio.cs…";
-      if (runs === 5) { setTimeout(() => { out.textContent += "\n\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs."; ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 650); }
-      setTimeout(() => {
-        out.textContent += `\nCompilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)`;
-      }, 600);
-    };
+      if (runs === 5) setTimeout(() => { escrever("\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs.\n", "aviso"); ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 700);
+      out.textContent = "";
+      if (atual === "Aluisio.cs") {
+        escrever("Compilando Aluisio.cs…\n", "info");
+        setTimeout(() => escrever(`Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)\n`), 600);
+        return;
+      }
+      const ext = extDe(atual), codigo = ta.value, stdin = stdinEl.value;
+      if (!LINGUAS[ext]) return;
+      rodando = true; btnRun.disabled = true; btnStop.hidden = false;
+      escrever(`▶ ${atual.split("/").pop()} · ${LINGUAS[ext].nome}\n`, "info");
+
+      if (ext === "cs") {
+        escrever("Compilando no servidor Piston…\n", "info");
+        const t0 = performance.now(), r = await csharpServidor(codigo, stdin);
+        if (!rodando) return;
+        if (r) {
+          if (r.compile && r.compile.code) { escrever((r.compile.stderr || r.compile.output || "") + "\n", "erro"); return terminou(false, Math.round(performance.now() - t0), "C# real (.NET)"); }
+          if (r.run.stdout) escrever(r.run.stdout);
+          if (r.run.stderr) escrever(r.run.stderr, "erro");
+          return terminou(!r.run.code, Math.round(performance.now() - t0), "C# real (.NET)");
+        }
+        escrever("Servidor indisponível. Usando o C# de bolso (tradução para JS, só o básico).\n\n", "aviso");
+      }
+
+      const w = worker || novoWorker();
+      const iniciarTimer = () => { clearTimeout(timerParar); timerParar = setTimeout(() => parar("Tempo esgotado (10 s). Tem um loop infinito aí?"), 10000); };
+      if (ext !== "py") iniciarTimer();
+      let jaCarregou = false;
+      w.onmessage = (e) => {
+        const d = e.data;
+        if (d.tipo === "fim") return terminou(d.ok, d.ms, ext === "cs" ? "C# de bolso" : "");
+        if (d.tipo === "iniciou") { jaCarregou = true; iniciarTimer(); return; }
+        escrever(d.t, d.tipo);
+      };
+      w.onerror = (e) => { escrever((e.message || "Erro ao iniciar o executor.") + "\n", "erro"); worker = null; terminou(false, 0); };
+      if (ext === "py") setTimeout(() => { if (rodando && !jaCarregou) { jaCarregou = true; iniciarTimer(); } }, 15000);
+      w.postMessage({ lang: ext, codigo, stdin });
+    }
+    btnRun.onclick = executar;
+
+    const obs = new MutationObserver(() => { if (!el.isConnected) { obs.disconnect(); salvar(); if (rodando && worker) { worker.terminate(); worker = null; } } });
+    obs.observe(document.body, { childList: true, subtree: true });
+
     abrir(inicial || "Aluisio.cs");
     return { ir: abrir };
   };

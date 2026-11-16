@@ -61,6 +61,8 @@ Autor ..... ${esc(P.nome)}`, "pre"),
   ▐▌▐▌▐▌</span>`, "pre"),
       conquistas: () => { const F = ALU.conquistasFeitas ? ALU.conquistasFeitas() : {}, T = ALU.CONQUISTAS || []; print(`${Object.keys(F).length}/${T.length} conquistas<br>` + T.map(([id, n]) => F[id] ? `<span class="k">[x] ${esc(n)}</span>` : `<span class="muted">[ ] ???</span>`).join("<br>")); },
       desligar: () => ALU.desligar && ALU.desligar(),
+      bonzinho: () => { if (ALU.urso) { ALU.urso.mostrar(); print("🐻 o Bonzinho voltou pra área de trabalho."); } else print("o urso está em outro computador.", "err"); },
+      urso: () => CMDS.bonzinho(),
     };
 
     function run(line) {
@@ -78,7 +80,7 @@ Autor ..... ${esc(P.nome)}`, "pre"),
       else if (e.key === "Tab") {
         e.preventDefault();
         const parts = inp.value.split(" ");
-        const pool = parts.length > 1 ? PROJ.map((p) => p.id) : Object.keys(CMDS).filter((c) => !["quack", "hack", "matrix", "girafa"].includes(c));
+        const pool = parts.length > 1 ? PROJ.map((p) => p.id) : Object.keys(CMDS).filter((c) => !["quack", "hack", "matrix", "girafa", "bonzinho", "urso"].includes(c));
         const m = pool.filter((c) => c.startsWith(parts[parts.length - 1]));
         if (m.length === 1) { parts[parts.length - 1] = m[0]; inp.value = parts.join(" ") + (parts.length === 1 ? " " : ""); }
         else if (m.length > 1) print(m.join("  "), "muted");

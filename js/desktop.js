@@ -199,5 +199,8 @@
     setTimeout(() => { if (!ALU.chatAberto) toast(P.usuario + " acabou de entrar", "Status: online", true); }, 3500);
     setTimeout(() => chegou("oiii"), 6500);
     setTimeout(() => chegou("tá por aí? 👀"), 9000);
+
+    // ---- Bonzinho, o urso ----
+    ALU.buddy && ALU.buddy(root.querySelector(".desk"));
   };
 })();

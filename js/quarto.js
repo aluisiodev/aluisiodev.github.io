@@ -16,7 +16,7 @@
         <div class="qt-view"><div class="qt-msg">Carregando o quarto…</div></div>
         <div class="qt-hint">Arraste para olhar em volta · role para aproximar · clique nos <b>!</b></div>
         <div class="qt-lista">${Q.pontos.filter((p) => !p.escondido).map((p) => `<button data-p="${p.id}">${esc(p.titulo.split("·")[0].trim())}</button>`).join("")}</div>
-        <div class="qt-card" hidden><div class="qt-card-bar"><span></span><button aria-label="Fechar">✕</button></div><p></p></div>
+        <div class="qt-card" hidden><div class="qt-card-bar"><span></span><button aria-label="Fechar">✕</button></div><p></p><a class="btn real qt-link" target="_blank" rel="noopener" hidden></a></div>
       </div>`;
     const view = el.querySelector(".qt-view"), card = el.querySelector(".qt-card");
     let vivo = true, api = {};
@@ -27,6 +27,8 @@
       card.hidden = false;
       card.querySelector("span").textContent = p.titulo;
       card.querySelector("p").textContent = p.texto;
+      const lk = card.querySelector(".qt-link"); lk.hidden = !p.link;
+      if (p.link) { lk.href = p.link; lk.textContent = (p.linkTexto || "Abrir") + " ↗"; }
       el.querySelectorAll(".qt-lista button").forEach((b) => b.classList.toggle("on", b.dataset.p === p.id));
       vistos.add(p.id);
       if (p.id === "luminaria") ALU.conquista && ALU.conquista("luminaria", "Iluminado", "Achou o ponto escondido do quarto.");

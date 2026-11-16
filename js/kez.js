@@ -82,7 +82,7 @@
 
   // sites extras (js/sites.js) entram aqui
   ALU.kezSites = ALU.kezSites || [];
-  const todas = () => [...PAGINAS.slice(0, 1), ...ALU.kezSites, ...PAGINAS.slice(1)];
+  const todas = () => [...ALU.kezSites, ...PAGINAS.slice(1), PAGINAS[0]];
 
   const norm = (u) => String(u || "").trim().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/#.*$/, "");
 

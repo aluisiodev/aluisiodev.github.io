@@ -1,0 +1,65 @@
+// Roda o código do Peep Studio fora da página, para um loop infinito não travar o aluOS.
+// Python usa o Pyodide (CPython em WebAssembly), JavaScript roda direto e C# passa pelo tradutor de bolso.
+let py = null;
+const out = (t, tipo = "out") => postMessage({ tipo, t });
+
+async function carregarPython() {
+  if (py) return py;
+  out("Carregando Python (só na primeira vez, uns segundos)…\n", "info");
+  importScripts("vendor/pyodide/pyodide.js");
+  py = await loadPyodide({ indexURL: new URL("vendor/pyodide/", location.href).href });
+  return py;
+}
+
+function linhasDe(stdin) { const l = String(stdin || "").split("\n"); let i = 0; return () => (i < l.length ? l[i++] : null); }
+
+async function rodarJS(codigo, stdin) {
+  const ler = linhasDe(stdin);
+  const fmt = (v) => typeof v === "string" ? v : (() => { try { return JSON.stringify(v); } catch { return String(v); } })();
+  const con = {
+    log: (...a) => out(a.map(fmt).join(" ") + "\n"), info: (...a) => out(a.map(fmt).join(" ") + "\n"),
+    warn: (...a) => out(a.map(fmt).join(" ") + "\n", "aviso"), error: (...a) => out(a.map(fmt).join(" ") + "\n", "erro"),
+    table: (x) => out(fmt(x) + "\n"), clear: () => {},
+  };
+  const prompt = (msg) => { if (msg) out(String(msg)); const r = ler(); if (msg) out((r ?? "") + "\n"); return r; };
+  const f = new Function("console", "prompt", "__out", "__readLine", `"use strict"; return (async () => {\n${codigo}\n})();`);
+  await f(con, prompt, (t) => out(t), ler);
+}
+
+async function rodarPython(codigo, stdin) {
+  const p = await carregarPython();
+  postMessage({ tipo: "iniciou" });
+  const ler = linhasDe(stdin);
+  const dec = new TextDecoder(); let buf = [];
+  const flush = () => { if (buf.length) { out(dec.decode(new Uint8Array(buf))); buf = []; } };
+  p.setStdout({ raw: (c) => { buf.push(c); if (c === 10) flush(); } });
+  p.setStderr({ batched: (t) => { flush(); out(t + "\n", "erro"); } });
+  p.setStdin({ stdin: () => { flush(); const r = ler(); if (r !== null) out(r + "\n", "eco"); return r === null ? undefined : r; } });
+  try { await p.runPythonAsync(codigo); } finally { flush(); }
+}
+
+async function rodarCSharp(codigo, stdin) {
+  importScripts("peep-csharp.js");
+  const js = self.CSharpBolso.traduzir(codigo);
+  const ler = linhasDe(stdin);
+  const f = new Function("__out", "__readLine", `"use strict";\n${self.CSharpBolso.PRELUDIO}\n${js}`);
+  try { f((t) => out(t), ler); }
+  catch (e) { e.traduzido = js; throw e; }
+}
+
+onmessage = async (e) => {
+  const { lang, codigo, stdin } = e.data;
+  const t0 = performance.now();
+  try {
+    if (lang === "py") await rodarPython(codigo, stdin);
+    else if (lang === "js") await rodarJS(codigo, stdin);
+    else if (lang === "cs") await rodarCSharp(codigo, stdin);
+    postMessage({ tipo: "fim", ok: true, ms: Math.round(performance.now() - t0) });
+  } catch (err) {
+    let msg = String(err && err.message || err);
+    if (lang === "py") msg = msg.split("\n").filter((l) => !/^\s*File "\/lib\/|_pyodide|pyodide\.ffi/.test(l)).join("\n");
+    out(msg.trim() + "\n", "erro");
+    if (/EOFError|EOF when reading/.test(msg)) out("Dica: o input() leu tudo que tinha em ENTRADA (stdin). Escreva uma resposta por linha lá do lado. →\n", "aviso");
+    postMessage({ tipo: "fim", ok: false, ms: Math.round(performance.now() - t0), traduzido: err && err.traduzido });
+  }
+};
