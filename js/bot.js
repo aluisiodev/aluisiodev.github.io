@@ -78,18 +78,36 @@
     return [um(EN ? GENERICO_EN : GENERICO)];
   }
 
+  // Com o servidor no ar, quem responde é o Gemini falando como o Aluísio ("online").
+  // Se a IA falhar ou a cota acabar, ele fica "offline" pelo resto da visita e entra o algoritmo dele (as regras acima).
+  const urlIA = () => { const C = ALU.CONFIG || {}; return C.chatApi || (C.api ? String(C.api).replace(/\/+$/, "") + "/chat" : ""); };
+  let offline = false;
+  try { offline = sessionStorage.getItem("alu.bot.offline") === "1"; } catch {}
+  const avisos = [];
+  const iaLigada = () => !!urlIA() && !offline;
+  function cair() {
+    if (offline) return; offline = true;
+    try { sessionStorage.setItem("alu.bot.offline", "1"); } catch {}
+    avisos.forEach((f) => { try { f(); } catch {} });
+  }
+  async function perguntarIA(texto, historico) {
+    if (!iaLigada()) return null;
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
+      const r = await fetch(urlIA(), { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagem: texto, historico: (historico || []).slice(-10), idioma: ALU.lang || "pt" }) });
+      clearTimeout(t);
+      if (r.ok) { const j = await r.json(); const linhas = String(j.resposta || "").split(/\n+/).map((x) => x.trim()).filter(Boolean); if (linhas.length) return linhas.slice(0, 5); }
+    } catch {}
+    cair();
+    return null;
+  }
   async function responder(texto, historico) {
-    const C = ALU.CONFIG || {}, api = C.chatApi || (C.api ? String(C.api).replace(/\/+$/, "") + "/chat" : "");
-    if (api) {
-      try {
-        const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 9000);
-        const r = await fetch(api, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagem: texto, historico: (historico || []).slice(-10), idioma: ALU.lang || "pt" }) });
-        clearTimeout(t);
-        if (r.ok) { const j = await r.json(); const linhas = String(j.resposta || "").split(/\n+/).map((x) => x.trim()).filter(Boolean); if (linhas.length) return linhas.slice(0, 4); }
-      } catch {}
-    }
+    const ia = await perguntarIA(texto, historico);
+    if (ia) { ia.ia = true; return ia; }
     return regras(texto);
   }
+  const INICIO = { pt: "(a pessoa acabou de abrir o MessagerTale no aluOS. puxe conversa você: cumprimente, se apresente em uma frase e pergunte no que pode ajudar)", en: "(the visitor just opened MessagerTale in aluOS. start the conversation: say hi, introduce yourself in one sentence and ask how you can help. answer in english)" };
+  const iniciar = () => perguntarIA(INICIO[ALU.lang === "en" ? "en" : "pt"], []);
 
-  ALU.bot = { responder, regras };
+  ALU.bot = { responder, regras, iniciar, iaLigada, estaOffline: () => offline, aoFicarOffline: (f) => avisos.push(f) };
 })();

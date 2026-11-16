@@ -139,10 +139,25 @@
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     }
 
+    // online = o Aluísio "de verdade" (IA). offline = o algoritmo dele (roteiro + regras).
+    const viaIA = () => ALU.bot && ALU.bot.iaLigada && ALU.bot.iaLigada();
+    function pintarStatus() {
+      const off = !!(ALU.CONFIG && (ALU.CONFIG.api || ALU.CONFIG.chatApi)) && ALU.bot.estaOffline();
+      status.querySelector("span").textContent = off ? T("offline · o algoritmo dele responde", "offline · his algorithm is answering") : "online";
+      status.classList.toggle("away", off);
+    }
+    let avisouOff = false;
+    function ficouOffline() {
+      if (avisouOff || !el.isConnected) return; avisouOff = true;
+      pintarStatus();
+      linha("", T(`${eu} ficou offline. Ele deixou um algoritmo respondendo por ele 🤖`, `${eu} went offline. He left an algorithm answering for him 🤖`), true);
+    }
+    ALU.bot.aoFicarOffline && ALU.bot.aoFicarOffline(() => later(ficouOffline, 0));
+
     function falar(no) {
       const n = NOS[no]; let t = 300;
       opsEl.innerHTML = "";
-      status.querySelector("span").textContent = "online"; status.classList.remove("away");
+      pintarStatus();
       n.diz.forEach((frase) => {
         const espera = Math.min(2200, 350 + frase.length * 22);
         later(() => { typing.textContent = T(`${eu} está digitando...`, `${eu} is typing...`); }, t);
@@ -181,6 +196,7 @@
       function enviar() {
         real.value = ""; real.readOnly = false; digitando = null; atualizarEnviar();
         linha(voce, txt); bip("out");
+        if (viaIA() && !destino.startsWith("!")) { conversarIA(txt); return; }
         if (destino === "!doghub" || destino === "!ligadin") { later(() => { ctx.abrir("kez", destino === "!doghub" ? "doghub.com/aluisiodev" : "ligadin.com/in/aluisio-alves"); falar("contato_ok"); }, 300); }
         else if (destino.startsWith("!abrir:")) { const id = destino.slice(7); later(() => { ctx.abrir("proj:" + id); falar("abriu"); }, 300); }
         else later(() => falar(destino), 300);
@@ -190,6 +206,9 @@
       const txt = real.value.trim();
       if (!txt || pensando || digitando) return;
       real.value = ""; atualizarEnviar(); linha(voce, txt); bip("out");
+      conversarIA(txt);
+    }
+    async function conversarIA(txt) {
       historico.push({ de: "visitante", texto: txt });
       pensando = true;
       later(() => { typing.textContent = T(`${eu} está digitando...`, `${eu} is typing...`); }, 350);
@@ -225,6 +244,18 @@
     if (!(ALU.chatPre || []).length) NOS.inicio.diz.unshift(T("oiii", "hiii"));
     (ALU.chatPre || []).forEach((m) => linha(eu, m.txt, false, m.hora));
     ALU.chatAberto = true;
-    later(() => falar("inicio"), 700);
+    // começa a conversa: com a IA no ar, o próprio Aluísio puxa assunto; senão, o roteiro.
+    if (viaIA()) {
+      pensando = true;
+      later(() => { typing.textContent = T(`${eu} está digitando...`, `${eu} is typing...`); }, 600);
+      ALU.bot.iniciar().then((r) => {
+        if (!vivo) return;
+        if (!r) { pensando = false; typing.textContent = ""; falar("inicio"); return; }
+        let t = 300;
+        r.forEach((frase, i) => { t += Math.min(1800, 450 + frase.length * 18); later(() => { typing.textContent = i < r.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t); });
+        later(() => { pensando = false; mostrarOps(NOS.menu.ops); }, t);
+      });
+    } else later(() => falar("inicio"), 700);
+    pintarStatus();
   };
 })();
