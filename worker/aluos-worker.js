@@ -3,7 +3,7 @@
 //   • o ranking dos jogos (nome que a pessoa escolher + pontos)
 //   • o livro de visitas (quem quis se identificar pelo commit no Peep Studio)
 //   • o chat com IA do MessagerTale (Google Gemini, com a Groq de reserva se você quiser)
-//   • a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada) e o "tocando agora" do Last.fm
+//   • a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada)
 //   • as estatísticas reais do GitHub no DogHub e o clima real do climaselva.
 //
 // Como colocar no ar (uns 10 minutos):
@@ -25,8 +25,6 @@
 //        GITHUB_USER  = aluisiodev (Text, opcional; é o padrão)  (estatísticas reais no DogHub)
 //        GITHUB_TOKEN = token do GitHub (Secret, opcional): sobe o limite da API e traz o gráfico de contribuições.
 //          Crie em https://github.com/settings/tokens > Fine-grained, sem nenhuma permissão extra (só leitura pública).
-//        LASTFM_API_KEY = chave da API do Last.fm (Secret) e LASTFM_USER = seu usuário do Last.fm (Text):
-//          o musikzify mostra o que você está ouvindo agora. Chave grátis em https://www.last.fm/api/account/create
 //      O clima do climaselva vem do Open-Meteo, que não precisa de chave.
 //
 // Base de conhecimento do chat (opcional): no KV "aluos", crie a chave "conhecimento" com qualquer texto
@@ -219,22 +217,6 @@ export default {
         return res;
       });
       return dado ? json(dado) : json({ erro: "GitHub não respondeu" }, 502);
-    }
-
-    // ---------- musikzify: o que o Aluísio está ouvindo agora (Last.fm) ----------
-    if (rota === "/lastfm") {
-      if (!env.LASTFM_API_KEY || !env.LASTFM_USER) return json({ erro: "Last.fm não configurado" }, 404);
-      const dado = await comCache("lastfm:" + env.LASTFM_USER, 45, async () => {
-        const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(env.LASTFM_USER)}&api_key=${env.LASTFM_API_KEY}&format=json&limit=6`);
-        if (!r.ok) return null;
-        const lista = ((await r.json()).recenttracks?.track || []).map((t) => ({
-          nome: t.name, artista: t.artist?.["#text"] || "", album: t.album?.["#text"] || "", url: t.url,
-          capa: (t.image || []).map((i) => i["#text"]).filter(Boolean).pop() || "",
-          agora: t["@attr"]?.nowplaying === "true", quando: t.date ? Number(t.date.uts) * 1000 : Date.now(),
-        }));
-        return { usuario: env.LASTFM_USER, tocando: lista[0] && lista[0].agora ? lista[0] : null, recentes: lista.filter((t) => !t.agora).slice(0, 5) };
-      });
-      return dado ? json(dado) : json({ erro: "Last.fm não respondeu" }, 502);
     }
 
     // ---------- climaselva: tempo real (Open-Meteo, sem chave) ----------

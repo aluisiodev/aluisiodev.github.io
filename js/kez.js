@@ -1,7 +1,7 @@
 // Kez(i)avana: o navegador da savana. Só abre as páginas "bootleg" do aluOS;
 // os botões "Sair da savana" levam para os sites de verdade numa aba nova.
 (function () {
-  const ALU = window.ALU, esc = (s) => ALU.esc(s);
+  const ALU = window.ALU, esc = (s) => ALU.esc(s), T = (pt, en) => (ALU.lang === "en" ? en : pt);
   const P = window.PERFIL, PROJ = window.PROJETOS;
   const repoDe = (p) => p.repo.replace("https://github.com/aluisiodev/", "");
   const real = (href, txt) => `<a class="btn real" href="${esc(href)}" target="_blank" rel="noopener">${esc(txt)} ↗</a>`;
@@ -12,8 +12,8 @@
       html: () => `
         <div class="kz-home">
           <div class="kz-logo">${ALU.pix("kez")}<h1>Kez<span>(i)</span>avana</h1></div>
-          <p class="kz-sub">o navegador que atravessa a savana da internet</p>
-          <form class="kz-busca"><input placeholder="Buscar na savana… (tente: nexo, doghub, ligadin)" aria-label="Buscar"><button class="btn">Rugir</button></form>
+          <p class="kz-sub">${T("o navegador que atravessa a savana da internet", "the browser that crosses the internet savanna")}</p>
+          <form class="kz-busca"><input placeholder="${T("Buscar na savana… (tente: nexo, doghub, ligadin)", "Search the savanna… (try: nexo, doghub, ligadin)")}" aria-label="${T("Buscar", "Search")}"><button class="btn">${T("Rugir", "Roar")}</button></form>
           <div class="kz-atalhos">
             <button data-ir="ligadin.com/feed">${ALU.pix("ligadin")}<span>LigadIn</span></button>
             <button data-ir="doghub.com/aluisiodev">${ALU.pix("doghub")}<span>DogHub</span></button>
@@ -26,35 +26,35 @@
       re: /^ligadin\.com\/in\/aluisio-alves\/?$/, titulo: () => `${P.nomeCompleto || P.nome} | LigadIn`,
       html: () => `
         <div class="li-page">
-          <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav"><button class="link" data-ir="ligadin.com/feed">Início</button> · Rede · Vagas · Mensagens · <b>Eu</b></span></header>
+          <header class="li-top"><span class="li-logo">${ALU.pix("ligadin")}<b>LigadIn</b></span><span class="li-nav"><button class="link" data-ir="ligadin.com/feed">${T("Início", "Home")}</button> · ${T("Rede · Vagas · Mensagens", "Network · Jobs · Messaging")} · <b>${T("Eu", "Me")}</b></span></header>
           <div class="li-card">
             <div class="li-capa"></div>
-            <img class="li-foto" src="${esc(P.foto)}" alt="Foto de ${esc(P.nome)}">
+            <img class="li-foto" src="${esc(P.foto)}" alt="${T("Foto de", "Photo of")} ${esc(P.nome)}">
             <h1>${esc(P.nomeCompleto || P.nome)}</h1>
             <p>${esc(P.headline || P.cargo)}</p>
-            <p class="muted">${esc(P.local)} · 500+ conexões (na savana)</p>
-            <div class="row">${real(P.contatos.linkedin, "Sair da savana: abrir perfil real")}<button class="btn sec" data-ir="chat">Mandar mensagem</button></div>
+            <p class="muted">${esc(P.local)} · ${T("500+ conexões (na savana)", "500+ connections (in the savanna)")}</p>
+            <div class="row">${real(P.contatos.linkedin, T("Sair da savana: abrir perfil real", "Leave the savanna: open real profile"))}<button class="btn sec" data-ir="chat">${T("Mandar mensagem", "Message")}</button></div>
           </div>
-          <div class="li-card"><h2>Sobre</h2>${P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
-          ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>Atividade</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-post"><small class="muted">${esc(p.autor || P.nomeCompleto || P.nome)}${p.colab ? " · com " + esc(p.colab) : ""} · ${esc(p.quando || "")}</small><p class="li-post-txt">${esc(p.texto).replace(/\n/g, "<br>")}</p></div>`).join("")}<button class="link" data-ir="ligadin.com/feed">Ver no feed →</button></div>` : ""}
-          ${(window.EXPERIENCIAS || []).length ? `<div class="li-card"><h2>Experiência</h2>${window.EXPERIENCIAS.map((x) => `<div class="li-item"><span class="li-emp">💼</span><div><strong>${esc(x.cargo)}</strong><small>${esc(x.empresa)}${x.tipo ? " · " + esc(x.tipo) : ""}</small><small>${esc(x.periodo)}</small></div></div>`).join("")}</div>` : ""}
-          <div class="li-card" id="certs"><h2>Licenças e certificações</h2>
+          <div class="li-card"><h2>${T("Sobre", "About")}</h2>${P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
+          ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>${T("Atividade", "Activity")}</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-post"><small class="muted">${esc(p.autor || P.nomeCompleto || P.nome)}${p.colab ? T(" · com ", " · with ") + esc(p.colab) : ""} · ${esc(p.quando || "")}</small><p class="li-post-txt">${esc(p.texto).replace(/\n/g, "<br>")}</p></div>`).join("")}<button class="link" data-ir="ligadin.com/feed">${T("Ver no feed →", "See on feed →")}</button></div>` : ""}
+          ${(window.EXPERIENCIAS || []).length ? `<div class="li-card"><h2>${T("Experiência", "Experience")}</h2>${window.EXPERIENCIAS.map((x) => `<div class="li-item"><span class="li-emp">💼</span><div><strong>${esc(x.cargo)}</strong><small>${esc(x.empresa)}${x.tipo ? " · " + esc(x.tipo) : ""}</small><small>${esc(x.periodo)}</small></div></div>`).join("")}</div>` : ""}
+          <div class="li-card" id="certs"><h2>${T("Licenças e certificações", "Licenses & certifications")}</h2>
             ${window.CERTIFICADOS.map((c) => `<div class="li-item">${ALU.pix("cert")}<div><strong>${esc(c.nome)}</strong>${c.emissor ? `<small>${esc(c.emissor)}</small>` : ""}</div></div>`).join("")}</div>
-          <div class="li-card"><h2>Competências</h2>${window.SKILLS.map((s) => `<div class="li-item">${ALU.pix(s.icone)}<div><strong>${esc(s.nome)}</strong></div></div>`).join("")}</div>
+          <div class="li-card"><h2>${T("Competências", "Skills")}</h2>${window.SKILLS.map((s) => `<div class="li-item">${ALU.pix(s.icone)}<div><strong>${esc(s.nome)}</strong></div></div>`).join("")}</div>
         </div>`,
     },
     {
       re: /^doghub\.com\/aluisiodev\/?$/, titulo: () => "aluisiodev · DogHub",
       html: () => `
         <div class="dh-page">
-          <header class="dh-top">${ALU.pix("doghub")}<b>DogHub</b><span>Onde o código vira amigo do homem</span></header>
+          <header class="dh-top">${ALU.pix("doghub")}<b>DogHub</b><span>${T("Onde o código vira amigo do homem", "Where code becomes man's best friend")}</span></header>
           <div class="dh-wrap">
             <aside class="dh-perfil">
-              <img src="${esc(P.foto)}" alt="Foto de ${esc(P.nome)}">
+              <img src="${esc(P.foto)}" alt="${T("Foto de", "Photo of")} ${esc(P.nome)}">
               <h1>${esc(P.nome)}</h1><p class="muted">aluisiodev</p>
-              ${real(P.contatos.github, "Sair da savana: DogHub real")}
+              ${real(P.contatos.github, T("Sair da savana: DogHub real", "Leave the savanna: real DogHub"))}
             </aside>
-            <section class="dh-repos"><h2>Repositórios fixados</h2>
+            <section class="dh-repos"><h2>${T("Repositórios fixados", "Pinned repositories")}</h2>
               ${PROJ.map((p) => `<button class="dh-repo" data-ir="doghub.com/aluisiodev/${repoDe(p)}"><strong>${esc(repoDe(p))}</strong><p>${esc(p.resumo)}</p><small><i style="background:${p.cor[0]}"></i>${esc(p.stack[0])}</small></button>`).join("")}
             </section>
           </div>
@@ -66,23 +66,23 @@
         if (!api || !box) return;
         let vivo = true;
         const CORES = { TypeScript: "#3178c6", JavaScript: "#f1e05a", "C#": "#178600", Go: "#00ADD8", Python: "#3572A5", HTML: "#e34c26", CSS: "#563d7c", Java: "#b07219", Shell: "#89e051" };
-        const quando = (iso) => { const d = Math.max(0, Math.round((Date.now() - new Date(iso)) / 864e5)); return d === 0 ? "hoje" : d === 1 ? "ontem" : d < 30 ? `há ${d} dias` : d < 365 ? `há ${Math.round(d / 30)} meses` : `há ${Math.round(d / 365)} anos`; };
+        const quando = (iso) => { const d = Math.max(0, Math.round((Date.now() - new Date(iso)) / 864e5)); return ALU.lang === "en" ? (d === 0 ? "today" : d === 1 ? "yesterday" : d < 30 ? `${d} days ago` : d < 365 ? `${Math.round(d / 30)} months ago` : `${Math.round(d / 365)} years ago`) : d === 0 ? "hoje" : d === 1 ? "ontem" : d < 30 ? `há ${d} dias` : d < 365 ? `há ${Math.round(d / 30)} meses` : `há ${Math.round(d / 365)} anos`; };
         fetch(String(api).replace(/\/+$/, "") + "/github").then((r) => (r.ok ? r.json() : null)).then((g) => {
           if (!vivo || !g || !g.perfil) return;
           const totL = g.linguagens.reduce((a, [, n]) => a + n, 0) || 1;
           const desde = g.perfil.desde ? new Date(g.perfil.desde).getFullYear() : "";
-          const contrib = g.contribuicoes ? `<div class="dh-contrib"><h3>${g.contribuicoes.total} contribuições no último ano</h3><div class="dh-graf">${g.contribuicoes.semanas.map((w) => `<div>${w.map((n) => `<i class="n${n === 0 ? 0 : n < 3 ? 1 : n < 6 ? 2 : n < 10 ? 3 : 4}" title="${n}"></i>`).join("")}</div>`).join("")}</div></div>` : "";
+          const contrib = g.contribuicoes ? `<div class="dh-contrib"><h3>${g.contribuicoes.total} ${T("contribuições no último ano", "contributions in the last year")}</h3><div class="dh-graf">${g.contribuicoes.semanas.map((w) => `<div>${w.map((n) => `<i class="n${n === 0 ? 0 : n < 3 ? 1 : n < 6 ? 2 : n < 10 ? 3 : 4}" title="${n}"></i>`).join("")}</div>`).join("")}</div></div>` : "";
           box.innerHTML = `
-            <h2>📊 Estatísticas reais <small>(direto do GitHub, sem filtro da savana)</small></h2>
+            <h2>📊 ${T("Estatísticas reais", "Real stats")} <small>${T("(direto do GitHub, sem filtro da savana)", "(straight from GitHub, no savanna filter)")}</small></h2>
             <div class="dh-nums">
-              <div><b>${g.perfil.repos}</b><span>repositórios</span></div><div><b>${g.estrelas}</b><span>estrelas</span></div>
-              <div><b>${g.perfil.seguidores}</b><span>seguidores</span></div><div><b>${desde}</b><span>no GitHub desde</span></div>
+              <div><b>${g.perfil.repos}</b><span>${T("repositórios", "repositories")}</span></div><div><b>${g.estrelas}</b><span>${T("estrelas", "stars")}</span></div>
+              <div><b>${g.perfil.seguidores}</b><span>${T("seguidores", "followers")}</span></div><div><b>${desde}</b><span>${T("no GitHub desde", "on GitHub since")}</span></div>
             </div>
             ${g.linguagens.length ? `<div class="dh-ling"><div class="dh-barra">${g.linguagens.map(([l, n]) => `<i style="flex:${n};background:${CORES[l] || "#8b949e"}" title="${esc(l)}"></i>`).join("")}</div>
               <ul>${g.linguagens.map(([l, n]) => `<li><i style="background:${CORES[l] || "#8b949e"}"></i>${esc(l)} <span>${Math.round((n / totL) * 100)}%</span></li>`).join("")}</ul></div>` : ""}
             ${contrib}
-            <h3>Mexeu por último</h3>
-            <ul class="dh-rec">${g.recentes.map((r) => `<li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.nome)} ↗</a><p>${esc(r.desc || "Sem descrição (ainda).")}</p><small>${r.lang ? `<i style="background:${CORES[r.lang] || "#8b949e"}"></i>${esc(r.lang)} · ` : ""}★ ${r.estrelas} · atualizado ${quando(r.atualizado)}</small></li>`).join("")}</ul>`;
+            <h3>${T("Mexeu por último", "Recently updated")}</h3>
+            <ul class="dh-rec">${g.recentes.map((r) => `<li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.nome)} ↗</a><p>${esc(r.desc || T("Sem descrição (ainda).", "No description (yet)."))}</p><small>${r.lang ? `<i style="background:${CORES[r.lang] || "#8b949e"}"></i>${esc(r.lang)} · ` : ""}★ ${r.estrelas} · ${T("atualizado", "updated")} ${quando(r.atualizado)}</small></li>`).join("")}</ul>`;
           box.hidden = false;
         }).catch(() => {});
         return () => { vivo = false; };
@@ -100,9 +100,9 @@
             <div class="dh-file">README.md</div>
             <div class="pad">
               <h1>${esc(p.nome)}</h1><p>${esc(p.descricao)}</p>
-              <h3>Destaques</h3><ul class="lista">${p.destaques.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
+              <h3>${T("Destaques", "Highlights")}</h3><ul class="lista">${p.destaques.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
               <h3>Stack</h3><div class="chips">${p.stack.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>
-              <div class="row">${real(p.repo, "Sair da savana: ver código real")}${p.demo ? real(p.demo, "Abrir site") : ""}<button class="btn sec" data-proj="${p.id}">Abrir no Peep Studio</button></div>
+              <div class="row">${real(p.repo, T("Sair da savana: ver código real", "Leave the savanna: see real code"))}${p.demo ? real(p.demo, T("Abrir site", "Open site")) : ""}<button class="btn sec" data-proj="${p.id}">${T("Abrir no Peep Studio", "Open in Peep Studio")}</button></div>
             </div>
           </div>
         </div>`;
@@ -121,12 +121,12 @@
       <div class="kz">
         <div class="kz-tabs"><div class="kz-tab on">${ALU.pix("kez")}<span class="kz-tt">Kez(i)avana</span></div><div class="kz-tab nova">+</div></div>
         <div class="kz-bar">
-          <button data-n="back" aria-label="Voltar">◀</button><button data-n="fwd" aria-label="Avançar">▶</button><button data-n="home" aria-label="Início">⌂</button>
-          <form class="kz-url"><span>${ALU.pix("kez")}</span><input aria-label="Endereço" spellcheck="false"></form>
-          <button data-n="go" class="kz-go">Ir</button>
+          <button data-n="back" aria-label="${T("Voltar", "Back")}">◀</button><button data-n="fwd" aria-label="${T("Avançar", "Forward")}">▶</button><button data-n="home" aria-label="${T("Início", "Home")}">⌂</button>
+          <form class="kz-url"><span>${ALU.pix("kez")}</span><input aria-label="${T("Endereço", "Address")}" spellcheck="false"></form>
+          <button data-n="go" class="kz-go">${T("Ir", "Go")}</button>
         </div>
         <div class="kz-view"></div>
-        <div class="kz-status">Pronto</div>
+        <div class="kz-status">${T("Pronto", "Done")}</div>
       </div>`;
     const view = el.querySelector(".kz-view"), input = el.querySelector(".kz-url input"), tt = el.querySelector(".kz-tt"), status = el.querySelector(".kz-status");
     const hist = []; let pos = -1; let limpar = null;
@@ -136,15 +136,15 @@
     function mostrar(url) {
       url = norm(url);
       input.value = url ? "kez://" + url.replace(/^kez:\/\//, "") : "kez://inicio";
-      let html = null, titulo = "Página não encontrada", achou = null, mm = null;
+      let html = null, titulo = T("Página não encontrada", "Page not found"), achou = null, mm = null;
       for (const pg of todas()) { const m = url.match(pg.re); if (m) { html = pg.html(m); if (html) { titulo = pg.titulo(m); achou = pg; mm = m; break; } } }
       if (limpar) { try { limpar(); } catch {} limpar = null; }
-      if (!html) html = `<div class="kz-404"><div class="kz-girafa">🦒</div><h1>A savana não encontrou essa página</h1><p>Nenhum leão, nenhuma zebra, nenhum <code>${esc(url)}</code>.</p><button class="btn" data-ir="inicio">Voltar para o início</button></div>`;
-      status.textContent = "Carregando…"; view.classList.add("loading");
+      if (!html) html = `<div class="kz-404"><div class="kz-girafa">🦒</div><h1>${T("A savana não encontrou essa página", "The savanna couldn't find this page")}</h1><p>${T("Nenhum leão, nenhuma zebra, nenhum", "No lion, no zebra, no")} <code>${esc(url)}</code>.</p><button class="btn" data-ir="inicio">${T("Voltar para o início", "Back to home")}</button></div>`;
+      status.textContent = T("Carregando…", "Loading…"); view.classList.add("loading");
       setTimeout(() => {
-        view.innerHTML = html; view.scrollTop = 0; tt.textContent = titulo; view.classList.remove("loading"); status.textContent = "Pronto";
+        view.innerHTML = html; view.scrollTop = 0; tt.textContent = titulo; view.classList.remove("loading"); status.textContent = T("Pronto", "Done");
         if (achou && achou.init) limpar = achou.init(view, ctx, mm, ir) || null;
-        if (!achou && ALU.conquista) ALU.conquista("404", "Perdido na savana", "Você achou a girafa da página 404.");
+        if (!achou && ALU.conquista) ALU.conquista("404", T("Perdido na savana", "Lost in the savanna"), T("Você achou a girafa da página 404.", "You found the 404 page giraffe."));
         view.querySelectorAll("[data-ir]").forEach((b) => (b.onclick = (e) => { e.preventDefault(); b.dataset.ir === "chat" ? ctx.abrir("chat") : ir(b.dataset.ir); }));
         view.querySelectorAll("[data-proj]").forEach((b) => (b.onclick = () => ctx.abrir("peep", "projetos/" + b.dataset.proj + ".md")));
         const busca = view.querySelector(".kz-busca");

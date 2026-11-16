@@ -6,6 +6,8 @@
   const ls = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
   const ativo = (el) => { const w = el.closest(".win"); return el.isConnected && (!w || w.classList.contains("focus")); };
   const um = (a) => a[Math.floor(Math.random() * a.length)];
+  const EN = ALU.lang === "en", T = (pt, en) => (EN ? en : pt);
+  const ERROU = ALU.lang === "en" ? "MISS" : "ERROU";
   const FONTE = "'Pixelify Sans', monospace";
 
   // ---------- som simples ----------
@@ -24,17 +26,17 @@
   // A pessoa escolhe o nome que quiser e publica a melhor marca dela. Do lado aparece o top 10.
   function ranking(caixa, jogo, rotulo, minhaMarca) {
     const esc = (s) => ALU.esc(s);
-    caixa.innerHTML = `<div class="rk"><h4>🏆 Ranking · ${esc(rotulo)}</h4>
-      <form class="rk-form"><input class="rk-nome" maxlength="20" placeholder="Seu nome no ranking" value="${esc(ls.get("alu.rk.nome", ""))}" aria-label="Seu nome no ranking"><button class="btn">Publicar <b class="rk-m">0</b></button></form>
-      <ol class="rk-lista"><li class="muted">carregando…</li></ol>
-      <small class="muted rk-aviso">${ALU.api && ALU.api.online() ? "Ranking de todo mundo que jogou." : "Ranking deste navegador (o global liga quando o servidor estiver no ar)."}</small></div>`;
+    caixa.innerHTML = `<div class="rk"><h4>🏆 ${T("Ranking", "Leaderboard")} · ${esc(rotulo)}</h4>
+      <form class="rk-form"><input class="rk-nome" maxlength="20" placeholder="${T("Seu nome no ranking", "Your name on the leaderboard")}" value="${esc(ls.get("alu.rk.nome", ""))}" aria-label="${T("Seu nome no ranking", "Your name on the leaderboard")}"><button class="btn">${T("Publicar", "Submit")} <b class="rk-m">0</b></button></form>
+      <ol class="rk-lista"><li class="muted">${T("carregando…", "loading…")}</li></ol>
+      <small class="muted rk-aviso">${ALU.api && ALU.api.online() ? T("Ranking de todo mundo que jogou.", "Leaderboard of everyone who played.") : T("Ranking deste navegador (o global liga quando o servidor estiver no ar).", "This browser's leaderboard (the global one turns on when the server is up).")}</small></div>`;
     const lista = caixa.querySelector(".rk-lista"), m = caixa.querySelector(".rk-m"), nome = caixa.querySelector(".rk-nome");
-    const pintar = (r) => { const eu = nome.value.trim().toLowerCase(); lista.innerHTML = (r || []).slice(0, 10).map((x, i) => `<li class="${x.nome.toLowerCase() === eu ? "eu" : ""}"><span>${["🥇", "🥈", "🥉"][i] || i + 1 + "."}</span><b>${esc(x.nome)}</b><i>${x.pontos}</i></li>`).join("") || '<li class="muted">Ninguém ainda. Seja o primeiro!</li>'; };
+    const pintar = (r) => { const eu = nome.value.trim().toLowerCase(); lista.innerHTML = (r || []).slice(0, 10).map((x, i) => `<li class="${x.nome.toLowerCase() === eu ? "eu" : ""}"><span>${["🥇", "🥈", "🥉"][i] || i + 1 + "."}</span><b>${esc(x.nome)}</b><i>${x.pontos}</i></li>`).join("") || `<li class="muted">${T("Ninguém ainda. Seja o primeiro!", "Nobody yet. Be the first!")}</li>`; };
     const atualizar = () => { m.textContent = minhaMarca(); };
     caixa.querySelector(".rk-form").onsubmit = async (e) => {
       e.preventDefault();
       const n = nome.value.trim().slice(0, 20);
-      if (!n) { nome.focus(); nome.placeholder = "Escreva um nome primeiro 🙂"; return; }
+      if (!n) { nome.focus(); nome.placeholder = T("Escreva um nome primeiro 🙂", "Type a name first 🙂"); return; }
       ls.set("alu.rk.nome", n);
       if (!ALU.api) return;
       pintar(await ALU.api.enviarRanking(jogo, n, minhaMarca()));
@@ -45,7 +47,16 @@
   }
 
   // =================== Jogo da velha contra Zizi ===================
-  const FALAS = {
+  const FALAS = EN ? {
+    inicio: ["Go ahead. I'll let you. 😏", "You're X. I'm the star. ⭐", "You already lost and don't even know it.", "Take a deep breath. You'll need it."],
+    jogador: ["Hmm… brave.", "That move? Seriously?", "I can see everything from here. 👀", "Interesting… for a beginner.", "Are you sweating? Looks like it.", "I'll pretend I didn't see that.", "Are you playing with your eyes closed?"],
+    zizi: ["Take that. ⭐", "Calculated.", "Your turn. No pressure. (lots of pressure)", "I've seen this ending before.", "That was just the warm-up."],
+    quase: ["Whoa, whoa, whoa! Close one.", "Getting warmer, huh…", "Thought I wouldn't notice?"],
+    vacilo: ["Oops. That was on purpose. I think.", "Let me see… no, wait…", "I was looking at the clock, that doesn't count."],
+    ziziVence: ["Easy GG. 😎", "Want a rematch? You'll lose again.", "I told you.", "Better luck next time. You'll need it."],
+    jogadorVence: ["No… impossible!", "That was luck. Pure luck.", "Fine, you won. This time.", "I'll tell no one."],
+    velha: ["A draw. Respect… a little.", "Cat's game. Meow.", "Nobody wins. How boring."],
+  } : {
     inicio: ["Pode começar. Eu deixo. 😏", "Você é X. Eu sou a estrela. ⭐", "Já perdeu e nem sabe ainda.", "Respira fundo. Vai precisar."],
     jogador: ["Hmm… corajoso.", "Essa jogada aí? Sério?", "Tô vendo tudo daqui. 👀", "Interessante… pra um iniciante.", "Você tá suando? Parece.", "Vou fingir que não vi isso.", "Tá jogando de olho fechado?"],
     zizi: ["Toma essa. ⭐", "Calculado.", "Sua vez. Sem pressão. (muita pressão)", "Eu já vi esse final.", "Isso foi só o aquecimento."],
@@ -59,8 +70,8 @@
     const pl = ls.get("alu.velha", { v: 0, z: 0, e: 0 });
     area.innerHTML = `<div class="zv">
       <div class="zv-lado"><div class="zv-zizi">${ALU.ziziSVG ? ALU.ziziSVG() : ""}</div><div class="zv-balao"><p></p></div></div>
-      <div><div class="zv-global" title="Placar somado de todas as pessoas que jogaram"><span>All users <b class="g-t">…</b></span><i>×</i><span><b class="g-z">…</b> Zizi</span></div>
-        <div class="jg-hud"><span class="msg">Sua vez (X)</span><span>Você <b class="v">${pl.v}</b> × <b class="z">${pl.z}</b> Zizi · Velha <b class="e">${pl.e}</b></span><button class="btn jg-go">Revanche</button></div>
+      <div><div class="zv-global" title="${T("Placar somado de todas as pessoas que jogaram", "Combined score of everyone who played")}"><span>${T("Todo mundo", "All users")} <b class="g-t">…</b></span><i>×</i><span><b class="g-z">…</b> Zizi</span></div>
+        <div class="jg-hud"><span class="msg">${T("Sua vez (X)", "Your turn (X)")}</span><span>${T("Você", "You")} <b class="v">${pl.v}</b> × <b class="z">${pl.z}</b> Zizi · ${T("Velha", "Draws")} <b class="e">${pl.e}</b></span><button class="btn jg-go">${T("Revanche", "Rematch")}</button></div>
         <div class="velha zv-tab"></div></div>
       <div class="zv-rk"></div></div>`;
     const tab = area.querySelector(".zv-tab"), msg = area.querySelector(".msg"), balao = area.querySelector(".zv-balao p"), zEl = area.querySelector(".zv-zizi");
@@ -70,7 +81,7 @@
     const pose = (p) => { if (ALU.ziziSVG) zEl.innerHTML = ALU.ziziSVG(p); };
     const pintarGlobal = (p) => { if (!p || !area.isConnected) return; area.querySelector(".g-t").textContent = p.todos || 0; area.querySelector(".g-z").textContent = p.zizi || 0; };
     if (ALU.api) ALU.api.placar().then(pintarGlobal);
-    const attRk = ranking(area.querySelector(".zv-rk"), "velha", "vitórias contra Zizi", () => pl.v);
+    const attRk = ranking(area.querySelector(".zv-rk"), "velha", T("vitórias contra Zizi", "wins against Zizi"), () => pl.v);
     function falar(tipo, p) {
       balao.textContent = um(FALAS[tipo]); balao.parentElement.classList.remove("pop"); void balao.offsetWidth; balao.parentElement.classList.add("pop");
       if (p) { pose(p); clearTimeout(tFala); tFala = setTimeout(() => !fim && pose("normal"), 1400); }
@@ -90,9 +101,9 @@
     }
     function checar() {
       let vencedor = null;
-      if (ganhou(b, "X")) { fim = true; vencedor = "todos"; pl.v++; msg.textContent = "Você venceu! 🎉"; falar("jogadorVence"); pose("triste"); conq("velha", "Mais esperto que Zizi", "Venceu Zizi no jogo da velha."); }
-      else if (ganhou(b, "O")) { fim = true; vencedor = "zizi"; pl.z++; msg.textContent = "Zizi venceu."; falar("ziziVence"); pose("ri"); }
-      else if (b.every(Boolean)) { fim = true; vencedor = "velha"; pl.e++; msg.textContent = "Deu velha."; falar("velha"); pose("normal"); }
+      if (ganhou(b, "X")) { fim = true; vencedor = "todos"; pl.v++; msg.textContent = T("Você venceu! 🎉", "You won! 🎉"); falar("jogadorVence"); pose("triste"); conq("velha", T("Mais esperto que Zizi", "Smarter than Zizi"), T("Venceu Zizi no jogo da velha.", "Beat Zizi at tic-tac-toe.")); }
+      else if (ganhou(b, "O")) { fim = true; vencedor = "zizi"; pl.z++; msg.textContent = T("Zizi venceu.", "Zizi won."); falar("ziziVence"); pose("ri"); }
+      else if (b.every(Boolean)) { fim = true; vencedor = "velha"; pl.e++; msg.textContent = T("Deu velha.", "It's a draw."); falar("velha"); pose("normal"); }
       area.querySelector(".v").textContent = pl.v; area.querySelector(".z").textContent = pl.z; area.querySelector(".e").textContent = pl.e;
       if (fim) { ls.set("alu.velha", pl); attRk(); if (ALU.api) ALU.api.somarPlacar(vencedor).then(pintarGlobal); }
     }
@@ -101,14 +112,14 @@
     function jogar(i) {
       if (fim || b[i] || msg.dataset.pensando) return; b[i] = "X"; tom(330, 0.06); checar(); desenhar(); if (fim) return;
       falar("jogador", Math.random() < 0.5 ? "brava" : null);
-      msg.textContent = "Zizi está pensando…"; msg.dataset.pensando = "1";
+      msg.textContent = T("Zizi está pensando…", "Zizi is thinking…"); msg.dataset.pensando = "1";
       setTimeout(() => {
         delete msg.dataset.pensando; if (fim || !area.isConnected) return;
         const [j, tipo] = cpu(); b[j] = "O"; tom(440, 0.06); checar(); desenhar();
-        if (!fim) { msg.textContent = "Sua vez (X)"; falar(tipo, tipo === "quase" ? "brava" : tipo === "vacilo" ? "triste" : "ri"); }
+        if (!fim) { msg.textContent = T("Sua vez (X)", "Your turn (X)"); falar(tipo, tipo === "quase" ? "brava" : tipo === "vacilo" ? "triste" : "ri"); }
       }, 700 + Math.random() * 500);
     }
-    function novo() { b = Array(9).fill(null); fim = false; msg.textContent = "Sua vez (X)"; desenhar(); pose("normal"); falar("inicio"); }
+    function novo() { b = Array(9).fill(null); fim = false; msg.textContent = T("Sua vez (X)", "Your turn (X)"); desenhar(); pose("normal"); falar("inicio"); }
     area.querySelector(".jg-go").onclick = novo; novo();
     return () => clearTimeout(tFala);
   }
@@ -116,9 +127,9 @@
   // =================== Pato Voador ===================
   function voador(area) {
     const W = 288, H = 400;
-    area.innerHTML = `<div class="jg-hud"><span>Pontos: <b class="pt">0</b></span><span>Recorde: <b class="rc">${ls.get("alu.voador", 0)}</b></span></div>
-      <div class="pv-wrap"><div><canvas class="jg-canvas pv" width="${W}" height="${H}"></canvas><p class="muted">Clique, toque ou aperte espaço para bater as asas.</p></div><div class="zv-rk"></div></div>`;
-    const attRk = ranking(area.querySelector(".zv-rk"), "voador", "recorde no Pato Voador", () => ls.get("alu.voador", 0));
+    area.innerHTML = `<div class="jg-hud"><span>${T("Pontos", "Score")}: <b class="pt">0</b></span><span>${T("Recorde", "Best")}: <b class="rc">${ls.get("alu.voador", 0)}</b></span></div>
+      <div class="pv-wrap"><div><canvas class="jg-canvas pv" width="${W}" height="${H}"></canvas><p class="muted">${T("Clique, toque ou aperte espaço para bater as asas.", "Click, tap or press space to flap.")}</p></div><div class="zv-rk"></div></div>`;
+    const attRk = ranking(area.querySelector(".zv-rk"), "voador", T("recorde no Pato Voador", "Flappy Duck high score"), () => ls.get("alu.voador", 0));
     const cv = area.querySelector("canvas"), g = cv.getContext("2d");
     let y, vy, canos, pts, estado = "pronto", raf, t = 0;
     const GAP = 135, VX = 1.7; // física por tempo (não por quadro), senão em telas de 120/144 Hz fica o dobro de rápido
@@ -150,7 +161,7 @@
       if (estado === "jogando") {
         vy = Math.min(6.5, vy + 0.24 * k); y += vy * k;
         prox -= k; if (prox <= 0) { prox = 105; canos.push({ x: W, topo: 50 + Math.random() * (H - GAP - 140), ok: false }); }
-        canos.forEach((c) => { c.x -= VX * k; if (!c.ok && c.x + 44 < 60) { c.ok = true; pts++; area.querySelector(".pt").textContent = pts; tom(880, 0.08, "triangle", 0.05); if (pts === 10) conq("voador", "Asas de pato", "Fez 10 pontos no Pato Voador."); } });
+        canos.forEach((c) => { c.x -= VX * k; if (!c.ok && c.x + 44 < 60) { c.ok = true; pts++; area.querySelector(".pt").textContent = pts; tom(880, 0.08, "triangle", 0.05); if (pts === 10) conq("voador", T("Asas de pato", "Duck wings"), T("Fez 10 pontos no Pato Voador.", "Scored 10 in Flappy Duck.")); } });
         canos = canos.filter((c) => c.x > -60);
         if (y < 8) { y = 8; vy = Math.max(0, vy); }
         const bateu = y > H - 52 || canos.some((c) => 60 + 14 > c.x && 60 - 14 < c.x + 44 && (y - 10 < c.topo || y + 10 > c.topo + GAP));
@@ -163,8 +174,8 @@
       g.fillStyle = "#c48b4a"; g.fillRect(0, H - 40, W, 40); g.fillStyle = "#8a5a2a"; for (let i = 0; i < W + 16; i += 16) g.fillRect(i - (t * VX) % 16, H - 40, 8, 6);
       pato(60, y, Math.max(-0.5, Math.min(1, vy / 10)));
       g.fillStyle = "#fff"; g.font = `24px ${FONTE}`; g.textAlign = "center";
-      if (estado === "pronto") g.fillText("toque para voar", W / 2, 120);
-      if (estado === "morto") { g.fillStyle = "rgba(0,0,0,.55)"; g.fillRect(0, 140, W, 90); g.fillStyle = "#fff"; g.fillText("quack! bateu", W / 2, 180); g.font = `16px ${FONTE}`; g.fillText("toque para tentar de novo", W / 2, 208); }
+      if (estado === "pronto") g.fillText(T("toque para voar", "tap to fly"), W / 2, 120);
+      if (estado === "morto") { g.fillStyle = "rgba(0,0,0,.55)"; g.fillRect(0, 140, W, 90); g.fillStyle = "#fff"; g.fillText(T("quack! bateu", "quack! crashed"), W / 2, 180); g.font = `16px ${FONTE}`; g.fillText(T("toque para tentar de novo", "tap to try again"), W / 2, 208); }
       raf = requestAnimationFrame(quadro);
     }
     const tecla = (e) => { if (!ativo(area)) return; if (e.code === "Space" || e.key === "ArrowUp" || e.key === "w") { e.preventDefault(); pular(); } };
@@ -178,17 +189,17 @@
   // Você é a pessoa da segurança. Três robôs do museu andam à noite. Vigie as câmeras,
   // feche as portas quando alguém chegar e não deixe a bateria acabar até as 6h.
   function plantao(area) {
-    const SALAS = ["Palco", "Salão", "Corredor E", "Corredor D", "Porta E", "Porta D"];
+    const SALAS = EN ? ["Stage", "Hall", "Left Hallway", "Right Hallway", "Left Door", "Right Door"] : ["Palco", "Salão", "Corredor E", "Corredor D", "Porta E", "Porta D"];
     const ROBOS = [
-      { nome: "Girafa de Lata", cor: "#e0a03a", lado: "E", agr: 0.32, cara: "🦒" },
-      { nome: "Leão Enferrujado", cor: "#c8642a", lado: "D", agr: 0.3, cara: "🦁" },
-      { nome: "Pato Mecânico", cor: "#9b6bff", lado: "?", agr: 0.26, cara: "🦆" },
+      { nome: T("Girafa de Lata", "Tin Giraffe"), cor: "#e0a03a", lado: "E", agr: 0.32, cara: "🦒" },
+      { nome: T("Leão Enferrujado", "Rusty Lion"), cor: "#c8642a", lado: "D", agr: 0.3, cara: "🦁" },
+      { nome: T("Pato Mecânico", "Mechanical Duck"), cor: "#9b6bff", lado: "?", agr: 0.26, cara: "🦆" },
     ];
     area.innerHTML = `<div class="pn">
-      <div class="pn-tela"><canvas width="480" height="270"></canvas><div class="pn-hud"><b class="pn-hora">12 AM</b><span>Noite <b class="pn-noite">1</b></span><span>Bateria <b class="pn-bat">100</b>%</span><span>Uso <b class="pn-uso">▮</b></span></div><button class="btn real pn-go">Começar a noite</button></div>
-      <div class="pn-ctrl"><button class="btn pn-pe">◧ Porta E</button><button class="btn pn-le">💡 Luz E</button><button class="btn real pn-cam">📷 Câmeras</button><button class="btn pn-ld">💡 Luz D</button><button class="btn pn-pd">Porta D ◨</button></div>
+      <div class="pn-tela"><canvas width="480" height="270"></canvas><div class="pn-hud"><b class="pn-hora">12 AM</b><span>${T("Noite", "Night")} <b class="pn-noite">1</b></span><span>${T("Bateria", "Power")} <b class="pn-bat">100</b>%</span><span>${T("Uso", "Usage")} <b class="pn-uso">▮</b></span></div><button class="btn real pn-go">${T("Começar a noite", "Start the night")}</button></div>
+      <div class="pn-ctrl"><button class="btn pn-pe">◧ ${T("Porta E", "Left door")}</button><button class="btn pn-le">💡 ${T("Luz E", "Left light")}</button><button class="btn real pn-cam">📷 ${T("Câmeras", "Cameras")}</button><button class="btn pn-ld">💡 ${T("Luz D", "Right light")}</button><button class="btn pn-pd">${T("Porta D", "Right door")} ◨</button></div>
       <div class="pn-cams" hidden>${SALAS.slice(0, 4).map((s, i) => `<button data-c="${i}">CAM ${i + 1} · ${s}</button>`).join("")}</div>
-      <p class="muted">Feche a porta quando a luz mostrar um robô. Câmeras, luzes e portas gastam bateria. Sobreviva até as 6 AM.</p>
+      <p class="muted">${T("Feche a porta quando a luz mostrar um robô. Câmeras, luzes e portas gastam bateria. Sobreviva até as 6 AM.", "Close the door when the light shows a robot. Cameras, lights and doors drain power. Survive until 6 AM.")}</p>
 </div>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d");
     const $ = (s) => area.querySelector(s);
@@ -208,7 +219,7 @@
       if (!st || st.morto || st.venceu) return;
       st.seg++; st.bat = Math.max(0, st.bat - uso() * 0.16);
       if (st.seg % 20 === 0) { st.hora++; tom(220, 0.4, "triangle", 0.05); }
-      if (st.hora >= 6) { st.venceu = true; clearInterval(timer); ls.set("alu.plantao", Math.min(5, st.noite + 1)); tom(523, 0.2, "triangle", 0.06); tom(659, 0.2, "triangle", 0.06, 0.2); tom(784, 0.4, "triangle", 0.06, 0.4); conq("plantao", "Sobreviveu ao plantão", "Chegou às 6 AM no Plantão Noturno."); $(".pn-go").hidden = false; $(".pn-go").textContent = "Próxima noite"; return; }
+      if (st.hora >= 6) { st.venceu = true; clearInterval(timer); ls.set("alu.plantao", Math.min(5, st.noite + 1)); tom(523, 0.2, "triangle", 0.06); tom(659, 0.2, "triangle", 0.06, 0.2); tom(784, 0.4, "triangle", 0.06, 0.4); conq("plantao", T("Sobreviveu ao plantão", "Survived the shift"), T("Chegou às 6 AM no Plantão Noturno.", "Made it to 6 AM in Night Watch.")); $(".pn-go").hidden = false; $(".pn-go").textContent = "Próxima noite"; return; }
       if (st.bat <= 0) { st.pe = st.pd = st.le = st.ld = st.cam = false; }
       ROBOS.forEach((r, i) => {
         const chance = r.agr + st.noite * 0.06 + st.hora * 0.02;
@@ -218,7 +229,7 @@
           else if (st.pos[i] === 3) {
             const fechada = st.lado[i] === "E" ? st.pe : st.pd;
             if (fechada) { st.pos[i] = Math.random() < 0.5 ? 0 : 1; if (r.lado === "?") st.lado[i] = um(["E", "D"]); tom(140, 0.15, "square", 0.05); }
-            else { st.morto = true; st.susto = i; clearInterval(timer); tom(90, 0.8, "sawtooth", 0.12); tom(60, 0.8, "square", 0.1, 0.05); $(".pn-go").hidden = false; $(".pn-go").textContent = "Tentar de novo"; }
+            else { st.morto = true; st.susto = i; clearInterval(timer); tom(90, 0.8, "sawtooth", 0.12); tom(60, 0.8, "square", 0.1, 0.05); $(".pn-go").hidden = false; $(".pn-go").textContent = T("Tentar de novo", "Try again"); }
           }
         }
       });
@@ -246,9 +257,9 @@
     function quadro() {
       raf = requestAnimationFrame(quadro);
       g.fillStyle = "#07060c"; g.fillRect(0, 0, 480, 270);
-      if (!st) { g.fillStyle = "#cfd6e4"; g.font = `20px ${FONTE}`; g.textAlign = "center"; g.fillText("Plantão Noturno no Museu da Savana", 240, 120); g.font = `14px ${FONTE}`; g.fillText("Noite " + ls.get("alu.plantao", 1) + " · boa sorte", 240, 150); return; }
-      if (st.morto) { const r = ROBOS[st.susto]; g.fillStyle = Math.random() < 0.5 ? "#2a0000" : "#000"; g.fillRect(0, 0, 480, 270); robo(160 + Math.random() * 8, 20 + Math.random() * 8, 11, r); g.fillStyle = "#ff4d6d"; g.font = `22px ${FONTE}`; g.textAlign = "center"; g.fillText(r.nome + " te pegou!", 240, 260); return; }
-      if (st.venceu) { g.fillStyle = "#ffe9a8"; g.font = `40px ${FONTE}`; g.textAlign = "center"; g.fillText("6 AM", 240, 130); g.font = `16px ${FONTE}`; g.fillText("Você sobreviveu à noite " + st.noite + "! 🌅", 240, 165); return; }
+      if (!st) { g.fillStyle = "#cfd6e4"; g.font = `20px ${FONTE}`; g.textAlign = "center"; g.fillText(T("Plantão Noturno no Museu da Savana", "Night Watch at the Savanna Museum"), 240, 120); g.font = `14px ${FONTE}`; g.fillText(T("Noite ", "Night ") + ls.get("alu.plantao", 1) + T(" · boa sorte", " · good luck"), 240, 150); return; }
+      if (st.morto) { const r = ROBOS[st.susto]; g.fillStyle = Math.random() < 0.5 ? "#2a0000" : "#000"; g.fillRect(0, 0, 480, 270); robo(160 + Math.random() * 8, 20 + Math.random() * 8, 11, r); g.fillStyle = "#ff4d6d"; g.font = `22px ${FONTE}`; g.textAlign = "center"; g.fillText(r.nome + T(" te pegou!", " got you!"), 240, 260); return; }
+      if (st.venceu) { g.fillStyle = "#ffe9a8"; g.font = `40px ${FONTE}`; g.textAlign = "center"; g.fillText("6 AM", 240, 130); g.font = `16px ${FONTE}`; g.fillText(T("Você sobreviveu à noite ", "You survived night ") + st.noite + "! 🌅", 240, 165); return; }
       if (st.cam && st.bat > 0) {
         g.fillStyle = "#14201a"; g.fillRect(0, 0, 480, 270);
         g.fillStyle = "#1f3328"; for (let i = 0; i < 270; i += 4) g.fillRect(0, i, 480, 1);
@@ -266,7 +277,7 @@
         if (porta) { g.fillStyle = "#6d6d7a"; g.fillRect(x, 40, 80, 160); g.fillStyle = "#4a4a56"; for (let k = 0; k < 160; k += 16) g.fillRect(x, 40 + k, 80, 3); }
         g.strokeStyle = "#000"; g.lineWidth = 4; g.strokeRect(x, 40, 80, 160);
       });
-      if (st.bat <= 0) { g.fillStyle = "rgba(0,0,0,.8)"; g.fillRect(0, 0, 480, 270); g.fillStyle = "#ff4d6d"; g.font = `16px ${FONTE}`; g.textAlign = "center"; g.fillText("sem bateria…", 240, 140); }
+      if (st.bat <= 0) { g.fillStyle = "rgba(0,0,0,.8)"; g.fillRect(0, 0, 480, 270); g.fillStyle = "#ff4d6d"; g.font = `16px ${FONTE}`; g.textAlign = "center"; g.fillText(T("sem bateria…", "out of power…"), 240, 140); }
     }
     quadro();
     return () => { clearInterval(timer); cancelAnimationFrame(raf); };
@@ -277,13 +288,13 @@
     const W = 360, H = 420, LANES = ["ArrowLeft", "ArrowDown", "ArrowUp", "ArrowRight"], SIMB = ["←", "↓", "↑", "→"], CORES = ["#c94fd8", "#2fbfd8", "#3aa34a", "#e0413a"];
     const TECLAS = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, a: 0, s: 1, w: 2, d: 3, d0: 0 };
     area.innerHTML = `<div class="rt">
-      <div class="zv-lado"><div class="zv-zizi rt-zizi">${ALU.ziziSVG ? ALU.ziziSVG() : ""}</div><div class="zv-balao"><p>Bora ver se você tem ritmo. 🎵</p></div></div>
-      <div><div class="jg-hud"><span>Pontos <b class="rt-p">0</b></span><span>Combo <b class="rt-c">0</b></span><span>Recorde <b class="rt-r">${ls.get("alu.ritmo", 0)}</b></span><button class="btn jg-go">Começar</button></div>
+      <div class="zv-lado"><div class="zv-zizi rt-zizi">${ALU.ziziSVG ? ALU.ziziSVG() : ""}</div><div class="zv-balao"><p>${T("Bora ver se você tem ritmo. 🎵", "Let's see if you've got rhythm. 🎵")}</p></div></div>
+      <div><div class="jg-hud"><span>${T("Pontos", "Score")} <b class="rt-p">0</b></span><span>Combo <b class="rt-c">0</b></span><span>${T("Recorde", "Best")} <b class="rt-r">${ls.get("alu.ritmo", 0)}</b></span><button class="btn jg-go">${T("Começar", "Start")}</button></div>
       <canvas class="jg-canvas" width="${W}" height="${H}"></canvas>
       <div class="rt-pads">${SIMB.map((s, i) => `<button data-l="${i}" style="--c:${CORES[i]}">${s}</button>`).join("")}</div>
-      <p class="muted">Setas (ou A S W D) quando a nota chegar na linha. No celular, toque nos botões.</p></div><div class="zv-rk"></div></div>`;
+      <p class="muted">${T("Setas (ou A S W D) quando a nota chegar na linha. No celular, toque nos botões.", "Arrow keys (or A S W D) when the note reaches the line. On mobile, tap the buttons.")}</p></div><div class="zv-rk"></div></div>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d"), balao = area.querySelector(".zv-balao p"), zEl = area.querySelector(".rt-zizi");
-    const attRk = ranking(area.querySelector(".zv-rk"), "ritmo", "recorde na Batalha de Ritmo", () => ls.get("alu.ritmo", 0));
+    const attRk = ranking(area.querySelector(".zv-rk"), "ritmo", T("recorde na Batalha de Ritmo", "Rhythm Battle high score"), () => ls.get("alu.ritmo", 0));
     const BPM = 120, BEAT = 60 / BPM, ALVO = H - 60, VEL = 260;
     let notas = [], inicio = 0, raf = null, tocando = false, pts = 0, combo = 0, flash = [0, 0, 0, 0], txt = "", txtT = 0, agendado = 0;
     // música original: baixo + melodia em escala pentatônica, gerada na hora
@@ -304,7 +315,7 @@
       if (!ac) return;
       gerar(); pts = 0; combo = 0; inicio = ac.currentTime + 0.3; tocando = true; agendado = 0;
       area.querySelector(".rt-p").textContent = 0; area.querySelector(".rt-c").textContent = 0;
-      falar("Valendo! Não pisca. 😏", "ri");
+      falar(T("Valendo! Não pisca. 😏", "Here we go! Don't blink. 😏"), "ri");
     }
     function batida() {
       // agenda bateria e baixo um pouco à frente
@@ -324,11 +335,11 @@
       const n = notas.filter((x) => x.l === l && !x.ok && !x.perdida).sort((a, b) => Math.abs(a.t - t) - Math.abs(b.t - t))[0];
       if (n && Math.abs(n.t - t) < 0.16) {
         n.ok = true; const perf = Math.abs(n.t - t) < 0.06;
-        pts += perf ? 300 : 100; combo++; txt = perf ? "PERFEITO!" : "BOM"; txtT = 30;
+        pts += perf ? 300 : 100; combo++; txt = perf ? T("PERFEITO!", "PERFECT!") : T("BOM", "GOOD"); txtT = 30;
         tom(n.f, 0.18, "square", 0.05);
-        if (combo === 10) falar("Ok… você até que manda bem.", "brava");
-        if (combo === 25) { falar("Para de acertar tudo! 😤", "brava"); conq("ritmo", "Ritmo de batalha", "Fez combo 25 na Batalha de Ritmo."); }
-      } else { combo = 0; txt = "ERROU"; txtT = 30; tom(120, 0.08, "sawtooth", 0.04); if (Math.random() < 0.3) falar(um(["Ritmo zero. 🙃", "Tá dançando outra música?", "Hahaha!"]), "ri"); }
+        if (combo === 10) falar(T("Ok… você até que manda bem.", "Okay… you're actually not bad."), "brava");
+        if (combo === 25) { falar(T("Para de acertar tudo! 😤", "Stop hitting everything! 😤"), "brava"); conq("ritmo", T("Ritmo de batalha", "Battle rhythm"), T("Fez combo 25 na Batalha de Ritmo.", "Hit a 25 combo in Rhythm Battle.")); }
+      } else { combo = 0; txt = ERROU; txtT = 30; tom(120, 0.08, "sawtooth", 0.04); if (Math.random() < 0.3) falar(um(EN ? ["Zero rhythm. 🙃", "Are you dancing to a different song?", "Hahaha!"] : ["Ritmo zero. 🙃", "Tá dançando outra música?", "Hahaha!"]), "ri"); }
       area.querySelector(".rt-p").textContent = pts; area.querySelector(".rt-c").textContent = combo;
     }
     function quadro() {
@@ -357,10 +368,10 @@
           tocando = false;
           const tot = notas.length, ac2 = notas.filter((n) => n.ok).length;
           if (pts > ls.get("alu.ritmo", 0)) { ls.set("alu.ritmo", pts); area.querySelector(".rt-r").textContent = pts; attRk(); }
-          falar(ac2 / tot > 0.8 ? "Tá bom, você venceu. Dessa vez. 😤" : ac2 / tot > 0.5 ? "Empate técnico. Eu ainda sou melhor." : "Vitória da Zizi! Volta quando treinar. 😎", ac2 / tot > 0.8 ? "triste" : "ri");
+          falar(ac2 / tot > 0.8 ? T("Tá bom, você venceu. Dessa vez. 😤", "Fine, you win. This time. 😤") : ac2 / tot > 0.5 ? T("Empate técnico. Eu ainda sou melhor.", "Technical draw. I'm still better.") : T("Vitória da Zizi! Volta quando treinar. 😎", "Zizi wins! Come back after some practice. 😎"), ac2 / tot > 0.8 ? "triste" : "ri");
         }
-      } else { g.fillStyle = "#cfd6e4"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText("Batalha de Ritmo", W / 2, 150); g.font = `14px ${FONTE}`; g.fillText("clique em Começar", W / 2, 176); }
-      if (txtT) { txtT--; g.fillStyle = txt === "ERROU" ? "#ff4d6d" : "#ffd23f"; g.font = `26px ${FONTE}`; g.fillText(txt, W / 2, 110); }
+      } else { g.fillStyle = "#cfd6e4"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText(T("Batalha de Ritmo", "Rhythm Battle"), W / 2, 150); g.font = `14px ${FONTE}`; g.fillText(T("clique em Começar", "click Start"), W / 2, 176); }
+      if (txtT) { txtT--; g.fillStyle = txt === ERROU ? "#ff4d6d" : "#ffd23f"; g.font = `26px ${FONTE}`; g.fillText(txt, W / 2, 110); }
     }
     const tecla = (e) => { if (!ativo(area)) return; const l = TECLAS[e.key]; if (l !== undefined) { e.preventDefault(); if (!e.repeat) acertar(l); } };
     document.addEventListener("keydown", tecla);

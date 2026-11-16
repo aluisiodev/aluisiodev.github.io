@@ -13,6 +13,24 @@
     ["ebaa", "Membro do fórum"], ["recado", "Deixou recado"], ["segunda", "Odeio segunda-feira"], ["barrel", "Deu um giro"], ["musikzify", "Trilha sonora"],
     ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"], ["tema", "Nostalgia de 2009"], ["banco", "Rico de experiência"], ["ligacao", "Alô?"], ["toques", "Toque polifônico"], ["clima-local", "Previsão sob medida"],
   ];
+  // títulos e descrições em inglês, por id (vale para qualquer lugar que chame ALU.conquista)
+  const CONQ_EN = {
+    konami: ["Secret code", "↑↑↓↓←→←→BA. A classic."], quack: ["Duck talk", "Typed quack out of nowhere."], savana: ["King of the savanna", "Typed savana and changed the wallpaper."],
+    relogio: ["Night shift", "The clock hit 12 AM. Watch the door."], lixeira: ["Dumpster diving", "Opened a file from the Recycle Bin."], terminal: ["Real hacker", "Found a secret terminal command."],
+    404: ["Lost in the savanna", "Found a page that doesn't exist."], segredo: ["Secret page", "Typed kez://segredo."], like10: ["Number 1 fan", "Liked a video 10 times."],
+    inscrito: ["Savanna subscriber", "Subscribed to the channel."], pato10h: ["Aquatic ASMR", "Watched the 10-hour duck video."], spam: ["Almost fell for it", "Opened the savanna prince's email."],
+    freddy: ["Night shift II", "Read the pizzeria manager's email."], cobra15: ["Snake charmer", "Scored 15 in Snake."], velha: ["Smarter than Zizi", "Beat Zizi at tic-tac-toe."],
+    pato100: ["Duck breeder", "Collected 100 quacks in Pato Clicker."], memoria: ["Elephant memory", "Completed Savanna Memory."], "pato-evoluiu": ["The duck evolved", "Ran code 5 times in Peep Studio."],
+    nudge: ["Attention seeker", "Shook the MessagerTale window."], luminaria: ["Enlightened", "Found the hidden spot in the bedroom."], turista: ["Bedroom tourist", "Looked at every object in the bedroom."],
+    desligar: ["Safe to turn off", "Shut down aluOS. It forgives you."], professor: ["Bot teacher", "Taught MessagerTale a new phrase."], bonzinho: ["Friends with Zizi", "Chatted with Zizi."],
+    ebaa: ["Forum member", "Replied to a topic on ebaa!."], recado: ["Left a scrap", "Wrote a scrap on yakurt."], segunda: ["I hate Mondays", "Joined the most honest community on yakurt."],
+    barrel: ["Do a barrel roll", "Asked Alulugle to spin."], musikzify: ["Soundtrack", "Opened the playlist on musikzify."], voador: ["Duck wings", "Scored 10 in Flappy Duck."],
+    plantao: ["Survived the shift", "Made it to 6 AM in Night Watch."], ritmo: ["Battle rhythm", "Hit a 25 combo in Rhythm Battle."], ligadin: ["Organic engagement", "Interacted on LigadIn."],
+    commit: ["First commit", "Signed the guestbook in Peep Studio."], talentos: ["Talent pool", "Read 5 identical rejections in imaíu's spam."], tema: ["2009 nostalgia", "Changed the aluOS theme."],
+    banco: ["Rich in experience", "Opened the bank app."], ligacao: ["Hello?", "Made a call."], toques: ["Polyphonic ringtone", "Said YES to the carrier."], "clima-local": ["Tailor-made forecast", "Checked the weather where you are on climaselva."],
+  };
+  const EM_EN = ALU.lang === "en";
+  if (EM_EN) ALU.CONQUISTAS.forEach((c) => { if (CONQ_EN[c[0]]) c[1] = CONQ_EN[c[0]][0]; });
   const ler = () => { try { return JSON.parse(localStorage.getItem("alu.conquistas")) || {}; } catch { return {}; } };
   const salvar = (o) => { try { localStorage.setItem("alu.conquistas", JSON.stringify(o)); } catch {} };
   let feitas = ler();
@@ -20,6 +38,7 @@
 
   ALU.conquista = function (id, titulo, desc) {
     if (feitas[id]) return;
+    if (EM_EN && CONQ_EN[id]) [titulo, desc] = [CONQ_EN[id][0], desc && /[ãõçáéíóúâêô]|\b(de|do|da|no|na|um|uma|o|a)\b/i.test(desc) ? CONQ_EN[id][1] : desc || CONQ_EN[id][1]];
     feitas[id] = Date.now(); salvar(feitas);
     const t = document.createElement("div");
     t.className = "conq";
@@ -34,7 +53,7 @@
   };
   function alertaFinal() {
     const t = document.createElement("div"); t.className = "conq final";
-    t.innerHTML = `<div class="conq-ic">👑</div><div><strong>Você achou TUDO.</strong><p>Me chama no LigadIn e conta como foi. Sério.</p></div>`;
+    t.innerHTML = `<div class="conq-ic">👑</div><div><strong>${EM_EN ? "You found EVERYTHING." : "Você achou TUDO."}</strong><p>${EM_EN ? "Ping me on LigadIn and tell me how it went. Seriously." : "Me chama no LigadIn e conta como foi. Sério."}</p></div>`;
     document.body.appendChild(t); setTimeout(() => t.remove(), 8000);
   }
 
@@ -81,9 +100,11 @@
   // ---------- Kez: página secreta ----------
   (ALU.kezSites = ALU.kezSites || []).push({
     re: /^(kez:\/\/)?(segredo|secret|savana)$/, titulo: () => "🤫",
-    html: () => `<div class="kz-404"><div class="kz-girafa">🗝️</div><h1>Você achou a página secreta</h1>
+    html: () => `<div class="kz-404"><div class="kz-girafa">🗝️</div>${EM_EN ? `<h1>You found the secret page</h1>
+      <p>Few people type addresses by hand these days. Respect.</p>
+      <p class="muted">Hint for the next secret: the taskbar clock doesn't like being poked 5 times.</p>` : `<h1>Você achou a página secreta</h1>
       <p>Pouca gente digita endereços à mão hoje em dia. Respeito.</p>
-      <p class="muted">Dica para o próximo segredo: o relógio da barra de tarefas não gosta de ser cutucado 5 vezes.</p></div>`,
+      <p class="muted">Dica para o próximo segredo: o relógio da barra de tarefas não gosta de ser cutucado 5 vezes.</p>`}</div>`,
     init: () => { ALU.conquista("segredo", "Página secreta", "Digitou kez://segredo."); },
   });
 
