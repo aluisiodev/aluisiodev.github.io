@@ -1,0 +1,72 @@
+// aluOS: estado global, papéis de parede, boot e escolha entre desktop e celular.
+(function () {
+  const ALU = window.ALU;
+  const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+  ALU.WALLPAPERS = [
+    { nome: "Aurora", cls: "wp-aurora" },
+    { nome: "Savana", cls: "wp-savana" },
+    { nome: "Noite", cls: "wp-noite" },
+  ];
+  ALU.CORES = ["#2f6bff", "#7c3aed", "#0e9f6e", "#d9468f", "#e07b12", "#4b5563"];
+  ALU.estado = { wall: Math.min(+(ls.get("alu.v2.wall") || 0), 2), accent: ls.get("alu.v2.accent") || "#2f6bff" };
+
+  ALU.setWall = (i) => {
+    ALU.estado.wall = i; ls.set("alu.v2.wall", i);
+    const wp = document.getElementById("wallpaper");
+    wp.className = "wallpaper " + ALU.WALLPAPERS[i].cls;
+  };
+  ALU.setAccent = (c) => { ALU.estado.accent = c; ls.set("alu.v2.accent", c); document.documentElement.style.setProperty("--accent", c); };
+
+  const isMobile = () => matchMedia("(max-width: 760px), (pointer: coarse) and (max-width: 1024px)").matches;
+  let modo = null;
+  function montar() {
+    const m = isMobile() ? "mobile" : "desktop";
+    if (m === modo) return;
+    modo = m;
+    document.body.dataset.modo = m;
+    document.getElementById("os").innerHTML = "";
+    (m === "mobile" ? ALU.mobile : ALU.desktop)(document.getElementById("os"));
+  }
+
+  // ----- boot -----
+  function boot(rapido) {
+    const b = document.getElementById("boot");
+    b.hidden = false; b.classList.remove("fim");
+    const linhas = [
+      "aluOS 2.0 — carregando",
+      "verificando memória .............. ok",
+      "abrindo a savana (Kez(i)avana) ... ok",
+      `carregando projetos (${window.PROJETOS.length}) ........... ok`,
+      "alimentando o pato do Peep Studio . ok",
+      "conectando ao MessagerTale ....... ok",
+    ];
+    const log = b.querySelector(".boot-log"); log.textContent = "";
+    let i = 0, acabou = false;
+    const fim = () => {
+      if (acabou) return; acabou = true;
+      b.classList.add("fim");
+      setTimeout(() => { b.hidden = true; }, 600);
+      try { sessionStorage.setItem("alu.booted", "1"); } catch {}
+    };
+    const passo = () => {
+      if (acabou) return;
+      if (i < linhas.length) { log.textContent += linhas[i++] + "\n"; setTimeout(passo, rapido ? 60 : 230); }
+      else { b.classList.add("logo"); setTimeout(fim, rapido ? 300 : 900); }
+    };
+    b.classList.remove("logo");
+    passo();
+    b.onclick = fim;
+    document.addEventListener("keydown", fim, { once: true });
+  }
+  ALU.reboot = () => { modo = null; boot(false); setTimeout(montar, 400); };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    ALU.setWall(ALU.estado.wall);
+    ALU.setAccent(ALU.estado.accent);
+    let jaBootou = false; try { jaBootou = sessionStorage.getItem("alu.booted") === "1"; } catch {}
+    montar();
+    boot(jaBootou);
+    let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(montar, 200); });
+  });
+})();
