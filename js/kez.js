@@ -63,11 +63,32 @@
       // estatísticas reais do GitHub, pelo servidor do aluOS
       init: (view) => {
         const api = ALU.CONFIG && ALU.CONFIG.api, box = view.querySelector(".dh-stats");
-        if (!api || !box) return;
+        if (!box) return;
         let vivo = true;
         const CORES = { TypeScript: "#3178c6", JavaScript: "#f1e05a", "C#": "#178600", Go: "#00ADD8", Python: "#3572A5", HTML: "#e34c26", CSS: "#563d7c", Java: "#b07219", Shell: "#89e051" };
         const quando = (iso) => { const d = Math.max(0, Math.round((Date.now() - new Date(iso)) / 864e5)); return ALU.lang === "en" ? (d === 0 ? "today" : d === 1 ? "yesterday" : d < 30 ? `${d} days ago` : d < 365 ? `${Math.round(d / 30)} months ago` : `${Math.round(d / 365)} years ago`) : d === 0 ? "hoje" : d === 1 ? "ontem" : d < 30 ? `há ${d} dias` : d < 365 ? `há ${Math.round(d / 30)} meses` : `há ${Math.round(d / 365)} anos`; };
-        fetch(String(api).replace(/\/+$/, "") + "/github").then((r) => (r.ok ? r.json() : null)).then((g) => {
+        // 1º o servidor do aluOS (com cache e gráfico de contribuições); se ele não responder, o GitHub direto do navegador
+        const direto = async () => {
+          const H = { Accept: "application/vnd.github+json" }, user = "aluisiodev";
+          const u = await fetch(`https://api.github.com/users/${user}`, { headers: H }); if (!u.ok) return null;
+          const perfil = await u.json();
+          const repos = await (await fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed&type=owner`, { headers: H })).json();
+          const meus = (Array.isArray(repos) ? repos : []).filter((r) => !r.fork), ling = {};
+          meus.forEach((r) => { if (r.language) ling[r.language] = (ling[r.language] || 0) + 1; });
+          return { perfil: { repos: perfil.public_repos, seguidores: perfil.followers, desde: perfil.created_at }, estrelas: meus.reduce((a, r) => a + r.stargazers_count, 0),
+            linguagens: Object.entries(ling).sort((a, b) => b[1] - a[1]).slice(0, 6),
+            recentes: meus.slice(0, 6).map((r) => ({ nome: r.name, desc: r.description, lang: r.language, estrelas: r.stargazers_count, atualizado: r.pushed_at, url: r.html_url })) };
+        };
+        const CHAVE = "alu.github.cache";
+        const buscar = async () => {
+          try { const c = JSON.parse(sessionStorage.getItem(CHAVE)); if (c && Date.now() - c.t < 36e5) return c.g; } catch {}
+          let g = null;
+          if (api) g = await fetch(String(api).replace(/\/+$/, "") + "/github").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+          if (!g || !g.perfil) g = await direto().catch(() => null);
+          if (g && g.perfil) try { sessionStorage.setItem(CHAVE, JSON.stringify({ t: Date.now(), g })); } catch {}
+          return g;
+        };
+        buscar().then((g) => {
           if (!vivo || !g || !g.perfil) return;
           const totL = g.linguagens.reduce((a, [, n]) => a + n, 0) || 1;
           const desde = g.perfil.desde ? new Date(g.perfil.desde).getFullYear() : "";
