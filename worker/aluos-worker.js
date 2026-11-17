@@ -16,7 +16,7 @@
 //        ORIGEM       = https://aluisiodev.github.io        (sites que podem usar o servidor; vários separados por vírgula, ou * para testar)
 //        CHAVE_ADMIN  = uma senha sua (Secret)              (para ler o livro de visitas)
 //        GEMINI_API_KEY = sua chave do Gemini (Secret, opcional) (para o chat com IA)
-//        GEMINI_MODEL   = gemini-2.5-flash (Text, opcional; é o padrão se você não criar)
+//        GEMINI_MODEL   = gemini-flash-latest (Text, opcional; é o padrão se você não criar)
 //      A chave do Gemini é grátis: https://aistudio.google.com/apikey > Create API key.
 //        GROQ_API_KEY   = chave da Groq (Secret, opcional): reserva quando o Gemini falhar ou a cota acabar. Grátis em https://console.groq.com/keys
 //        SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET (Secrets, opcionais): para o musikzify mostrar a playlist com capas.
@@ -112,7 +112,8 @@ async function perguntarIA(env, sistema, hist, msg, diagnostico = false) {
   const log = [];
   const nota = (quem, status, txt) => { const l = `${quem}: ${status}${txt ? " · " + String(txt).replace(/\s+/g, " ").slice(0, 220) : ""}`; log.push(l); console.log("[chat] " + l); };
   if (env.GEMINI_API_KEY) {
-    const modelos = [...new Set([env.GEMINI_MODEL || "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"])];
+    // os apelidos "-latest" sempre apontam pro modelo atual (os 2.5 já dão 404 pra contas novas)
+    const modelos = [...new Set([env.GEMINI_MODEL || "gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite"])];
     for (const modelo of modelos) {
       const config = { maxOutputTokens: 350, temperature: 0.6, stopSequences: PARAR };
       if (/2\.5/.test(modelo)) config.thinkingConfig = { thinkingBudget: 0 }; // sem "pensar": resposta rápida e não gasta a cota
