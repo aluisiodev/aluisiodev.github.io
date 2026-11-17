@@ -26,9 +26,9 @@
     ["filho", "Fernanda Lideranças", "👩‍🏫", "Diretora de Pessoas e Culturas e Outras Pessoas", "2 d",
       "Meu filho de 5 anos me perguntou: \"mãe, por que você trabalha?\"\n\nRespondi com um silêncio. Depois chorei. Depois montei um framework.\n\nO que uma criança de 5 anos pode nos ensinar sobre gestão de stakeholders, OKRs e o futuro da inteligência artificial? Tudo. Leia nos comentários. 👇\n\n#liderança #maternidade #okrs #storytelling",
       7712, 455, [["Filho da Fernanda", "eu só perguntei se ia ter janta"]]],
-    ["gerente", "Gerente da Pizzaria", "🍕", "Gerente de Turno Noturno | Segurança em primeiro lugar (quase)", "3 d",
-      "Estamos contratando para o turno da noite! 🌙\n\n✅ Ambiente animado (MUITO animado)\n✅ Colegas que não dormem nunca\n✅ Vale-pizza\n✅ Treinamento rápido de 5 noites\n\nNão é necessário experiência. É necessário reflexo.\n\nInteressados: só aparecer à meia-noite. A porta vai estar aberta. 🚪\n\n#vagas #turnodanoite #pizzaria",
-      666, 87, [["Ex-segurança", "não vá"], ["Gerente da Pizzaria", "@Ex-segurança comentário removido pela moderação"]]],
+    ["gerente", "Gerente do Museu", "🦕", "Gerente de Turno Noturno | Segurança em primeiro lugar (quase)", "3 d",
+      "Estamos contratando para o turno da noite! 🌙\n\n✅ Ambiente animado (MUITO animado)\n✅ Colegas que não dormem nunca\n✅ Entrada grátis nas exposições\n✅ Treinamento rápido de 5 noites\n\nNão é necessário experiência. É necessário reflexo.\n\nInteressados: só aparecer à meia-noite. A porta vai estar aberta. 🚪\n\n#vagas #turnodanoite #museu",
+      666, 87, [["Ex-segurança", "não vá"], ["Gerente do Museu", "@Ex-segurança comentário removido pela moderação"]]],
     ["zizi", "Zizi", "zizi", "Mascote do aluOS | Invicta no jogo da velha | Espadachim Pleno", "3 d",
       "Feliz em compartilhar que completei 1.000 partidas de jogo da velha sem perder. ⚔️\n\nO segredo? Começar pelo meio e intimidar o adversário com comentários estratégicos.\n\nAberta a desafios. Clique em mim na área de trabalho.\n\n#jogodavelha #invicta #softskills",
       1024, 256, [["kez_e_olmo", "ela perdeu ontem pra mim 🤭"], ["Zizi", "@kez_e_olmo isso foi um bug"]]],
@@ -56,7 +56,7 @@
       ["so it was you running in the hallway at 4 AM"]],
     filho: ["Director of People and Cultures and Other People", "My 5-year-old son asked me: \"mom, why do you work?\"\n\nI answered with silence. Then I cried. Then I built a framework.\n\nWhat can a 5-year-old teach us about stakeholder management, OKRs and the future of artificial intelligence? Everything. Read in the comments. 👇\n\n#leadership #motherhood #okrs #storytelling",
       ["i just asked if there would be dinner"]],
-    gerente: ["Night Shift Manager | Safety first (almost)", "We're hiring for the night shift! 🌙\n\n✅ Lively environment (VERY lively)\n✅ Coworkers who never sleep\n✅ Pizza vouchers\n✅ Quick 5-night training\n\nNo experience required. Reflexes required.\n\nInterested? Just show up at midnight. The door will be open. 🚪\n\n#jobs #nightshift #pizzeria",
+    gerente: ["Night Shift Manager | Safety first (almost)", "We're hiring for the night shift! 🌙\n\n✅ Lively environment (VERY lively)\n✅ Coworkers who never sleep\n✅ Free entry to the exhibits\n✅ Quick 5-night training\n\nNo experience required. Reflexes required.\n\nInterested? Just show up at midnight. The door will be open. 🚪\n\n#jobs #nightshift #museum",
       ["don't go", "@Ex-segurança comment removed by moderation"]],
     zizi: ["aluOS mascot | Undefeated at tic-tac-toe | Mid-level Swordswoman", "Happy to share that I've completed 1,000 tic-tac-toe matches without losing. ⚔️\n\nThe secret? Start in the middle and intimidate your opponent with strategic comments.\n\nOpen to challenges. Click me on the desktop.\n\n#tictactoe #undefeated #softskills",
       ["she lost to me yesterday 🤭", "@kez_e_olmo that was a bug"]],
@@ -67,7 +67,7 @@
   };
   if (ALU.lang === "en") FEED.forEach((f) => { const e = FEED_EN[f[0]]; if (!e) return; f[3] = e[0]; f[5] = e[1]; f[4] = f[4].replace(" d", "d").replace(" h", "h"); (f[8] || []).forEach((c, i) => { if (e[2][i]) c[1] = e[2][i]; }); });
   // nomes engraçados dos personagens também viram inglês
-  const NOMES_EN = { "Patrícia Mindset": "Patricia Mindset", "Seu Jorge do RH": "Jorge from HR", "Rato Anônimo": "Anonymous Rat", "Vizinho do Thiago": "Thiago's Neighbor", "Fernanda Lideranças": "Fernanda Leadership", "Filho da Fernanda": "Fernanda's Son", "Gerente da Pizzaria": "Pizzeria Manager", "Ex-segurança": "Former Guard", "Lucas Visionário": "Lucas Visionary", "Recrutador do Google": "A Recruiter", "Pato Roxo": "Purple Duck", "Dev Cansado": "Tired Dev" };
+  const NOMES_EN = { "Patrícia Mindset": "Patricia Mindset", "Seu Jorge do RH": "Jorge from HR", "Rato Anônimo": "Anonymous Rat", "Vizinho do Thiago": "Thiago's Neighbor", "Fernanda Lideranças": "Fernanda Leadership", "Filho da Fernanda": "Fernanda's Son", "Gerente do Museu": "Museum Manager", "Ex-segurança": "Former Guard", "Lucas Visionário": "Lucas Visionary", "Recrutador do Google": "A Recruiter", "Pato Roxo": "Purple Duck", "Dev Cansado": "Tired Dev" };
   const nomeEn = (n) => NOMES_EN[n] || n;
   if (ALU.lang === "en") FEED.forEach((f) => { f[1] = nomeEn(f[1]); (f[8] || []).forEach((c) => { c[0] = nomeEn(c[0]); c[1] = c[1].replace(/@(Ex-segurança|Dev Cansado)/, (m, n) => "@" + nomeEn(n)); }); });
   if (ALU.lang === "en") NOTICIAS.splice(0, NOTICIAS.length, "Survey: 9 out of 10 devs swear \"it works on my machine\"", "Company swaps raise for colorful beanbag", "Chocolate value up 300% in the HR market", "Cat promoted to Head after night delivery", "Monday is still Monday", "AI learns to write gratitude posts on its own");

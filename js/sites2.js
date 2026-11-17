@@ -207,7 +207,7 @@
       ["paranoid_android", "🤖", "OK Computer. não aceito argumentos."],
       ["crying_lightning", "⚡", "Humbug é subestimado e eu vou morrer nessa colina"]] },
     { id: "fnaf", cat: "Jogos", t: "dicas para sobreviver ao turno da noite", autor: "seguranca_novato", posts: [
-      ["seguranca_novato", "🔦", "primeiro dia de trabalho na pizzaria. alguma dica?"],
+      ["seguranca_novato", "🔦", "primeiro dia de trabalho no museu. alguma dica?"],
       ["urso_animatronico", "🐻", "har har har"],
       ["seguranca_novato", "🔦", "isso não ajudou em nada"]] },
     { id: "sekiro", cat: "Jogos", t: "zerei Sekiro e agora não sei o que fazer da vida", autor: "lobo_de_um_braco", posts: [
@@ -220,7 +220,7 @@
     urso: ["Savanna Lounge", "is there someone with blue hair and a sword on my desktop??", ["a blue-haired assistant with a sword on her back showed up on my desktop. is it a virus???", "hi! I'm not a virus, I'm Zizi, aluOS's virtual assistant. I promise not to install any toolbars.", "she's nice. she helped me find the page I lost"]],
     vim: ["Programming", "tutorial: how to exit vim", ["I opened vim in 2019. does anyone know how to get out? my family misses me", ":q!", "THANK YOU. I'll see the sun for the first time in years"]],
     album: ["Music", "best album: Humbug, Nectar or OK Computer?", ["all three are on my bedroom wall, so you know my answer: yes.", "OK Computer. no arguments accepted.", "Humbug is underrated and I will die on this hill"]],
-    fnaf: ["Games", "tips for surviving the night shift", ["first day at the pizzeria. any tips?", "har har har", "that didn't help at all"]],
+    fnaf: ["Games", "tips for surviving the night shift", ["first day at the museum. any tips?", "har har har", "that didn't help at all"]],
     sekiro: ["Games", "beat Sekiro and now I don't know what to do with my life", ["200 hours. Isshin taught me more than college did.", "hesitation is defeat. on to NG+"]],
   };
   if (EN) TOPICOS.forEach((t) => { const e = TOPICOS_EN[t.id]; if (!e) return; t.cat = e[0]; t.t = e[1]; t.posts.forEach((p, i) => { if (e[2][i]) p[2] = e[2][i]; }); });
