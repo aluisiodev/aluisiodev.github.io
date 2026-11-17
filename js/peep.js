@@ -175,17 +175,26 @@ class Program
   let worker = null;
   function novoWorker() { if (worker) worker.terminate(); worker = new Worker("js/peep-worker.js"); return worker; }
 
+  // C# de verdade: compila no Wandbox (.NET 8, grátis e sem chave). Se o navegador não alcançar o Wandbox,
+  // tenta pelo servidor do aluOS (rota /csharp). Se nada responder, o C# de bolso assume.
+  const WANDBOX = "https://wandbox.org/api/compile.json", COMPILADOR = "dotnetcore-8.0.402";
+  const errosCS = (txt) => [...new Set(String(txt || "").split("\n").filter((l) => /error CS\d+/.test(l)).map((l) => l.replace(/^.*?prog\.cs/, "Program.cs").replace(/\s*\[[^\]]*\.csproj\]\s*$/, "")))].join("\n");
   async function csharpServidor(codigo, stdin) {
-    const url = (ALU.CONFIG && ALU.CONFIG.csharpApi) || "https://emkc.org/api/v2/piston/execute";
-    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
-    try {
-      const r = await fetch(url, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ language: "csharp", version: "*", files: [{ name: "Program.cs", content: codigo }], stdin: stdin || "" }) });
-      if (!r.ok) return null;
-      const j = await r.json();
-      if (!j || !j.run) return null;
-      return j;
-    } catch { return null; } finally { clearTimeout(t); }
+    const corpo = JSON.stringify({ compiler: COMPILADOR, code: codigo, stdin: stdin || "", save: false });
+    const tentar = async (url) => {
+      const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 30000);
+      try {
+        const r = await fetch(url, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: corpo });
+        if (!r.ok) return null;
+        const w = await r.json();
+        if (!w || w.status === undefined) return null;
+        const comp = errosCS([w.compiler_error, w.compiler_output, w.compiler_message].join("\n"));
+        if (comp && !w.program_output) return { compile: { code: 1, stderr: comp }, run: { stdout: "", stderr: "", code: 1 } };
+        return { compile: { code: 0 }, run: { stdout: w.program_output || "", stderr: w.program_error || "", code: Number(w.status) || 0 } };
+      } catch { return null; } finally { clearTimeout(t); }
+    };
+    const proprio = ALU.CONFIG && ALU.CONFIG.csharpApi, api = ALU.CONFIG && ALU.CONFIG.api;
+    return (proprio && (await tentar(proprio))) || (await tentar(WANDBOX)) || (api && (await tentar(String(api).replace(/\/+$/, "") + "/csharp"))) || null;
   }
 
   ALU.peep = function (el, ctx, inicial) {
@@ -406,8 +415,8 @@ class Program
       if (runs === 5) setTimeout(() => { escrever(T("\n⚠ Aviso PEEP0005: o pato evoluiu. 🦆 → 🦢\nEle agora revisa seus PRs.\n", "\n⚠ Warning PEEP0005: the duck evolved. 🦆 → 🦢\nIt now reviews your PRs.\n"), "aviso"); ALU.conquista && ALU.conquista("pato-evoluiu", "O pato evoluiu", "Executou o código 5 vezes no Peep Studio."); }, 700);
       out.textContent = "";
       if (atual === "Aluisio.cs") {
-        escrever("Compilando Aluisio.cs…\n", "info");
-        setTimeout(() => escrever(`Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)\n`), 600);
+        escrever(T("Compilando Aluisio.cs…\n", "Compiling Aluisio.cs…\n"), "info");
+        setTimeout(() => escrever(T(`Compilação concluída: 0 erro(s), 0 aviso(s), 1 pato.\n\nOlá! Eu sou o ${P.nome}.\n${PROJ.length} projetos na pasta, e contando.\nMe chama no MessagerTale! :)\n`, `Build succeeded: 0 error(s), 0 warning(s), 1 duck.\n\nHi! I\'m ${P.nome}.\n${PROJ.length} projects in the folder, and counting.\nPing me on MessagerTale! :)\n`)), 600);
         return;
       }
       const ext = extDe(atual), codigo = valor(), stdin = stdinEl.value;
@@ -416,7 +425,7 @@ class Program
       escrever(`▶ ${atual.split("/").pop()} · ${LINGUAS[ext].nome}\n`, "info");
 
       if (ext === "cs") {
-        escrever("Compilando no servidor Piston…\n", "info");
+        escrever(T("Compilando com .NET 8 no Wandbox… (a primeira vez demora uns segundos)\n", "Compiling with .NET 8 on Wandbox… (the first run takes a few seconds)\n"), "info");
         const t0 = performance.now(), r = await csharpServidor(codigo, stdin);
         if (!rodando) return;
         if (r) {

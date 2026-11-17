@@ -32,7 +32,7 @@
     [/girafa|savana|leao|zebra/, () => [um(["🦒", "a savana agradece a visita", "já tentou digitar savana em algum lugar?"])]],
     [/zizi|mascote|assistente/, () => ["Zizi é a assistente virtual do aluOS. mora na área de trabalho, te mostra o sistema e te ajuda a deixar seu nome com um commit", "e jura que é invencível no jogo da velha"]],
     [/segredo|easter|conquista|dica/, () => [um(["tenta o terminal e digita algo que um hacker digitaria", "o relógio da barra de tarefas não gosta de ser cutucado", "a lixeira tem mais coisa do que parece", "tem uma luminária no quarto que quase ninguém acha"])]],
-    [/piada|me faz rir|conta uma/, () => [um([["por que o programador foi ao médico?", "porque estava com um bug no sistema 🥁"], ["quantos devs são precisos pra trocar uma lâmpada?", "nenhum, é problema de hardware"], ["o que o pato disse pro dev?", "quack quack (tradução: você esqueceu o ponto e vírgula)"]])]],
+    [/piada|me faz rir|conta uma/, () => [um([["por que o computador foi preso?", "porque executou um programa 🥁"], ["qual é o animal que não vale mais nada?", "o javali 🐗"], ["por que o programador nunca sai do banho?", "porque o xampu diz: aplique, enxágue, repita 🔁"], ["quantos devs são precisos pra trocar uma lâmpada?", "nenhum, é problema de hardware"], ["o que o pato disse pro dev?", "quack quack (tradução: você esqueceu o ponto e vírgula)"]])]],
     [/hora|que horas/, () => [`aqui são ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`]],
     [/fome|comida|cafe/, () => [hora() < 12 ? "café da manhã é sagrado ☕" : "agora bateu vontade de um café ☕"]],
     [/te amo|amo voce|lindo|gato|fofo/, () => [um(["hehe 😳", "para que eu fico sem graça", "own <3"])]],
@@ -79,15 +79,21 @@
   }
 
   // Com o servidor no ar, quem responde é o Gemini falando como o Aluísio ("online").
-  // Se a IA falhar ou a cota acabar, ele fica "offline" pelo resto da visita e entra o algoritmo dele (as regras acima).
+  // Se a IA falhar 2 vezes seguidas (cota, sobrecarga), ele fica "offline" por 3 minutos e entra o algoritmo dele (as regras acima).
   const urlIA = () => { const C = ALU.CONFIG || {}; return C.chatApi || (C.api ? String(C.api).replace(/\/+$/, "") + "/chat" : ""); };
-  let offline = false;
-  try { offline = sessionStorage.getItem("alu.bot.offline") === "1"; } catch {}
+  // Uma falha solta (IA sobrecarregada por um instante) não derruba: ele só fica offline depois de 2 falhas
+  // seguidas, e volta a tentar a IA depois de 3 minutos.
+  const PAUSA = 3 * 60000;
+  let offlineAte = 0, falhas = 0;
+  try { offlineAte = Number(sessionStorage.getItem("alu.bot.offlineAte")) || 0; } catch {}
   const avisos = [];
-  const iaLigada = () => !!urlIA() && !offline;
+  const estaOffline = () => Date.now() < offlineAte;
+  const iaLigada = () => !!urlIA() && !estaOffline();
   function cair() {
-    if (offline) return; offline = true;
-    try { sessionStorage.setItem("alu.bot.offline", "1"); } catch {}
+    falhas++;
+    if (falhas < 2 || estaOffline()) return;
+    falhas = 0; offlineAte = Date.now() + PAUSA;
+    try { sessionStorage.setItem("alu.bot.offlineAte", String(offlineAte)); } catch {}
     avisos.forEach((f) => { try { f(); } catch {} });
   }
   async function perguntarIA(texto, historico) {
@@ -104,7 +110,7 @@
         const corte = linhas.findIndex((l, i) => i > 0 && QUEM.test(l));
         if (corte > 0) linhas = linhas.slice(0, corte);
         linhas = linhas.map((l) => l.replace(QUEM, "").trim() ? l.replace(/^\s*(alu[ií]sio(\.dev)?|voc[eê])\s*:\s*/i, "") : l).filter((l) => l.trim());
-        if (linhas.length) return linhas.slice(0, 8);
+        if (linhas.length) { falhas = 0; return linhas.slice(0, 8); }
       }
     } catch {}
     cair();
@@ -118,5 +124,5 @@
   const INICIO = { pt: "(a pessoa acabou de abrir o MessagerTale no aluOS. puxe conversa você: cumprimente, se apresente em uma frase e pergunte no que pode ajudar)", en: "(the visitor just opened MessagerTale in aluOS. start the conversation: say hi, introduce yourself in one sentence and ask how you can help. answer in english)" };
   const iniciar = () => perguntarIA(INICIO[ALU.lang === "en" ? "en" : "pt"], []);
 
-  ALU.bot = { responder, regras, iniciar, iaLigada, estaOffline: () => offline, aoFicarOffline: (f) => avisos.push(f) };
+  ALU.bot = { responder, regras, iniciar, iaLigada, estaOffline, aoFicarOffline: (f) => avisos.push(f) };
 })();

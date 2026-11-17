@@ -4,7 +4,8 @@
 //   • o livro de visitas (quem quis se identificar pelo commit no Peep Studio)
 //   • o chat com IA do MessagerTale (Google Gemini, com a Groq de reserva se você quiser)
 //   • a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada)
-//   • as estatísticas reais do GitHub no DogHub e o clima real do climaselva.
+//   • as estatísticas reais do GitHub no DogHub e o clima real do climaselva
+//   • a ponte para compilar C# no Peep Studio (Wandbox, grátis).
 //
 // Como colocar no ar (uns 10 minutos):
 //   1. Crie uma conta grátis em https://dash.cloudflare.com
@@ -33,6 +34,8 @@
 //
 // Para ler quem assinou o livro de visitas, abra no navegador:
 //   https://aluos.SEU-USUARIO.workers.dev/visitas?chave=SUA_CHAVE_ADMIN
+// Se o chat ficar "offline", veja o motivo (cota, chave, modelo) em:
+//   https://aluos.SEU-USUARIO.workers.dev/diagnostico?chave=SUA_CHAVE_ADMIN
 
 const PERSONA = `Você é o Aluísio Alves, desenvolvedor de software brasileiro, conversando pelo MessagerTale,
 um mensageiro estilo anos 2000 dentro do portfolio dele (o aluOS, um sistema operacional de mentira no navegador).
@@ -60,6 +63,7 @@ Quando o assunto for o Aluísio, use só os fatos abaixo e a base de conheciment
 
 Sobre ele:
 - headline: Software Developer | C# / .NET | TypeScript & React | Redis | Docker | REST APIs
+- skills: C#/.NET, TypeScript, JavaScript, React, Docker, Redis, PostgreSQL, APIs REST
 - experiência: Back-end Developer na Intervalor (estágio, out/2025 a ago/2026); Telemarketing Operational Support na LBV - Legião da Boa Vontade (out/2024 a set/2025)
 - certificações: Claude 101 (Anthropic), Introduction to Cybersecurity (Cisco), EF SET 55/100 (B2), Linux 100: Fundamentals (TCM Security), Formação Iniciante em Programação T6 - ONE
 - foi instrutor na oficina "Programação e Eletrônica com Tinkercad" na Jornada Tecnológica Integrada da UNIP
@@ -88,6 +92,68 @@ async function comCache(chave, segundos, buscar) {
 }
 const limpa = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
 
+// limite por IP guardado na memória do Worker (cada servidor da Cloudflare conta separado; é um freio, não um muro)
+const BALDES = new Map();
+function passouDoLimite(chave, max) {
+  const min = Math.floor(Date.now() / 60000), k = chave + ":" + min, n = (BALDES.get(k) || 0) + 1;
+  BALDES.set(k, n);
+  if (BALDES.size > 5000) for (const x of BALDES.keys()) if (!x.endsWith(":" + min)) BALDES.delete(x);
+  return n > max;
+}
+// identifica a pessoa sem guardar o IP: um resumo (hash) do IP com uma "pitada" secreta
+async function apelidoIP(ip, env) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode((env.CHAVE_ADMIN || "aluos") + ":" + ip));
+  return [...new Uint8Array(d).slice(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Pergunta à IA. Ordem: o modelo do Gemini que você escolheu, depois modelos "lite" (cota grátis maior),
+// e por fim a Groq. Erros 429 (cota), 404 (modelo aposentado) e 5xx (sobrecarga) passam para o próximo.
+async function perguntarIA(env, sistema, hist, msg, diagnostico = false) {
+  const log = [];
+  const nota = (quem, status, txt) => { const l = `${quem}: ${status}${txt ? " · " + String(txt).replace(/\s+/g, " ").slice(0, 220) : ""}`; log.push(l); console.log("[chat] " + l); };
+  if (env.GEMINI_API_KEY) {
+    const modelos = [...new Set([env.GEMINI_MODEL || "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"])];
+    for (const modelo of modelos) {
+      const config = { maxOutputTokens: 350, temperature: 0.6, stopSequences: PARAR };
+      if (/2\.5/.test(modelo)) config.thinkingConfig = { thinkingBudget: 0 }; // sem "pensar": resposta rápida e não gasta a cota
+      for (let tentativa = 0; tentativa < 2; tentativa++) {
+        try {
+          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
+            method: "POST", headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: [...hist.map((m) => ({ role: m.de, parts: [{ text: m.texto }] })), { role: "user", parts: [{ text: msg }] }], generationConfig: config }),
+          });
+          if (r.ok) {
+            const j = await r.json();
+            const txt = (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
+            if (txt) { nota("gemini " + modelo, 200); return { resposta: txt, via: "gemini " + modelo, log }; }
+            nota("gemini " + modelo, "200 vazio", j.candidates?.[0]?.finishReason || j.promptFeedback?.blockReason);
+            break;
+          }
+          nota("gemini " + modelo, r.status, await r.text());
+          if (r.status === 400 || r.status === 401 || r.status === 403) return groq(env, sistema, hist, msg, log); // chave errada: não adianta trocar de modelo
+          if (r.status >= 500 && tentativa === 0) { await new Promise((ok) => setTimeout(ok, 700)); continue; } // sobrecarga: tenta mais uma vez
+          break;
+        } catch (e) { nota("gemini " + modelo, "erro de rede", e.message); break; }
+      }
+    }
+  } else nota("gemini", "sem GEMINI_API_KEY");
+  return groq(env, sistema, hist, msg, log);
+}
+async function groq(env, sistema, hist, msg, log) {
+  if (!env.GROQ_API_KEY) { log.push("groq: sem GROQ_API_KEY"); return { resposta: "", via: "", log }; }
+  try {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: env.GROQ_MODEL || "llama-3.3-70b-versatile", max_tokens: 350, temperature: 0.6, stop: PARAR.slice(0, 4),
+        messages: [{ role: "system", content: sistema }, ...hist.map((m) => ({ role: m.de === "user" ? "user" : "assistant", content: m.texto })), { role: "user", content: msg }] }),
+    });
+    if (r.ok) { const j = await r.json(); const txt = j.choices?.[0]?.message?.content?.trim() || ""; log.push("groq: 200"); return { resposta: txt, via: txt ? "groq" : "", log }; }
+    log.push(`groq: ${r.status} · ${(await r.text()).replace(/\s+/g, " ").slice(0, 220)}`);
+  } catch (e) { log.push("groq: erro de rede · " + e.message); }
+  console.log("[chat] " + log.join(" | "));
+  return { resposta: "", via: "", log };
+}
+
 export default {
   async fetch(req, env) {
     const origens = String(env.ORIGEM || "*").split(",").map((x) => x.trim()).filter(Boolean), quem = req.headers.get("Origin") || "";
@@ -101,12 +167,16 @@ export default {
     const ler = async (k, d) => (db ? (await db.get(k, "json")) ?? d : d);
     const gravar = (k, v) => db && db.put(k, JSON.stringify(v));
 
-    // limite simples: no máximo 30 escritas por minuto por IP
-    if (req.method === "POST" && db && rota !== "/" && rota !== "/chat") {
-      const ip = req.headers.get("CF-Connecting-IP") || "?", k = "lim:" + ip + ":" + Math.floor(Date.now() / 60000);
-      const n = Number(await db.get(k)) || 0;
-      if (n > 30) return json({ erro: "devagar 🙂" }, 429);
-      await db.put(k, String(n + 1), { expirationTtl: 120 });
+    // ---------- proteção contra abuso ----------
+    // 1. POST só vem do próprio site (se ORIGEM estiver configurada). Scripts podem mentir o Origin, mas isso já
+    //    barra outros sites usando o seu servidor pelo navegador de quem os visita.
+    // 2. Limite por IP em memória (não gasta escrita do KV, que no plano grátis é 1.000 por dia).
+    //    Chat: 12 por minuto. Demais POSTs: 20 por minuto. Compilar C#: 6 por minuto.
+    const ip = req.headers.get("CF-Connecting-IP") || "?";
+    if (req.method === "POST") {
+      if (!origens.includes("*") && quem && !origens.includes(quem)) return json({ erro: "origem não permitida" }, 403);
+      const tipo = rota === "/" || rota === "/chat" ? "chat" : rota === "/csharp" ? "cs" : "post", max = { chat: 12, cs: 6, post: 20 }[tipo];
+      if (passouDoLimite(tipo + ":" + ip, max)) return json({ erro: "devagar 🙂" }, 429);
     }
 
     // ---------- placar global do jogo da velha ----------
@@ -138,13 +208,20 @@ export default {
     // ---------- livro de visitas ----------
     if (rota === "/visitas") {
       if (req.method === "POST") {
-        const v = { nome: limpa(corpo.nome, 60), contato: limpa(corpo.contato, 120), recado: limpa(corpo.recado, 500), commit: limpa(corpo.commit, 120), idioma: limpa(corpo.idioma, 5), quando: new Date().toISOString() };
+        const v = { nome: limpa(corpo.nome, 60), contato: limpa(corpo.contato, 120), recado: limpa(corpo.recado, 500), commit: limpa(corpo.commit, 120), idioma: limpa(corpo.idioma, 5), quando: new Date().toISOString(), quem: await apelidoIP(ip, env) };
         if (!v.nome) return json({ erro: "nome vazio" }, 400);
-        const lista = await ler("visitas", []); lista.unshift(v); await gravar("visitas", lista.slice(0, 1000));
+        const lista = await ler("visitas", []), hoje = v.quando.slice(0, 10), deHoje = lista.filter((x) => String(x.quando).startsWith(hoje));
+        // anti-spam sem gastar escrita extra: cada pessoa (IP) assina até 3 vezes por dia, e o livro aceita até 100 assinaturas por dia
+        if (deHoje.filter((x) => x.quem === v.quem).length >= 3) return json({ ok: true, repetido: true });
+        if (deHoje.length >= 100) return json({ erro: "o livro de visitas encheu hoje. volte amanhã 🙂" }, 429);
+        // a mesma pessoa assinando de novo com o mesmo nome só atualiza a assinatura
+        const i = lista.findIndex((x) => x.quem === v.quem && x.nome.toLowerCase() === v.nome.toLowerCase());
+        if (i >= 0) lista.splice(i, 1);
+        lista.unshift(v); await gravar("visitas", lista.slice(0, 1000));
         return json({ ok: true, total: lista.length });
       }
       if (!env.CHAVE_ADMIN || url.searchParams.get("chave") !== env.CHAVE_ADMIN) return json({ erro: "só o Aluísio pode ler 🙂" }, 403);
-      return json(await ler("visitas", []));
+      return json((await ler("visitas", [])).map(({ quem: _, ...v }) => v));
     }
 
     // ---------- chat com IA: Gemini primeiro, Groq de reserva ----------
@@ -159,31 +236,28 @@ export default {
       const extra = db ? (await db.get("conhecimento")) || "" : "";
       const sistema = PERSONA + (extra ? "\n\nBase de conhecimento (escrita pelo Aluísio, use como verdade):\n" + extra.slice(0, 12000) : "")
         + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
-      let resposta = "", via = "";
-      if (env.GEMINI_API_KEY) {
-        const modelo = env.GEMINI_MODEL || "gemini-2.5-flash";
-        const config = { maxOutputTokens: 350, temperature: 0.6, stopSequences: PARAR };
-        if (modelo.startsWith("gemini-2.5")) config.thinkingConfig = { thinkingBudget: 0 }; // sem "pensar": resposta rápida e não gasta a cota
-        try {
-          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
-            method: "POST", headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" },
-            body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: [...hist.map((m) => ({ role: m.de, parts: [{ text: m.texto }] })), { role: "user", parts: [{ text: msg }] }], generationConfig: config }),
-          });
-          if (r.ok) { const j = await r.json(); resposta = (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim(); via = "gemini"; }
-        } catch {}
-      }
-      if (!resposta && env.GROQ_API_KEY) {
-        try {
-          const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ model: env.GROQ_MODEL || "llama-3.3-70b-versatile", max_tokens: 350, temperature: 0.6, stop: PARAR.slice(0, 4),
-              messages: [{ role: "system", content: sistema }, ...hist.map((m) => ({ role: m.de === "user" ? "user" : "assistant", content: m.texto })), { role: "user", content: msg }] }),
-          });
-          if (r.ok) { const j = await r.json(); resposta = j.choices?.[0]?.message?.content?.trim() || ""; via = "groq"; }
-        } catch {}
-      }
-      resposta = so_minha_fala(resposta);
+      const { resposta: bruta, via } = await perguntarIA(env, sistema, hist, msg);
+      const resposta = so_minha_fala(bruta);
       return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);
+    }
+
+    // ---------- Peep Studio: compila C# no Wandbox quando o navegador não alcança direto ----------
+    if (rota === "/csharp" && req.method === "POST") {
+      const code = String(corpo.code || "").slice(0, 20000), stdin = String(corpo.stdin || "").slice(0, 2000);
+      if (!code.trim()) return json({ erro: "código vazio" }, 400);
+      try {
+        const r = await fetch("https://wandbox.org/api/compile.json", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ compiler: "dotnetcore-8.0.402", code, stdin, save: false }) });
+        return r.ok ? json(await r.json()) : json({ erro: "Wandbox respondeu " + r.status }, 502);
+      } catch { return json({ erro: "Wandbox fora do ar" }, 502); }
+    }
+
+    // ---------- diagnóstico do chat: mostra por que o Gemini/Groq falham ----------
+    // abra https://aluos.SEU-USUARIO.workers.dev/diagnostico?chave=SUA_CHAVE_ADMIN
+    if (rota === "/diagnostico") {
+      if (!env.CHAVE_ADMIN || url.searchParams.get("chave") !== env.CHAVE_ADMIN) return json({ erro: "só o Aluísio pode ver 🙂" }, 403);
+      const r = await perguntarIA(env, "Responda só: ok", [], "teste", true);
+      return json({ kv: !!db, origem: env.ORIGEM || "(vazio = qualquer site)", gemini_chave: !!env.GEMINI_API_KEY, groq_chave: !!env.GROQ_API_KEY, respondeu: r.via || "ninguém", resposta: r.resposta, tentativas: r.log });
     }
 
     // ---------- DogHub: estatísticas reais do GitHub (guardadas por 1 hora) ----------
@@ -234,7 +308,7 @@ export default {
     if (rota === "/musicas") {
       const id = env.PLAYLIST_ID || "6kNcU6KqmK0X4zxYZCuhMq";
       const cache = await ler("musicas:" + id, null);
-      if (cache && Date.now() - cache.quando < 3600e3 && !url.searchParams.has("atualizar")) return json(cache);
+      if (cache && Date.now() - cache.quando < 600e3 && !url.searchParams.has("atualizar")) return json(cache); // 10 min: mudou a playlist, aparece logo
       let faixas = null, capa = "", nome = "";
       if (env.SPOTIFY_CLIENT_ID && env.SPOTIFY_CLIENT_SECRET) {
         try {

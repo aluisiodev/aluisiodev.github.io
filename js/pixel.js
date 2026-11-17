@@ -104,6 +104,36 @@
       c.grid(3, 5, [".www..w.w.", "w.....www.", "w.....w.w.", "w.....www.", ".www..w.w."], { w: "#ffffff" });
       return c.outline(K);
     },
+    javascript() {
+      const c = new Px();
+      c.rect(1, 1, 14, 14, "#f7df1e");
+      c.grid(6, 8, ["..k", "..k", "..k", "k.k", ".k."], { k: K }).grid(10, 8, [".kk", "k..", ".k.", "..k", "kk."], { k: K });
+      return c.outline(K);
+    },
+    typescript() {
+      const c = new Px();
+      c.rect(1, 1, 14, 14, "#3178c6");
+      c.grid(6, 8, ["www", ".w.", ".w.", ".w.", ".w."], { w: "#ffffff" }).grid(10, 8, [".ww", "w..", ".w.", "..w", "ww."], { w: "#ffffff" });
+      return c.outline(K);
+    },
+    docker() {
+      const c = new Px();
+      c.grid(0, 2, [".....cc.........", ".....cc.........", "..cc.cc.cc......", "..cc.cc.cc......", "cc.cc.cc.cc..b..", "cc.cc.cc.cc.bb.b",
+        "bbbbbbbbbbbbbbb.", "bbbbbbbbbbbbbb..", "bbwbbbbbbbbbbb..", ".bbbbbbbbbbbb...", "..bbbbbbbbbb....", "....bbbbbb......"], { c: "#7cc4f5", b: "#2496ed", w: "#ffffff" });
+      return c.outline(K);
+    },
+    redis() {
+      const c = new Px();
+      c.grid(0, 2, ["....rrrrrrrr....", "..rrrrwwrrrrrr..", "..DDrrrrrrrrDD..", "....DDDDDDDD....", "....rrrrrrrr....", "..rrrrrrrrrrrr..",
+        "..DDrrrrrrrrDD..", "....DDDDDDDD....", "....rrrrrrrr....", "..rrrrrrrrrrrr..", "..DDrrrrrrrrDD..", "....DDDDDDDD...."], { r: "#ff5a4d", D: "#a41e11", w: "#ffffff" });
+      return c.outline(K);
+    },
+    postgresql() {
+      const c = new Px();
+      c.grid(1, 2, ["......bbbbbb...", "....bbbbbbbbbb.", "...bbbbbbllllbb", "..bbbwkbbllllbb", "..bbbbbbbllllbb", "..bbbbbbbbllbb.",
+        "..bbb.bbbbbbb..", "..bb...bb..bb..", "..bb...bb..bb..", "...bb..bb..bb..", "....b.........."], { b: "#336791", l: "#6f9fcf", w: "#ffffff", k: K });
+      return c.outline(K);
+    },
     cert() {
       const c = new Px();
       c.rect(1, 2, 14, 10, "#fff4d6").rect(2, 3, 12, 8, "#fff9ea");

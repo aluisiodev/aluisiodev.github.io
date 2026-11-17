@@ -59,11 +59,14 @@
     "Dica secreta: o terminal conhece mais comandos do que o 'ajuda' mostra.",
     "Me desafia no Jogo da velha do clicajogos. Eu não perco fácil. 😏",
   ];
+  // trocadilhos que funcionam em português (os de inglês ficam em PIADAS_EN)
   const PIADAS = [
-    ["Por que o programador usa óculos?", "Porque ele não consegue C#. 🤓"],
-    ["Qual é o animal mais antigo da internet?", "A zebra. Ela ainda é em preto e branco."],
-    ["O que o HTML disse pro CSS?", "Sem você eu não sou ninguém… só um texto feio."],
-    ["Por que a espada não foi pra escola?", "Porque já era afiada. ⚔️"],
+    ["Por que o computador foi preso?", "Porque executou um programa. 🚔"],
+    ["O que o pato disse para a pata?", "Vem quá! 🦆"],
+    ["Qual é o animal que não vale mais nada?", "O javali. 🐗"],
+    ["Qual é o contrário de volátil?", "Vem cá, sobrinho."],
+    ["Por que o programador nunca sai do banho?", "Porque o xampu diz: aplique, enxágue, repita. 🔁"],
+    ["O que o zero disse para o oito?", "Que cinto bonito!"],
   ];
   const PIADAS_EN = [
     ["Why do programmers wear glasses?", "Because they can't C#. 🤓"],

@@ -5,6 +5,7 @@
   const conq = (...a) => ALU.conquista && ALU.conquista(...a);
   const ls = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
   const ativo = (el) => { const w = el.closest(".win"); return el.isConnected && (!w || w.classList.contains("focus")); };
+  const digitando = (e) => /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || "") || (e.target && e.target.isContentEditable);
   const um = (a) => a[Math.floor(Math.random() * a.length)];
   const EN = ALU.lang === "en", T = (pt, en) => (EN ? en : pt);
   const ERROU = ALU.lang === "en" ? "MISS" : "ERROU";
@@ -178,7 +179,7 @@
       if (estado === "morto") { g.fillStyle = "rgba(0,0,0,.55)"; g.fillRect(0, 140, W, 90); g.fillStyle = "#fff"; g.fillText(T("quack! bateu", "quack! crashed"), W / 2, 180); g.font = `16px ${FONTE}`; g.fillText(T("toque para tentar de novo", "tap to try again"), W / 2, 208); }
       raf = requestAnimationFrame(quadro);
     }
-    const tecla = (e) => { if (!ativo(area)) return; if (e.code === "Space" || e.key === "ArrowUp" || e.key === "w") { e.preventDefault(); pular(); } };
+    const tecla = (e) => { if (digitando(e) || !ativo(area)) return; if (e.code === "Space" || e.key === "ArrowUp" || e.key === "w") { e.preventDefault(); pular(); } };
     cv.addEventListener("pointerdown", (e) => { e.preventDefault(); pular(); });
     document.addEventListener("keydown", tecla);
     reset(); quadro();
@@ -284,47 +285,128 @@
   }
 
   // =================== Batalha de Ritmo contra Zizi ===================
+  // Três dificuldades, cada uma com sua música original gerada na hora pelo Web Audio.
+  const NOTA = (n) => 440 * Math.pow(2, (n - 69) / 12); // número MIDI -> Hz
+  const MUSICAS = {
+    facil: {
+      nome: () => T("Pôr do sol na savana", "Savanna Sunset"), bpm: 92, vel: 210, janela: 0.2, mult: 1,
+      // melodia escrita à mão, uma nota por batida (null = pausa), na pentatônica de dó
+      notas() {
+        const E = [60, 62, 64, 67, 69, 72, 74, 76];
+        const A = [0, 2, 3, 4, 3, 2, 0, null, 2, 3, 4, 5, 4, 3, 2, null], B = [5, 4, 3, 4, 5, 6, 5, null, 4, 3, 2, 3, 2, 1, 0, null];
+        const m = [...A, ...B, ...A, ...B.slice(0, 12), 1, 0, 0, null];
+        return m.map((d, i) => (d === null ? null : { b: i, l: d % 4, f: NOTA(E[d]) })).filter(Boolean);
+      },
+      acordes: [[48, 55, 64], [45, 52, 60], [41, 48, 57], [43, 50, 59]], // C, Am, F, G (um por compasso)
+    },
+    normal: {
+      nome: () => T("Duelo no deserto", "Desert Duel"), bpm: 120, vel: 260, janela: 0.16, mult: 1.5,
+      notas() {
+        const E = [261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3], r = [];
+        let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+        for (let b = 0; b < 64; b++) {
+          if (rnd() < 0.75) r.push({ b, l: Math.floor(rnd() * 4), f: E[Math.floor(rnd() * E.length)] });
+          if (b > 16 && rnd() < 0.35) r.push({ b: b + 0.5, l: Math.floor(rnd() * 4), f: E[Math.floor(rnd() * E.length)] });
+        }
+        return r;
+      },
+      acordes: [[45, 52, 57], [41, 48, 57], [43, 50, 55], [40, 47, 55]],
+    },
+    dificil: {
+      nome: () => T("Recife de Coral", "Coral Reef"), bpm: 132, vel: 330, janela: 0.12, mult: 2.5, eco: true,
+      // música aquática original: arpejos em colcheias sobre acordes de sétima que descem devagar,
+      // com semicolcheias nos finais de frase e eco de água
+      notas() {
+        const PROG = [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [48, 52, 55, 59], [46, 50, 53, 57], [45, 48, 52, 55], [43, 46, 50, 53], [45, 49, 52, 55]];
+        const FORMAS = [[0, 1, 2, 3, 2, 1, 2, 3], [0, 2, 1, 3, 2, 3, 1, 2], [3, 2, 1, 2, 0, 1, 2, 3], [0, 1, 3, 2, 3, 1, 2, 0]];
+        const r = [];
+        for (let rep = 0; rep < 2; rep++) PROG.forEach((ac, c) => {
+          const base = (rep * 8 + c) * 4, forma = FORMAS[(c + rep) % 4];
+          forma.forEach((k, i) => {
+            if (i === 7 && c % 2 === 1) return; // respiro no fim de cada frase
+            r.push({ b: base + i / 2, l: k, f: NOTA(ac[k] + 12) });
+            if (rep === 1 && c % 2 === 1 && (i === 5 || i === 6)) r.push({ b: base + i / 2 + 0.25, l: (k + 1) % 4, f: NOTA(ac[(k + 1) % 4] + 24) });
+          });
+        });
+        return r;
+      },
+      acordes: [[41, 53, 57, 64], [40, 52, 55, 62], [38, 50, 53, 60], [36, 48, 52, 59], [34, 46, 50, 57], [33, 45, 48, 55], [31, 43, 46, 53], [33, 45, 49, 55]],
+      porCompasso: 1,
+    },
+  };
+
   function ritmo(area) {
-    const W = 360, H = 420, LANES = ["ArrowLeft", "ArrowDown", "ArrowUp", "ArrowRight"], SIMB = ["←", "↓", "↑", "→"], CORES = ["#c94fd8", "#2fbfd8", "#3aa34a", "#e0413a"];
-    const TECLAS = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, a: 0, s: 1, w: 2, d: 3, d0: 0 };
+    const W = 360, H = 420, SIMB = ["←", "↓", "↑", "→"], CORES = ["#c94fd8", "#2fbfd8", "#3aa34a", "#e0413a"];
+    const TECLAS = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, a: 0, s: 1, w: 2, d: 3, A: 0, S: 1, W: 2, D: 3 };
+    const DIFS = [["facil", T("Fácil", "Easy")], ["normal", "Normal"], ["dificil", T("Difícil", "Hard")]];
+    let dif = ls.get("alu.ritmo.dif", "normal"); if (!MUSICAS[dif]) dif = "normal";
     area.innerHTML = `<div class="rt">
       <div class="zv-lado"><div class="zv-zizi rt-zizi">${ALU.ziziSVG ? ALU.ziziSVG() : ""}</div><div class="zv-balao"><p>${T("Bora ver se você tem ritmo. 🎵", "Let's see if you've got rhythm. 🎵")}</p></div></div>
-      <div><div class="jg-hud"><span>${T("Pontos", "Score")} <b class="rt-p">0</b></span><span>Combo <b class="rt-c">0</b></span><span>${T("Recorde", "Best")} <b class="rt-r">${ls.get("alu.ritmo", 0)}</b></span><button class="btn jg-go">${T("Começar", "Start")}</button></div>
+      <div><div class="rt-dif" role="group" aria-label="${T("Dificuldade", "Difficulty")}">${DIFS.map(([id, n]) => `<button class="btn${id === dif ? " on" : ""}" data-d="${id}">${n}</button>`).join("")}</div>
+      <div class="jg-hud"><span>${T("Pontos", "Score")} <b class="rt-p">0</b></span><span>Combo <b class="rt-c">0</b></span><span>${T("Recorde", "Best")} <b class="rt-r">${ls.get("alu.ritmo", 0)}</b></span><button class="btn jg-go">${T("Começar", "Start")}</button></div>
       <canvas class="jg-canvas" width="${W}" height="${H}"></canvas>
       <div class="rt-pads">${SIMB.map((s, i) => `<button data-l="${i}" style="--c:${CORES[i]}">${s}</button>`).join("")}</div>
       <p class="muted">${T("Setas (ou A S W D) quando a nota chegar na linha. No celular, toque nos botões.", "Arrow keys (or A S W D) when the note reaches the line. On mobile, tap the buttons.")}</p></div><div class="zv-rk"></div></div>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d"), balao = area.querySelector(".zv-balao p"), zEl = area.querySelector(".rt-zizi");
     const attRk = ranking(area.querySelector(".zv-rk"), "ritmo", T("recorde na Batalha de Ritmo", "Rhythm Battle high score"), () => ls.get("alu.ritmo", 0));
-    const BPM = 120, BEAT = 60 / BPM, ALVO = H - 60, VEL = 260;
-    let notas = [], inicio = 0, raf = null, tocando = false, pts = 0, combo = 0, flash = [0, 0, 0, 0], txt = "", txtT = 0, agendado = 0;
-    // música original: baixo + melodia em escala pentatônica, gerada na hora
-    const ESCALA = [261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3];
-    function gerar() {
-      notas = []; let seed = 7;
-      const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-      for (let b = 4; b < 4 + 64; b++) {
-        const t = b * BEAT;
-        if (rnd() < 0.75) notas.push({ t, l: Math.floor(rnd() * 4), ok: false, perdida: false, f: ESCALA[Math.floor(rnd() * ESCALA.length)] });
-        if (b > 20 && rnd() < 0.35) notas.push({ t: t + BEAT / 2, l: Math.floor(rnd() * 4), ok: false, perdida: false, f: ESCALA[Math.floor(rnd() * ESCALA.length)] });
-      }
-    }
+    const ALVO = H - 60;
+    let M = MUSICAS[dif], BEAT = 60 / M.bpm, notas = [], inicio = 0, raf = null, tocando = false, pts = 0, combo = 0, flash = [0, 0, 0, 0], txt = "", txtT = 0, agendado = 0, total = 0, eco = null;
     const agora = () => (ac ? ac.currentTime : 0) - inicio;
     function falar(t, p) { balao.textContent = t; if (ALU.ziziSVG) zEl.innerHTML = ALU.ziziSVG(p || "normal"); }
+    // som com eco opcional (a água do Recife de Coral)
+    function som(f, dur, tipo, vol, quando = 0, ataque = 0.005) {
+      try {
+        if (localStorage.getItem("alu.mudo") === "1" || !ac) return;
+        const t0 = ac.currentTime + quando, o = ac.createOscillator(), gn = ac.createGain();
+        o.type = tipo; o.frequency.value = f;
+        gn.gain.setValueAtTime(0.0001, t0); gn.gain.linearRampToValueAtTime(vol, t0 + ataque); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(gn).connect(ac.destination); if (M.eco && eco) gn.connect(eco);
+        o.start(t0); o.stop(t0 + dur + 0.05);
+      } catch {}
+    }
+    function prepararEco() {
+      if (eco || !ac) return;
+      try {
+        eco = ac.createDelay(1); eco.delayTime.value = (60 / MUSICAS.dificil.bpm) * 0.75;
+        const fb = ac.createGain(), filtro = ac.createBiquadFilter(), saida = ac.createGain();
+        fb.gain.value = 0.38; filtro.type = "lowpass"; filtro.frequency.value = 1800; saida.gain.value = 0.5;
+        eco.connect(filtro).connect(fb).connect(eco); filtro.connect(saida).connect(ac.destination);
+      } catch { eco = null; }
+    }
+    function escolher(d) {
+      if (tocando || !MUSICAS[d]) return;
+      dif = d; M = MUSICAS[d]; BEAT = 60 / M.bpm; ls.set("alu.ritmo.dif", d);
+      area.querySelectorAll(".rt-dif button").forEach((b) => b.classList.toggle("on", b.dataset.d === d));
+      falar(d === "facil" ? T("Modo fácil? Tudo bem, eu entendo. 🙂", "Easy mode? That's fine, I get it. 🙂") : d === "dificil" ? T("Recife de Coral. Te vejo lá no fundo. 🌊", "Coral Reef. See you at the bottom. 🌊") : T("O clássico. Bora. 😏", "The classic. Let's go. 😏"), d === "dificil" ? "ri" : "normal");
+    }
+    area.querySelectorAll(".rt-dif button").forEach((b) => (b.onclick = () => escolher(b.dataset.d)));
     function comecar() {
       try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch {}
       if (!ac) return;
-      gerar(); pts = 0; combo = 0; inicio = ac.currentTime + 0.3; tocando = true; agendado = 0;
+      if (ac.state === "suspended") ac.resume();
+      prepararEco();
+      notas = M.notas().map((n) => ({ t: (n.b + 4) * BEAT, l: n.l, f: n.f, ok: false, perdida: false }));
+      total = Math.ceil(Math.max(...notas.map((n) => n.t)) / BEAT) + 4;
+      pts = 0; combo = 0; inicio = ac.currentTime + 0.3; tocando = true; agendado = 0;
+      area.querySelectorAll(".rt-dif button").forEach((b) => (b.disabled = true));
       area.querySelector(".rt-p").textContent = 0; area.querySelector(".rt-c").textContent = 0;
       falar(T("Valendo! Não pisca. 😏", "Here we go! Don't blink. 😏"), "ri");
     }
     function batida() {
-      // agenda bateria e baixo um pouco à frente
-      while (tocando && agendado < 72) {
+      // agenda bateria, baixo e acordes um pouco à frente
+      while (tocando && agendado < total) {
         const t = agendado * BEAT;
         if (t > agora() + 0.5) break;
-        const q = t - agora();
-        tom(agendado % 2 ? 110 : 82, 0.12, "triangle", 0.09, Math.max(0, q));
-        tom(agendado % 4 === 2 ? 1800 : 3000, 0.02, "square", 0.012, Math.max(0, q));
+        const q = Math.max(0, t - agora()), compasso = Math.floor(agendado / 4), ac4 = M.acordes[compasso % M.acordes.length];
+        if (dif === "dificil") {
+          if (agendado % 4 === 0) ac4.forEach((n, i) => som(NOTA(n), BEAT * 4.2, i ? "sine" : "triangle", i ? 0.018 : 0.05, q, 0.35));
+          som(NOTA(ac4[0] + (agendado % 2 ? 12 : 0)), 0.25, "sine", 0.05, q);
+          if (agendado % 2) som(5200, 0.03, "triangle", 0.006, q);
+        } else {
+          som(NOTA(ac4[0] - (agendado % 2 ? 0 : 12) + 12), 0.14, "triangle", 0.08, q);
+          if (agendado % 4 === 0) ac4.forEach((n) => som(NOTA(n + 12), BEAT * 3.6, "sine", 0.014, q, 0.08));
+          som(agendado % 4 === 2 ? 1800 : 3000, 0.02, "square", 0.01, q);
+        }
         agendado++;
       }
     }
@@ -333,47 +415,59 @@
       flash[l] = 8;
       const t = agora();
       const n = notas.filter((x) => x.l === l && !x.ok && !x.perdida).sort((a, b) => Math.abs(a.t - t) - Math.abs(b.t - t))[0];
-      if (n && Math.abs(n.t - t) < 0.16) {
-        n.ok = true; const perf = Math.abs(n.t - t) < 0.06;
-        pts += perf ? 300 : 100; combo++; txt = perf ? T("PERFEITO!", "PERFECT!") : T("BOM", "GOOD"); txtT = 30;
-        tom(n.f, 0.18, "square", 0.05);
+      if (n && Math.abs(n.t - t) < M.janela) {
+        n.ok = true; const perf = Math.abs(n.t - t) < M.janela * 0.4;
+        pts += Math.round((perf ? 300 : 100) * M.mult); combo++; txt = perf ? T("PERFEITO!", "PERFECT!") : T("BOM", "GOOD"); txtT = 30;
+        som(n.f, dif === "dificil" ? 0.35 : 0.18, dif === "dificil" ? "triangle" : "square", dif === "dificil" ? 0.07 : 0.05);
         if (combo === 10) falar(T("Ok… você até que manda bem.", "Okay… you're actually not bad."), "brava");
         if (combo === 25) { falar(T("Para de acertar tudo! 😤", "Stop hitting everything! 😤"), "brava"); conq("ritmo", T("Ritmo de batalha", "Battle rhythm"), T("Fez combo 25 na Batalha de Ritmo.", "Hit a 25 combo in Rhythm Battle.")); }
       } else { combo = 0; txt = ERROU; txtT = 30; tom(120, 0.08, "sawtooth", 0.04); if (Math.random() < 0.3) falar(um(EN ? ["Zero rhythm. 🙃", "Are you dancing to a different song?", "Hahaha!"] : ["Ritmo zero. 🙃", "Tá dançando outra música?", "Hahaha!"]), "ri"); }
       area.querySelector(".rt-p").textContent = pts; area.querySelector(".rt-c").textContent = combo;
     }
+    function fimDaMusica() {
+      tocando = false;
+      area.querySelectorAll(".rt-dif button").forEach((b) => (b.disabled = false));
+      const tot = notas.length, ac2 = notas.filter((n) => n.ok).length;
+      if (pts > ls.get("alu.ritmo", 0)) { ls.set("alu.ritmo", pts); area.querySelector(".rt-r").textContent = pts; attRk(); }
+      if (dif === "dificil" && ac2 / tot > 0.8) conq("ritmo-coral", T("Mergulhador", "Deep diver"), T("Venceu o Recife de Coral no difícil.", "Beat Coral Reef on hard."));
+      falar(ac2 / tot > 0.8 ? T("Tá bom, você venceu. Dessa vez. 😤", "Fine, you win. This time. 😤") : ac2 / tot > 0.5 ? T("Empate técnico. Eu ainda sou melhor.", "Technical draw. I'm still better.") : T("Vitória da Zizi! Volta quando treinar. 😎", "Zizi wins! Come back after some practice. 😎"), ac2 / tot > 0.8 ? "triste" : "ri");
+    }
     function quadro() {
       raf = requestAnimationFrame(quadro);
-      g.fillStyle = "#14102a"; g.fillRect(0, 0, W, H);
+      const fundo = dif === "dificil" ? ["#0b1f33", "#0e2840", "#0c2238"] : ["#14102a", "#1b1636", "#191431"];
+      g.fillStyle = fundo[0]; g.fillRect(0, 0, W, H);
       const lw = W / 4;
       for (let i = 0; i < 4; i++) {
-        g.fillStyle = i % 2 ? "#1b1636" : "#191431"; g.fillRect(i * lw, 0, lw, H);
+        g.fillStyle = i % 2 ? fundo[1] : fundo[2]; g.fillRect(i * lw, 0, lw, H);
         g.fillStyle = flash[i] ? CORES[i] : "#3a3358"; g.fillRect(i * lw + 6, ALVO - 4, lw - 12, 8);
         g.fillStyle = "#cfd6e4"; g.font = `22px ${FONTE}`; g.textAlign = "center"; g.fillText(SIMB[i], i * lw + lw / 2, ALVO + 34);
         if (flash[i]) flash[i]--;
+      }
+      if (dif === "dificil") { // bolhas subindo
+        const tt = performance.now() / 1000; g.fillStyle = "rgba(170,220,255,.25)";
+        for (let k = 0; k < 12; k++) { const x = (k * 53 + Math.sin(tt + k) * 8) % W, y = H - ((tt * (20 + k * 3) + k * 70) % (H + 20)); g.fillRect(x, y, 3 + (k % 3), 3 + (k % 3)); }
       }
       if (tocando) {
         batida();
         const t = agora();
         notas.forEach((n) => {
           if (n.ok || n.perdida) return;
-          const y = ALVO - (n.t - t) * VEL;
+          const y = ALVO - (n.t - t) * M.vel;
           if (y > ALVO + 50) { n.perdida = true; combo = 0; area.querySelector(".rt-c").textContent = 0; return; }
           if (y < -30) return;
           g.fillStyle = "#1b1426"; g.fillRect(n.l * lw + 10, y - 14, lw - 20, 28);
           g.fillStyle = CORES[n.l]; g.fillRect(n.l * lw + 13, y - 11, lw - 26, 22);
-          g.fillStyle = "#fff"; g.font = `18px ${FONTE}`; g.fillText(SIMB[n.l], n.l * lw + lw / 2, y + 6);
+          g.fillStyle = "#fff"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText(SIMB[n.l], n.l * lw + lw / 2, y + 6);
         });
-        if (notas.every((n) => n.ok || n.perdida)) {
-          tocando = false;
-          const tot = notas.length, ac2 = notas.filter((n) => n.ok).length;
-          if (pts > ls.get("alu.ritmo", 0)) { ls.set("alu.ritmo", pts); area.querySelector(".rt-r").textContent = pts; attRk(); }
-          falar(ac2 / tot > 0.8 ? T("Tá bom, você venceu. Dessa vez. 😤", "Fine, you win. This time. 😤") : ac2 / tot > 0.5 ? T("Empate técnico. Eu ainda sou melhor.", "Technical draw. I'm still better.") : T("Vitória da Zizi! Volta quando treinar. 😎", "Zizi wins! Come back after some practice. 😎"), ac2 / tot > 0.8 ? "triste" : "ri");
-        }
-      } else { g.fillStyle = "#cfd6e4"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText(T("Batalha de Ritmo", "Rhythm Battle"), W / 2, 150); g.font = `14px ${FONTE}`; g.fillText(T("clique em Começar", "click Start"), W / 2, 176); }
-      if (txtT) { txtT--; g.fillStyle = txt === ERROU ? "#ff4d6d" : "#ffd23f"; g.font = `26px ${FONTE}`; g.fillText(txt, W / 2, 110); }
+        if (notas.every((n) => n.ok || n.perdida)) fimDaMusica();
+      } else {
+        g.fillStyle = "#cfd6e4"; g.font = `18px ${FONTE}`; g.textAlign = "center"; g.fillText(T("Batalha de Ritmo", "Rhythm Battle"), W / 2, 140);
+        g.font = `14px ${FONTE}`; g.fillText(`♪ ${M.nome()} · ${M.bpm} BPM`, W / 2, 166); g.fillText(T("clique em Começar", "click Start"), W / 2, 190);
+      }
+      if (txtT) { txtT--; g.fillStyle = txt === ERROU ? "#ff4d6d" : "#ffd23f"; g.font = `26px ${FONTE}`; g.textAlign = "center"; g.fillText(txt, W / 2, 110); }
     }
-    const tecla = (e) => { if (!ativo(area)) return; const l = TECLAS[e.key]; if (l !== undefined) { e.preventDefault(); if (!e.repeat) acertar(l); } };
+    // só joga com o teclado quando a música está tocando e a pessoa não está digitando (ex.: nome no ranking)
+    const tecla = (e) => { if (!tocando || digitando(e) || !ativo(area)) return; const l = TECLAS[e.key]; if (l !== undefined) { e.preventDefault(); if (!e.repeat) acertar(l); } };
     document.addEventListener("keydown", tecla);
     area.querySelectorAll(".rt-pads button").forEach((b) => b.addEventListener("pointerdown", (e) => { e.preventDefault(); acertar(+b.dataset.l); }));
     area.querySelector(".jg-go").onclick = comecar;
