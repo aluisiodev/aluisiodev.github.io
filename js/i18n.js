@@ -24,7 +24,14 @@
       "In my projects you'll find sites with 3D, AI agents for customer support, headless CMS integrations and shops that talk straight through WhatsApp.",
     ],
   });
-  const SK = { csharp: "The language I use on the back end with .NET and ASP.NET Core. Example in this portfolio: Contentstack Delivery App (Razor Pages, dependency injection, API consumption)." };
+  const SK = {
+    csharp: "The language I use on the back end with .NET and ASP.NET Core. Example in this portfolio: Contentstack Delivery App (Razor Pages, dependency injection, API consumption).",
+    typescript: "JavaScript with types. I use it on the front end with React and Next.js and in Node APIs. Example in this portfolio: Mirav (Next.js 16 + three.js).",
+    javascript: "The foundation of everything on the web. This whole operating system is plain JavaScript, no framework and no build step.",
+    docker: "Containers to run APIs and databases the same way on any machine. Example in this portfolio: Mirav's Go API runs in Docker.",
+    redis: "In-memory cache and data to keep APIs fast: sessions, queues and responses stored for a few seconds.",
+    postgresql: "Relational database I use with migrations and SQL queries. Example in this portfolio: Mirav (PostgreSQL 16).",
+  };
   (window.SKILLS || []).forEach((s) => { if (SK[s.id]) s.texto = SK[s.id]; });
   const CE = {
     claude101: [null, "Claude 101 course from Claude Academy (Anthropic)."],

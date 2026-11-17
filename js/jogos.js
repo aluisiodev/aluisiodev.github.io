@@ -37,7 +37,7 @@
     }
     function iniciar() { cobra = [[10, 10], [9, 10], [8, 10]]; dir = prox = [1, 0]; pts = 0; area.querySelector(".pt").textContent = 0; novaFruta(); desenhar(); clearInterval(timer); timer = setInterval(tick, 110); vivo = true; }
     const K = { ArrowUp: [0, -1], w: [0, -1], ArrowDown: [0, 1], s: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0] };
-    const tecla = (e) => { if (!vivo || !ativo(area)) return; const k = K[e.key]; if (k && !(k[0] === -dir[0] && k[1] === -dir[1])) { prox = k; e.preventDefault(); } };
+    const tecla = (e) => { if (!vivo || !ativo(area) || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return; const k = K[e.key]; if (k && !(k[0] === -dir[0] && k[1] === -dir[1])) { prox = k; e.preventDefault(); } };
     document.addEventListener("keydown", tecla);
     cv.addEventListener("pointerdown", (e) => {
       if (!vivo) return; const r = cv.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;

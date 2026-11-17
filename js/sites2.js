@@ -172,10 +172,13 @@
           ALU.urso && ALU.urso.falar && ALU.urso.falar(T(`Boa! ${f.nome} é das boas.`, `Nice! ${f.nome} is a good one.`));
         }));
       }
-      pintar();
+      // no site publicado, o player do Spotify já mostra a playlist atual; a cópia salva no código só aparece
+      // na prévia (onde o player não carrega) ou até o servidor responder com a lista de verdade
       const api = ALU.CONFIG && ALU.CONFIG.api;
+      if (bloqueado) pintar(); else { ol.hidden = true; if (quem) quem.innerHTML = `<img src="${esc(P.foto)}" alt=""> <b>${esc(P.nome)}</b> · Spotify`; }
       if (api) fetch(String(api).replace(/\/+$/, "") + "/musicas").then((r) => (r.ok ? r.json() : null)).then((j) => {
         if (!j || !Array.isArray(j.faixas) || !j.faixas.length || !view.isConnected) return;
+        ol.hidden = false;
         lista = j.faixas.map((f) => ({ nome: f.nome, artista: f.artista, d: f.ms ? dur(f.ms) : "", capa: f.capa || "", id: f.id || "" }));
         if (j.capa) { const im = view.querySelector(".mz-capa img"); if (im) im.src = j.capa; }
         pintar();

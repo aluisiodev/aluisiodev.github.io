@@ -27,6 +27,11 @@ window.PERFIL = {
 // Pasta Skills. Adicione mais itens aqui quando quiser.
 window.SKILLS = [
   { id: "csharp", nome: "C#", icone: "csharp", texto: "Linguagem que uso no back-end com .NET e ASP.NET Core. Exemplo no portfolio: Contentstack Delivery App (Razor Pages, injeção de dependência, consumo de API)." },
+  { id: "typescript", nome: "TypeScript", icone: "typescript", texto: "JavaScript com tipos. Uso no front-end com React e Next.js e em APIs Node. Exemplo no portfolio: Mirav (Next.js 16 + three.js)." },
+  { id: "javascript", nome: "JavaScript", icone: "javascript", texto: "A base de tudo na web. Este sistema operacional inteiro é JavaScript puro, sem framework e sem build." },
+  { id: "docker", nome: "Docker", icone: "docker", texto: "Containers para subir APIs e bancos do mesmo jeito em qualquer máquina. Exemplo no portfolio: a API em Go do Mirav roda em Docker." },
+  { id: "redis", nome: "Redis", icone: "redis", texto: "Cache e dados em memória para deixar APIs rápidas: sessões, filas e respostas guardadas por alguns segundos." },
+  { id: "postgresql", nome: "PostgreSQL", icone: "postgresql", texto: "Banco relacional que uso com migrations e consultas SQL. Exemplo no portfolio: Mirav (PostgreSQL 16)." },
 ];
 
 // Licenças e certificações (pasta Skills e perfil do LigadIn).
@@ -137,7 +142,7 @@ window.PROJETOS = [
 ];
 
 // Serviços opcionais. Deixe vazio para tudo funcionar só no navegador.
-// csharpApi: URL compatível com a API do Piston para compilar C# de verdade. Vazio = tenta o Piston público e,
+// csharpApi: URL compatível com a API do Wandbox (/api/compile.json) para compilar C# de verdade. Vazio = usa o Wandbox público e,
 //            se não der, usa o "C# de bolso" (tradução para JavaScript).
 window.ALU = window.ALU || {};
 // Seus posts do LinkedIn, para aparecerem no LigadIn (perfil e topo do feed).
