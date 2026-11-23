@@ -88,17 +88,30 @@
       if (p) { pose(p); clearTimeout(tFala); tFala = setTimeout(() => !fim && pose("normal"), 1400); }
       tom(520 + Math.random() * 200, 0.05, "square", 0.03); tom(700, 0.05, "square", 0.03, 0.06);
     }
-    // Zizi joga bem, mas se distrai: às vezes não bloqueia e às vezes joga em qualquer lugar.
+    // Zizi joga com minimax (enxerga o jogo inteiro até o fim). Ela sempre fecha a vitória e sempre
+    // bloqueia. Só raramente (≈1 em 12 jogadas sem perigo imediato) escolhe uma casa
+    // que não é a perfeita, então ganhar dela é possível, mas exige perceber a brecha e armar uma jogada dupla.
+    function minimax(q, vez) {
+      if (ganhou(q, "O")) return 10; if (ganhou(q, "X")) return -10; if (q.every(Boolean)) return 0;
+      let melhor = vez === "O" ? -99 : 99;
+      for (let i = 0; i < 9; i++) if (!q[i]) {
+        q[i] = vez; const v = minimax(q, vez === "O" ? "X" : "O"); q[i] = null;
+        melhor = vez === "O" ? Math.max(melhor, v - (v > 0 ? 1 : 0)) : Math.min(melhor, v + (v < 0 ? 1 : 0));
+      }
+      return melhor;
+    }
     function cpu() {
       const vazios = b.map((v, i) => (v ? null : i)).filter((i) => i !== null);
       const fecha = (s) => vazios.find((i) => { const q = b.slice(); q[i] = s; return ganhou(q, s); });
-      const vence = fecha("O"); if (vence != null && Math.random() < 0.85) return [vence, "zizi"];
-      const bloqueio = fecha("X");
-      if (bloqueio != null) return Math.random() < 0.55 ? [bloqueio, "quase"] : [(() => { const o = vazios.filter((i) => i !== bloqueio); return o.length ? um(o) : bloqueio; })(), "vacilo"];
-      if (Math.random() < 0.4) return [um(vazios), "zizi"];
-      if (!b[4] && Math.random() < 0.6) return [4, "zizi"];
-      const cantos = [0, 2, 6, 8].filter((i) => !b[i]); if (cantos.length) return [um(cantos), "zizi"];
-      return [um(vazios), "zizi"];
+      const vence = fecha("O"); if (vence != null) return [vence, "zizi"];
+      const bloqueio = fecha("X"); if (bloqueio != null) return [bloqueio, "quase"];
+      if (vazios.length === 9) return [um([0, 2, 4, 6, 8]), "zizi"];
+      const notas = vazios.map((i) => { const q = b.slice(); q[i] = "O"; return [i, minimax(q, "X")]; });
+      const top = Math.max(...notas.map(([, v]) => v));
+      const melhores = notas.filter(([, v]) => v === top).map(([i]) => i);
+      const outras = notas.filter(([, v]) => v < top).map(([i]) => i); // abre espaço pra uma jogada dupla do jogador
+      if (outras.length && vazios.length <= 7 && Math.random() < 0.08) return [um(outras), "vacilo"];
+      return [um(melhores), "zizi"];
     }
     function checar() {
       let vencedor = null;
@@ -351,7 +364,10 @@
     const attRk = ranking(area.querySelector(".zv-rk"), "ritmo", T("recorde na Batalha de Ritmo", "Rhythm Battle high score"), () => ls.get("alu.ritmo", 0));
     const ALVO = H - 60;
     let M = MUSICAS[dif], BEAT = 60 / M.bpm, notas = [], inicio = 0, raf = null, tocando = false, pts = 0, combo = 0, flash = [0, 0, 0, 0], txt = "", txtT = 0, agendado = 0, total = 0, eco = null;
-    const agora = () => (ac ? ac.currentTime : 0) - inicio;
+    // relógio do jogo pelo performance.now(): no iPhone o AudioContext pode ficar "interrupted" e o
+    // currentTime para, aí as notas não desciam. O som é agendado relativo (quando = t - agora()).
+    const relogio = () => performance.now() / 1000;
+    const agora = () => relogio() - inicio;
     function falar(t, p) { balao.textContent = t; if (ALU.ziziSVG) zEl.innerHTML = ALU.ziziSVG(p || "normal"); }
     // som com eco opcional (a água do Recife de Coral)
     function som(f, dur, tipo, vol, quando = 0, ataque = 0.005) {
@@ -381,13 +397,15 @@
     }
     area.querySelectorAll(".rt-dif button").forEach((b) => (b.onclick = () => escolher(b.dataset.d)));
     function comecar() {
-      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch {}
-      if (!ac) return;
-      if (ac.state === "suspended") ac.resume();
+      if (tocando) return;
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state !== "running") ac.resume(); } catch {}
+      if (ALU.destravarAudio) ALU.destravarAudio();
       prepararEco();
       notas = M.notas().map((n) => ({ t: (n.b + 4) * BEAT, l: n.l, f: n.f, ok: false, perdida: false }));
       total = Math.ceil(Math.max(...notas.map((n) => n.t)) / BEAT) + 4;
-      pts = 0; combo = 0; inicio = ac.currentTime + 0.3; tocando = true; agendado = 0;
+      pts = 0; combo = 0; inicio = relogio() + 0.6; tocando = true; agendado = 0;
+      // no celular, rola até o jogo para a pista e os botões ficarem na tela
+      if (matchMedia("(pointer: coarse)").matches) cv.scrollIntoView({ behavior: "smooth", block: "start" });
       area.querySelectorAll(".rt-dif button").forEach((b) => (b.disabled = true));
       area.querySelector(".rt-p").textContent = 0; area.querySelector(".rt-c").textContent = 0;
       falar(T("Valendo! Não pisca. 😏", "Here we go! Don't blink. 😏"), "ri");
@@ -470,6 +488,8 @@
     const tecla = (e) => { if (!tocando || digitando(e) || !ativo(area)) return; const l = TECLAS[e.key]; if (l !== undefined) { e.preventDefault(); if (!e.repeat) acertar(l); } };
     document.addEventListener("keydown", tecla);
     area.querySelectorAll(".rt-pads button").forEach((b) => b.addEventListener("pointerdown", (e) => { e.preventDefault(); acertar(+b.dataset.l); }));
+    // tocar direto na pista também vale (cada coluna é uma seta)
+    cv.addEventListener("pointerdown", (e) => { if (!tocando) return; e.preventDefault(); const r = cv.getBoundingClientRect(); acertar(Math.min(3, Math.max(0, Math.floor(((e.clientX - r.left) / r.width) * 4)))); });
     area.querySelector(".jg-go").onclick = comecar;
     quadro();
     return () => { tocando = false; cancelAnimationFrame(raf); document.removeEventListener("keydown", tecla); };

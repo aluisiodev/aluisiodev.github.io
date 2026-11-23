@@ -13,7 +13,7 @@
         <div class="kz-home">
           <div class="kz-logo">${ALU.pix("kez")}<h1>Kez<span>(i)</span>avana</h1></div>
           <p class="kz-sub">${T("o navegador que atravessa a savana da internet", "the browser that crosses the internet savanna")}</p>
-          <form class="kz-busca"><input placeholder="${T("Buscar na savana… (tente: nexo, doghub, ligadin)", "Search the savanna… (try: nexo, doghub, ligadin)")}" aria-label="${T("Buscar", "Search")}"><button class="btn">${T("Rugir", "Roar")}</button></form>
+          <form class="kz-busca"><input placeholder="${T("Buscar na savana… (tente: deskmate, doghub, ligadin)", "Search the savanna… (try: deskmate, doghub, ligadin)")}" aria-label="${T("Buscar", "Search")}"><button class="btn">${T("Rugir", "Roar")}</button></form>
           <div class="kz-atalhos">
             <button data-ir="ligadin.com/feed">${ALU.pix("ligadin")}<span>LigadIn</span></button>
             <button data-ir="doghub.com/aluisiodev">${ALU.pix("doghub")}<span>DogHub</span></button>

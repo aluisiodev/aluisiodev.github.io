@@ -516,7 +516,7 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .im-ler input, .im-ler textarea { font: 14px var(--ui); padding: 5px 8px; border: 0; box-shadow: var(--sunken); background: #fff; }
 .im-ler textarea { width: 100%; min-height: 140px; resize: vertical; font: 19px var(--txt); margin-bottom: 8px; }
 .im-alerta { background: #fff1b8; padding: 6px 10px; box-shadow: 0 0 0 2px #1b1426; }
-@container (max-width: 640px) { .im { grid-template-columns: 1fr; height: auto; } .im-side { flex-direction: row; flex-wrap: wrap; align-items: center; } .im-pastas { display: none; } }
+@container (max-width: 640px) { .im { grid-template-columns: 1fr; height: auto; } .im-side { flex-direction: row; flex-wrap: wrap; align-items: center; } .im-pastas { flex-direction: row; flex-wrap: wrap; } }
 
 /* clicajogos */
 .cj { min-height: 100%; background: #10234d repeating-linear-gradient(45deg, transparent 0 12px, rgba(255,255,255,.03) 12px 24px); color: #fff; font-size: 14px; }
@@ -871,3 +871,11 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 
 .cl-loc { font: 12px var(--ui); color: #fff; background: #2b4a78; padding: 3px 8px; box-shadow: 0 0 0 1px #a9bad6; }
 .cl-loc:disabled { opacity: .7; }
+/* cobrinha: direcional na tela (só em telas de toque) e pista sem rolar a página */
+.cb-cv, .rt canvas { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.cb-pad { display: none; grid-template-columns: repeat(3, 56px); grid-template-rows: 48px 48px; gap: 6px; justify-content: center; margin: 10px auto 0; width: min(360px, 100%); }
+.cb-pad button { background: #2a2140; color: #fff; font: 700 20px var(--ui); box-shadow: 0 0 0 2px #000, 3px 3px 0 #000; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+.cb-pad button:active { transform: translate(2px, 2px); box-shadow: 0 0 0 2px #000; filter: brightness(1.4); }
+.cb-pad [data-k="ArrowUp"] { grid-column: 2; } .cb-pad [data-k="ArrowLeft"] { grid-column: 1; grid-row: 2; } .cb-pad [data-k="ArrowDown"] { grid-column: 2; grid-row: 2; } .cb-pad [data-k="ArrowRight"] { grid-column: 3; grid-row: 2; }
+@media (pointer: coarse) { .cb-pad { display: grid; } }
+[data-modo="mobile"] .cb-pad { display: grid; }

@@ -67,7 +67,7 @@ Sobre ele:
 - experiência: Back-end Developer na Intervalor (estágio, out/2025 a ago/2026); Telemarketing Operational Support na LBV - Legião da Boa Vontade (out/2024 a set/2025)
 - certificações: Claude 101 (Anthropic), Introduction to Cybersecurity (Cisco), EF SET 55/100 (B2), Linux 100: Fundamentals (TCM Security), Formação Iniciante em Programação T6 - ONE
 - foi instrutor na oficina "Programação e Eletrônica com Tinkercad" na Jornada Tecnológica Integrada da UNIP
-- projetos: MiraV (site 3D do espelho inteligente VisaVision, Next.js + three.js + API em Go), Nexo Assist (agent de IA para service desk com Mastra, Gemini e Groq), Doce & Afeto (vitrine de confeitaria que fecha o pedido no WhatsApp, React), Contentstack Delivery App (ASP.NET Core + CMS headless)
+- projetos: MiraV (site 3D do espelho inteligente VisaVision, Next.js + three.js + API em Go), Deskmate (agent de IA open-source e auto-hospedável que se pluga em service desks como GLPI, Jira e Zammad; ASP.NET Core .NET 10 + React, PostgreSQL, em construção), Doce & Afeto (vitrine de confeitaria que fecha o pedido no WhatsApp, React), Contentstack Delivery App (ASP.NET Core + CMS headless)
 - gosta de Arctic Monkeys, Radiohead e Joji, de Sekiro, de anime (Chainsaw Man, Jujutsu Kaisen, Berserk) e de Hora de Aventura
 - contato: LinkedIn linkedin.com/in/aluisio-alves e GitHub github.com/aluisiodev
 - no aluOS tem: pasta Projetos, Peep Studio (IDE que roda Python, JS e C#; dá pra assinar o livro de visitas com um commit), Kez(i)avana (navegador com jogos e paródias), quarto_360 e a Zizi, assistente virtual de cabelo azul
@@ -292,6 +292,15 @@ export default {
         return res;
       });
       return dado ? json(dado) : json({ erro: "GitHub não respondeu" }, 502);
+    }
+
+    // ---------- climaselva: localização aproximada pela conexão (quando o GPS do celular é negado) ----------
+    // A Cloudflare já sabe a cidade aproximada de quem fez a requisição; nada é guardado.
+    if (rota === "/onde") {
+      const cf = req.cf || {};
+      const lat = Number(cf.latitude), lon = Number(cf.longitude);
+      if (!isFinite(lat) || !isFinite(lon) || (!lat && !lon)) return json({ erro: "sem localização" }, 404);
+      return json({ lat: +lat.toFixed(2), lon: +lon.toFixed(2), cidade: cf.city || "", estado: cf.regionCode || cf.region || "" });
     }
 
     // ---------- climaselva: tempo real (Open-Meteo, sem chave) ----------
