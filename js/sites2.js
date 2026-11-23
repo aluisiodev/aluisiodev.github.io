@@ -207,7 +207,7 @@
       ["paranoid_android", "🤖", "OK Computer. não aceito argumentos."],
       ["crying_lightning", "⚡", "Humbug é subestimado e eu vou morrer nessa colina"]] },
     { id: "fnaf", cat: "Jogos", t: "dicas para sobreviver ao turno da noite", autor: "seguranca_novato", posts: [
-      ["seguranca_novato", "🔦", "primeiro dia de trabalho na pizzaria. alguma dica?"],
+      ["seguranca_novato", "🔦", "primeiro dia de trabalho no museu. alguma dica?"],
       ["urso_animatronico", "🐻", "har har har"],
       ["seguranca_novato", "🔦", "isso não ajudou em nada"]] },
     { id: "sekiro", cat: "Jogos", t: "zerei Sekiro e agora não sei o que fazer da vida", autor: "lobo_de_um_braco", posts: [
@@ -220,7 +220,7 @@
     urso: ["Savanna Lounge", "is there someone with blue hair and a sword on my desktop??", ["a blue-haired assistant with a sword on her back showed up on my desktop. is it a virus???", "hi! I'm not a virus, I'm Zizi, aluOS's virtual assistant. I promise not to install any toolbars.", "she's nice. she helped me find the page I lost"]],
     vim: ["Programming", "tutorial: how to exit vim", ["I opened vim in 2019. does anyone know how to get out? my family misses me", ":q!", "THANK YOU. I'll see the sun for the first time in years"]],
     album: ["Music", "best album: Humbug, Nectar or OK Computer?", ["all three are on my bedroom wall, so you know my answer: yes.", "OK Computer. no arguments accepted.", "Humbug is underrated and I will die on this hill"]],
-    fnaf: ["Games", "tips for surviving the night shift", ["first day at the pizzeria. any tips?", "har har har", "that didn't help at all"]],
+    fnaf: ["Games", "tips for surviving the night shift", ["first day at the museum. any tips?", "har har har", "that didn't help at all"]],
     sekiro: ["Games", "beat Sekiro and now I don't know what to do with my life", ["200 hours. Isshin taught me more than college did.", "hesitation is defeat. on to NG+"]],
   };
   if (EN) TOPICOS.forEach((t) => { const e = TOPICOS_EN[t.id]; if (!e) return; t.cat = e[0]; t.t = e[1]; t.posts.forEach((p, i) => { if (e[2][i]) p[2] = e[2][i]; }); });
@@ -326,16 +326,31 @@
       carregar(c[3], c[4]);
       const loc = view.querySelector(".cl-loc");
       if (loc) {
-        if (!navigator.geolocation) loc.hidden = true;
+        const base = api ? String(api).replace(/\/+$/, "") : "";
+        const usar = (lat, lon, rotulo) => {
+          if (!vivo) return;
+          view.querySelector(".cl-agora small").textContent = rotulo;
+          loc.disabled = false; loc.textContent = T("📍 Sua localização", "📍 Your location"); carregar(lat, lon);
+          conq("clima-local", T("Previsão sob medida", "Tailor-made forecast"), T("Viu o clima de onde você está no climaselva.", "Checked the weather where you are on climaselva."));
+        };
+        // plano B: sem GPS (negado, desligado ou demorando), usa a cidade aproximada da conexão
+        const pelaConexao = (motivo) => {
+          if (!base) return falhou(motivo);
+          fetch(base + "/onde").then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((d) => usar(d.lat, d.lon, T(`Perto de ${d.cidade || "você"}${d.estado ? " (" + d.estado + ")" : ""} · pela sua conexão · agora`, `Near ${d.cidade || "you"}${d.estado ? " (" + d.estado + ")" : ""} · from your connection · now`)))
+            .catch(() => falhou(motivo));
+        };
+        const falhou = (motivo) => {
+          if (!vivo) return; loc.disabled = false;
+          loc.textContent = motivo === 1 ? T("📍 Localização bloqueada. Libere nas configurações", "📍 Location blocked. Allow it in settings") : T("📍 Não deu. Tentar de novo", "📍 Didn't work. Try again");
+        };
         loc.onclick = () => {
           loc.disabled = true; loc.textContent = T("📍 procurando você…", "📍 looking for you…");
+          if (!navigator.geolocation || !window.isSecureContext) return pelaConexao(0);
           navigator.geolocation.getCurrentPosition((pos) => {
-            if (!vivo) return;
             const lat = pos.coords.latitude.toFixed(2), lon = pos.coords.longitude.toFixed(2);
-            view.querySelector(".cl-agora small").textContent = T(`Onde você está (${lat}, ${lon}) · agora`, `Where you are (${lat}, ${lon}) · now`);
-            loc.textContent = T("📍 Sua localização", "📍 Your location"); carregar(lat, lon);
-            conq("clima-local", T("Previsão sob medida", "Tailor-made forecast"), T("Viu o clima de onde você está no climaselva.", "Checked the weather where you are on climaselva."));
-          }, () => { loc.disabled = false; loc.textContent = T("📍 Não deu. Tentar de novo", "📍 Didn't work. Try again"); }, { timeout: 10000, maximumAge: 600000 });
+            usar(lat, lon, T(`Onde você está (${lat}, ${lon}) · agora`, `Where you are (${lat}, ${lon}) · now`));
+          }, (err) => pelaConexao(err && err.code), { enableHighAccuracy: false, timeout: 12000, maximumAge: 900000 });
         };
       }
       return () => { vivo = false; };
@@ -347,7 +362,7 @@
   const COMUNIDADES = [["segunda", T("Eu odeio segunda-feira", "I hate Mondays"), GATO], ["csharp", T("Eu amo C#", "I love C#"), ALU.pix("csharp")], ["madrugada", T("Programo de madrugada", "I code at 3 AM"), "🌙"], ["abas", T("Eu não fecho as abas do navegador", "I never close my browser tabs"), "🗂️"], ["sekiro", T("Sekiro me humilhou", "Sekiro humbled me"), "🗡️"], ["aventura", T("Hora de Aventura", "Adventure Time"), "🍬"], ["pato", T("Patos roxos existem", "Purple ducks are real"), ALU.pix("peep")], ["cafe", T("Café > sono", "Coffee > sleep"), "☕"]];
   const recados = () => ls.get("alu.yakurt", []);
   const avYk = (e) => (e.startsWith("img:") ? `<img src="${esc(e.slice(4))}" alt="">` : e);
-  const RECADOS_BASE = [["pato_roxo", "🦆", T("quack quack! passando pra deixar um recado 🦆✨", "quack quack! just stopping by to leave a scrap 🦆✨")], ["kez_e_olmo", "img:img/kez.jpg", T("oiii!! perfil lindo, amor beijos 😘", "hiii!! lovely profile, love you kisses 😘")], ["Zizi", "⚔️", T("lembrete: beber água e commitar com mensagem decente", "reminder: drink water and write decent commit messages")]];
+  const RECADOS_BASE = [["pato_roxo", "🦆", T("quack quack! passando pra deixar um recado 🦆✨", "quack quack! just stopping by to leave a scrap 🦆✨")], ["kez_e_olmo", "img:img/kez.jpg", T("oiii! perfil lindo amor, beijos ❤️", "hiii! lovely profile love, kisses ❤️")], ["Zizi", "⚔️", T("lembrete: beber água e commitar com mensagem decente", "reminder: drink water and write decent commit messages")]];
   const topoYk = () => `<header class="yk-top"><b>yakurt</b><nav><button class="link" data-ir="yakurt.com/perfil/aluisio">${T("Início", "Home")}</button> · <span>${T("Recados", "Scraps")}</span> · <span>${T("Comunidades", "Communities")}</span></nav><small>${T("visitante", "visitor")}@kez.com · ${T("Sair", "Log out")}</small></header>`;
   ALU.kezSites.push({
     re: /^yakurt\.com\/perfil\/aluisio\/?$/, titulo: () => `yakurt - ${P.nome}`,

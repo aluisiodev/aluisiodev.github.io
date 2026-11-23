@@ -10,7 +10,9 @@
   function cobrinha(area) {
     const N = 20, S = 18;
     area.innerHTML = `<div class="jg-hud"><span>${T("Pontos", "Score")}: <b class="pt">0</b></span><span>${T("Recorde", "Best")}: <b class="rc">${ls.get("alu.cobrinha", 0)}</b></span><button class="btn jg-go">${T("Jogar", "Play")}</button></div>
-      <canvas width="${N * S}" height="${N * S}" class="jg-canvas"></canvas><p class="muted">${T("Setas ou WASD. No celular, toque nas bordas.", "Arrow keys or WASD. On mobile, tap the edges.")}</p>`;
+      <canvas width="${N * S}" height="${N * S}" class="jg-canvas cb-cv"></canvas>
+      <div class="cb-pad" aria-label="${T("Direcional", "D-pad")}"><button data-k="ArrowUp" aria-label="${T("Cima", "Up")}">▲</button><button data-k="ArrowLeft" aria-label="${T("Esquerda", "Left")}">◀</button><button data-k="ArrowDown" aria-label="${T("Baixo", "Down")}">▼</button><button data-k="ArrowRight" aria-label="${T("Direita", "Right")}">▶</button></div>
+      <p class="muted">${T("Setas ou WASD. No celular, deslize o dedo, toque do lado da cabeça para virar ou use o direcional.", "Arrow keys or WASD. On mobile, swipe, tap beside the head to turn, or use the D-pad.")}</p>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d");
     let cobra, dir, prox, fruta, pts, timer = null, vivo = false;
     const novaFruta = () => { do { fruta = [Math.floor(Math.random() * N), Math.floor(Math.random() * N)]; } while (cobra.some(([x, y]) => x === fruta[0] && y === fruta[1])); };
@@ -35,14 +37,23 @@
       g.fillStyle = "rgba(0,0,0,.6)"; g.fillRect(0, 0, cv.width, cv.height);
       g.fillStyle = "#fff"; g.font = "28px 'Pixelify Sans', monospace"; g.textAlign = "center"; g.fillText(T("fim de jogo", "game over"), cv.width / 2, cv.height / 2);
     }
-    function iniciar() { cobra = [[10, 10], [9, 10], [8, 10]]; dir = prox = [1, 0]; pts = 0; area.querySelector(".pt").textContent = 0; novaFruta(); desenhar(); clearInterval(timer); timer = setInterval(tick, 110); vivo = true; }
+    function iniciar() { cobra = [[10, 10], [9, 10], [8, 10]]; dir = prox = [1, 0]; pts = 0; area.querySelector(".pt").textContent = 0; novaFruta(); desenhar(); clearInterval(timer); timer = setInterval(tick, 110); vivo = true; if (matchMedia("(pointer: coarse)").matches) cv.scrollIntoView({ behavior: "smooth", block: "start" }); }
     const K = { ArrowUp: [0, -1], w: [0, -1], ArrowDown: [0, 1], s: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0] };
     const tecla = (e) => { if (!vivo || !ativo(area) || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return; const k = K[e.key]; if (k && !(k[0] === -dir[0] && k[1] === -dir[1])) { prox = k; e.preventDefault(); } };
     document.addEventListener("keydown", tecla);
-    cv.addEventListener("pointerdown", (e) => {
-      if (!vivo) return; const r = cv.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-      const k = Math.abs(x) > Math.abs(y) ? [Math.sign(x), 0] : [0, Math.sign(y)]; if (!(k[0] === -dir[0] && k[1] === -dir[1])) prox = k;
+    // no celular: deslize o dedo pra qualquer lado, toque do lado da cabeça pra onde quer virar, ou use o direcional
+    const virar = (k) => { if (vivo && !(k[0] === -dir[0] && k[1] === -dir[1]) && !(k[0] === dir[0] && k[1] === dir[1])) prox = k; };
+    let toque = null;
+    cv.addEventListener("pointerdown", (e) => { if (!vivo) return; e.preventDefault(); toque = { x: e.clientX, y: e.clientY }; });
+    cv.addEventListener("pointerup", (e) => {
+      if (!vivo || !toque) return; const dx = e.clientX - toque.x, dy = e.clientY - toque.y; toque = null;
+      if (Math.hypot(dx, dy) > 18) return virar(Math.abs(dx) > Math.abs(dy) ? [Math.sign(dx), 0] : [0, Math.sign(dy)]); // deslizou
+      // tocou: vira pro lado do toque em relação à cabeça da cobra
+      const r = cv.getBoundingClientRect(), cx = ((e.clientX - r.left) / r.width) * N, cy = ((e.clientY - r.top) / r.height) * N;
+      const hx = cobra[0][0] + 0.5, hy = cobra[0][1] + 0.5;
+      if (dir[0]) virar([0, cy < hy ? -1 : 1]); else virar([cx < hx ? -1 : 1, 0]);
     });
+    area.querySelectorAll(".cb-pad button").forEach((bt) => bt.addEventListener("pointerdown", (e) => { e.preventDefault(); virar(K[bt.dataset.k]); }));
     area.querySelector(".jg-go").onclick = iniciar;
     cobra = [[10, 10]]; fruta = [14, 10]; desenhar();
     return () => { clearInterval(timer); document.removeEventListener("keydown", tecla); };

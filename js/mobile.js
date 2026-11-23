@@ -29,14 +29,42 @@
     { id: "zizi", nome: "Zizi ⚔️", bpm: 140, onda: "triangle", filtro: 6000,
       mel: [[72, .5], [76, .5], [79, .5], [84, 1], [79, .5], [84, 1.5], [0, .5], [74, .5], [77, .5], [81, .5], [86, 1], [81, .5], [86, 1.5], [0, .5],
         [76, .5], [79, .5], [83, .5], [88, 1.5], [86, .5], [84, 2], [0, 1]] },
+    // a música do modo difícil da Batalha de Ritmo, em versão toque: arpejos sobre acordes de sétima que descem
+    { id: "coral", nome: "Recife de Coral 🌊", bpm: 132, onda: "triangle", filtro: 2600, eco: true, ...(() => {
+      const PROG = [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [48, 52, 55, 59], [46, 50, 53, 57], [45, 48, 52, 55], [43, 46, 50, 53], [45, 49, 52, 55]];
+      const FORMAS = [[0, 1, 2, 3, 2, 1, 2, 3], [0, 2, 1, 3, 2, 3, 1, 2], [3, 2, 1, 2, 0, 1, 2, 3], [0, 1, 3, 2, 3, 1, 2, 0]];
+      const mel = [], baixo = [];
+      PROG.forEach((ac, c) => {
+        FORMAS[c % 4].forEach((k, i) => mel.push(i === 7 && c % 2 === 1 ? [0, .5] : [ac[k] + 12, .5]));
+        baixo.push([ac[0] - 12, 2], [ac[0], 2]);
+      });
+      return { mel, baixo };
+    })() },
   ];
   let actx = null, tocando = null;
+  // iPhone: a chave do silencioso cala o Web Audio e o som só sai depois de um toque.
+  // No primeiro toque em qualquer lugar, liga o áudio no modo "reprodução" e destrava o AudioContext,
+  // assim os toques (e a ligação surpresa, que chega sem ninguém tocar na tela) funcionam.
+  const SILENCIO = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+  let destravado = false;
+  function destravarAudio() {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== "running") actx.resume(); } catch {}
+    if (destravado) return; destravado = true;
+    try { const a = new Audio(SILENCIO); a.setAttribute("playsinline", ""); a.play().catch(() => {}); } catch {}
+  }
+  ALU.destravarAudio = destravarAudio;
+  ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, destravarAudio, { capture: true, passive: true }));
   function tocar(id, loop = true) {
     parar();
     const t = TOQUES.find((x) => x.id === id) || TOQUES[0];
-    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch { return; }
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== "running") actx.resume(); } catch { return; }
     const out = actx.createGain(); out.gain.value = 0.16; out.connect(actx.destination);
     const lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = t.filtro; lp.connect(out);
+    if (t.eco) { // eco de água, como no jogo
+      const d = actx.createDelay(1), fb = actx.createGain(); d.delayTime.value = (60 / t.bpm) * 0.75; fb.gain.value = 0.35;
+      lp.connect(d); d.connect(fb); fb.connect(d); d.connect(out);
+    }
     const b = 60 / t.bpm, dur = (seq) => seq.reduce((a, [, d]) => a + d, 0) * b;
     const voz = (seq, onda, vol, t0) => {
       let at = t0;

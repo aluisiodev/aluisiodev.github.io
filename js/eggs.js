@@ -19,7 +19,7 @@
     relogio: ["Night shift", "The clock hit 12 AM. Watch the door."], lixeira: ["Dumpster diving", "Opened a file from the Recycle Bin."], terminal: ["Real hacker", "Found a secret terminal command."],
     404: ["Lost in the savanna", "Found a page that doesn't exist."], segredo: ["Secret page", "Typed kez://segredo."], like10: ["Number 1 fan", "Liked a video 10 times."],
     inscrito: ["Savanna subscriber", "Subscribed to the channel."], pato10h: ["Aquatic ASMR", "Watched the 10-hour duck video."], spam: ["Almost fell for it", "Opened the savanna prince's email."],
-    freddy: ["Night shift II", "Read the pizzeria manager's email."], cobra15: ["Snake charmer", "Scored 15 in Snake."], velha: ["Smarter than Zizi", "Beat Zizi at tic-tac-toe."],
+    freddy: ["Night shift II", "Read the museum manager's email."], cobra15: ["Snake charmer", "Scored 15 in Snake."], velha: ["Smarter than Zizi", "Beat Zizi at tic-tac-toe."],
     pato100: ["Duck breeder", "Collected 100 quacks in Pato Clicker."], memoria: ["Elephant memory", "Completed Savanna Memory."], "pato-evoluiu": ["The duck evolved", "Ran code 5 times in Peep Studio."],
     nudge: ["Attention seeker", "Shook the MessagerTale window."], luminaria: ["Enlightened", "Found the hidden spot in the bedroom."], turista: ["Bedroom tourist", "Looked at every object in the bedroom."],
     desligar: ["Safe to turn off", "Shut down aluOS. It forgives you."], professor: ["Bot teacher", "Taught MessagerTale a new phrase."], bonzinho: ["Friends with Zizi", "Chatted with Zizi."],

@@ -13,9 +13,9 @@
 
     const CMDS = {
       ajuda: () => print(
-        (EN ? [["about", "who I am"], ["projects", "list the projects"], ["open &lt;project&gt;", "open a project (e.g. open nexo)"], ["skills", "skills and courses"], ["open kez | peep | quarto", "open an app"],
+        (EN ? [["about", "who I am"], ["projects", "list the projects"], ["open &lt;project&gt;", "open a project (e.g. open deskmate)"], ["skills", "skills and courses"], ["open kez | peep | quarto", "open an app"],
          ["contact", "where to find me"], ["neofetch", "system info"], ["theme &lt;1-5&gt;", "change the wallpaper"], ["clear", "clear the screen"], ["achievements", "what you've found so far"], ["exit", "close the terminal"]]
-        : [["sobre", "quem sou eu"], ["projetos", "lista os projetos"], ["abrir &lt;projeto&gt;", "abre um projeto (ex.: abrir nexo)"], ["skills", "skills e cursos"], ["abrir kez | peep | quarto", "abre um app"],
+        : [["sobre", "quem sou eu"], ["projetos", "lista os projetos"], ["abrir &lt;projeto&gt;", "abre um projeto (ex.: abrir deskmate)"], ["skills", "skills e cursos"], ["abrir kez | peep | quarto", "abre um app"],
          ["contato", "onde me encontrar"], ["neofetch", "informações do sistema"], ["tema &lt;1-5&gt;", "troca o papel de parede"], ["limpar", "limpa a tela"], ["conquistas", "o que você já achou"], ["sair", "fecha o terminal"]])
           .map(([c, d]) => `<span class="k">${c}</span> <span class="muted">— ${d}</span>`).join("<br>")),
       sobre: () => print(P.bio.map(esc).join("<br><br>")),
