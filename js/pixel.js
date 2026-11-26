@@ -62,14 +62,30 @@
       c.rect(10, 10, 1, 3, "#3b2414").rect(9, 9, 3, 1, "#4b3018");
       return c.outline(K);
     },
-    // Concord: dois balões de conversa (um teal, um roxo) com uma notinha musical
+    // Concord: o "controle sorridente" de camelô. impressão desalinhada, um olho maior que o outro,
+    // um chifre torto e o roxo errado. é paródia, não é o logo de ninguém.
     concord() {
       const c = new Px();
-      c.rect(1, 2, 10, 7, "#2fbfa8").rect(2, 1, 8, 9, "#2fbfa8").rect(3, 10, 2, 2, "#2fbfa8");
-      c.rect(6, 6, 9, 6, "#7c5cff").rect(7, 5, 7, 8, "#7c5cff").rect(12, 13, 2, 2, "#7c5cff");
-      c.rect(3, 4, 1, 1, "#ffffff").rect(5, 4, 1, 1, "#ffffff").rect(7, 4, 1, 1, "#ffffff");
-      c.rect(11, 7, 1, 4, "#ffd23f").rect(9, 10, 2, 2, "#ffd23f").rect(12, 7, 1, 1, "#ffd23f");
-      return c.outline("#141026");
+      c.rect(0, 0, 16, 16, "#6f5ff7").cantos().rect(0, 13, 16, 3, "#5a49e0").cantos();
+      c.rect(1, 1, 3, 1, "#8f84ff");
+      const CARA = [
+        "..w.......w.",
+        ".ww......ww.",
+        ".wwwwwwwwwww",
+        "wwwwwwwwwwww",
+        "wwbbwwwwbbww",
+        "wwbbwwwwbwww",
+        "wwwwwwwwwwww",
+        "wbwwwwwwwwbw",
+        "wwbbbbbbbbww",
+        "wwwwwwwwwwww",
+        "www......www",
+        "ww........ww",
+      ];
+      c.grid(3, 2, CARA, { w: "#ff5fa2", b: "#ff5fa2" }); // a cor "vazando" da impressão torta
+      c.grid(2, 2, CARA, { w: "#f4f1e6", b: "#6f5ff7" });
+      c.px(12, 1, "#f4f1e6"); // o chifre que entortou na fábrica
+      return c;
     },
     // claude: um bichinho de pixel cor de terracota, com bracinhos e quatro patinhas (é como eu me desenho ✦)
     claude() {
