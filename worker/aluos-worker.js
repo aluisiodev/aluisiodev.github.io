@@ -6,6 +6,7 @@
 //   • a playlist do musikzify (lista e capas vindas do Spotify, sempre atualizada)
 //   • as estatísticas reais do GitHub no DogHub e o clima real do climaselva
 //   • a ponte para compilar C# no Peep Studio (Wandbox, grátis).
+//   • os bots do Concord (Zizi e Peep), com a mesma IA do chat: Gemini primeiro, Groq de reserva.
 //
 // Como colocar no ar (uns 10 minutos):
 //   1. Crie uma conta grátis em https://dash.cloudflare.com
@@ -74,6 +75,29 @@ Sobre ele:
 - contato: LinkedIn linkedin.com/in/aluisio-alves e GitHub github.com/aluisiodev
 - no aluOS tem: pasta Projetos, Peep Studio (IDE que roda Python, JS e C#; dá pra assinar o livro de visitas com um commit), Kez(i)avana (navegador com jogos e paródias), quarto_360 e a Zizi, assistente virtual de cabelo azul
 Se não souber algo sobre a vida dele, diga que prefere responder pessoalmente no LinkedIn.`;
+
+// ---------- bots do Concord ----------
+// Fatos sobre como o aluOS foi feito, que os dois bots podem contar.
+const COMO_FOI_FEITO = `Como o aluOS foi feito (use como verdade, não invente além disso):
+- foi 100% "vibecodado": o Aluísio não escreveu o código à mão. todas as ideias, o visual, os personagens e as piadas são dele;
+  ele descrevia o que queria em conversas, testava cada versão, apontava bugs e pedia mudanças.
+- a IA que escreveu o código foi o Claude, da Anthropic, usado pelo Claude Code num projeto do Claude. cada lote de pedidos virou um PR no GitHub, e o Aluísio revisava e fazia o merge.
+- o primeiro pedido foi: "quero que meu portfolio seja tipo um desktop. para celular, quero que seja como se fosse um celular mesmo". a referência de visual foi o jogo Emily is Away.
+- tecnologia: HTML, CSS e JavaScript puros, sem framework nem build. pixel art desenhada em código, músicas e sons gerados com Web Audio,
+  Python no navegador com Pyodide, site no GitHub Pages e um Cloudflare Worker grátis para placar, ranking, livro de visitas, clima, GitHub e IA.
+- os bots (Zizi, Peep e o Aluísio "online" do MessagerTale) usam o Google Gemini e, quando ele falha ou a cota acaba, a Groq. sem as duas, entram respostas prontas.
+- a Zizi foi inspirada na Kezia, namorada do Aluísio (ela é a kez_e_olmo do yakurt). só conte isso se perguntarem.`;
+const ESTILO_BOT = `Você está no Concord, um app de chat de comunidade dentro do aluOS (o portfolio do Aluísio, um sistema operacional de mentira no navegador),
+no servidor que conta como o aluOS foi feito. Responda em no máximo 3 linhas curtas, sem markdown, emoji só de vez em quando.
+Responda no idioma da pessoa (português do Brasil por padrão). Escreva só a sua próxima mensagem e pare; nunca escreva a fala de outra pessoa.`;
+const BOTS = {
+  zizi: `Você é a Zizi, a assistente virtual do aluOS: uma garota em pixel art de cabelo azul cujo símbolo é uma estrelinha.
+É simpática, confiante e um pouco provocadora (adora lembrar que ganha no jogo da velha), mas sempre ajuda de verdade.
+Fala de você no feminino.\n` + ESTILO_BOT + "\n" + COMO_FOI_FEITO,
+  peep: `Você é o Peep, o patinho roxo mascote do Peep Studio, a IDE do aluOS. É um "pato de borracha" de programação:
+ajuda com dúvidas de código, explica com calma e às vezes devolve uma pergunta para a pessoa pensar. Solta um "quack" de vez em quando.
+Pode mostrar um exemplo curto de código, uma instrução por linha, sem cercas de markdown (aí pode passar de 3 linhas, até umas 8).\n` + ESTILO_BOT + "\n" + COMO_FOI_FEITO,
+};
 
 const JOGOS = ["velha", "voador", "ritmo"];
 // a IA às vezes continua a conversa sozinha ("pessoa: ... você: ..."): corta isso
@@ -178,7 +202,7 @@ export default {
     const ip = req.headers.get("CF-Connecting-IP") || "?";
     if (req.method === "POST") {
       if (!origens.includes("*") && quem && !origens.includes(quem)) return json({ erro: "origem não permitida" }, 403);
-      const tipo = rota === "/" || rota === "/chat" ? "chat" : rota === "/csharp" ? "cs" : "post", max = { chat: 12, cs: 6, post: 20 }[tipo];
+      const tipo = rota === "/" || rota === "/chat" || rota === "/concord" ? "chat" : rota === "/csharp" ? "cs" : "post", max = { chat: 12, cs: 6, post: 20 }[tipo];
       if (passouDoLimite(tipo + ":" + ip, max)) return json({ erro: "devagar 🙂" }, 429);
     }
 
@@ -239,6 +263,22 @@ export default {
       const extra = db ? (await db.get("conhecimento")) || "" : "";
       const sistema = PERSONA + (extra ? "\n\nBase de conhecimento (escrita pelo Aluísio, use como verdade):\n" + extra.slice(0, 12000) : "")
         + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
+      const { resposta: bruta, via } = await perguntarIA(env, sistema, hist, msg);
+      const resposta = so_minha_fala(bruta);
+      return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);
+    }
+
+    // ---------- Concord: bots Zizi e Peep, com a mesma IA do chat ----------
+    if (rota === "/concord" && req.method === "POST") {
+      const bot = BOTS[corpo.bot] ? corpo.bot : "zizi";
+      const msg = limpa(corpo.mensagem, 600);
+      if (!msg) return json({ erro: "mensagem vazia" }, 400);
+      const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-8)
+        .map((m) => ({ de: m.de === "eu" ? "user" : "model", texto: limpa(m.texto, 600) })).filter((m) => m.texto);
+      while (hist.length && hist[0].de !== "user") hist.shift();
+      for (let i = hist.length - 1; i > 0; i--) if (hist[i].de === hist[i - 1].de) { hist[i - 1].texto += "\n" + hist[i].texto; hist.splice(i, 1); }
+      if (hist.length && hist[hist.length - 1].de === "user") hist.pop();
+      const sistema = BOTS[bot] + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
       const { resposta: bruta, via } = await perguntarIA(env, sistema, hist, msg);
       const resposta = so_minha_fala(bruta);
       return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);

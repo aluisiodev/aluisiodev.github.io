@@ -16,6 +16,7 @@
     peep:     { titulo: "Peep Studio", icone: "peep", w: 920, h: 600 },
     chat:     { titulo: "MessagerTale", icone: "chat", w: 600, h: 520 },
     terminal: { titulo: "Terminal", icone: "terminal", w: 640, h: 420 },
+    concord:  { titulo: "Concord", icone: "concord", w: 960, h: 620 },
     lixeira:  { titulo: "Lixeira", icone: "lixeira", w: 460, h: 320 },
     ajustes:  { titulo: "Painel de controle", icone: "ajustes", w: 540, h: 460 },
   };
@@ -209,7 +210,7 @@
     if (a.projeto) return renderProjeto(el, ctx, a.projeto);
     if (a.item) return renderProps(el, ctx, a);
     if (id.startsWith("pasta:")) return renderPasta(el, ctx, id.slice(6));
-    const f = { notas: renderNotas, lixeira: renderLixeira, ajustes: renderAjustes, terminal: ALU.terminal, chat: ALU.chat, kez: ALU.kez, peep: ALU.peep, quarto: ALU.quarto }[id];
+    const f = { notas: renderNotas, lixeira: renderLixeira, ajustes: renderAjustes, terminal: ALU.terminal, chat: ALU.chat, kez: ALU.kez, peep: ALU.peep, quarto: ALU.quarto, concord: ALU.concord }[id];
     return f(el, ctx, arg);
   }
 

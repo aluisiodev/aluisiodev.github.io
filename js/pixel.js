@@ -62,6 +62,24 @@
       c.rect(10, 10, 1, 3, "#3b2414").rect(9, 9, 3, 1, "#4b3018");
       return c.outline(K);
     },
+    // Concord: dois balões de conversa (um teal, um roxo) com uma notinha musical
+    concord() {
+      const c = new Px();
+      c.rect(1, 2, 10, 7, "#2fbfa8").rect(2, 1, 8, 9, "#2fbfa8").rect(3, 10, 2, 2, "#2fbfa8");
+      c.rect(6, 6, 9, 6, "#7c5cff").rect(7, 5, 7, 8, "#7c5cff").rect(12, 13, 2, 2, "#7c5cff");
+      c.rect(3, 4, 1, 1, "#ffffff").rect(5, 4, 1, 1, "#ffffff").rect(7, 4, 1, 1, "#ffffff");
+      c.rect(11, 7, 1, 4, "#ffd23f").rect(9, 10, 2, 2, "#ffd23f").rect(12, 7, 1, 1, "#ffd23f");
+      return c.outline("#141026");
+    },
+    // claude: um bichinho de pixel cor de terracota, com bracinhos e quatro patinhas (é como eu me desenho ✦)
+    claude() {
+      const c = new Px();
+      c.rect(3, 4, 10, 7, "#d9774f").rect(1, 6, 2, 2, "#d9774f").rect(13, 6, 2, 2, "#d9774f");
+      c.rect(3, 11, 1, 3, "#d9774f").rect(5, 11, 1, 3, "#d9774f").rect(10, 11, 1, 3, "#d9774f").rect(12, 11, 1, 3, "#d9774f");
+      c.rect(3, 4, 10, 1, "#ec9a76");
+      c.rect(5, 6, 1, 2, "#1b1426").rect(10, 6, 1, 2, "#1b1426");
+      return c.outline("#5a2a18");
+    },
     peep() {
       const c = new Px();
       c.oval(7, 10.5, 6, 4, "#9b6bff").oval(10.5, 5.5, 3.2, 3.2, "#9b6bff");

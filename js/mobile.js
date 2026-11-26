@@ -15,7 +15,7 @@
   const PROPRIOS = { sms: renderSMS, banco: renderBanco, toque: renderToque };
 
   const PAG1 = ["pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", "sms", "banco", "quarto", "notas"];
-  const PAG2_FIM = ["toque", "ajustes", "lixeira"];
+  const PAG2_FIM = ["concord", "toque", "ajustes", "lixeira"];
   const DOCK = ["chat", "kez", "peep", "terminal"];
 
   // ================= toques (melodias originais, tocadas com Web Audio) =================

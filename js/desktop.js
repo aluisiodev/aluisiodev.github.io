@@ -1,7 +1,7 @@
 // Modo desktop: ícones, janelas, barra de tarefas, menu iniciar e notificações.
 (function () {
   const ALU = window.ALU, esc = (s) => ALU.esc(s);
-  const DESK = ["pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", "chat", "kez", "peep", "terminal", "ajustes", "lixeira"];
+  const DESK = ["pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", "chat", "kez", "peep", "concord", "terminal", "ajustes", "lixeira"];
 
   ALU.desktop = function (root) {
     const P = window.PERFIL;
@@ -139,7 +139,7 @@
 
     // ---- menu iniciar ----
     root.querySelector(".tb-start").addEventListener("click", () => { launcher.hidden = !launcher.hidden; if (!launcher.hidden) launcher.querySelector("input").focus(); });
-    const todos = ["chat", "kez", "peep", "terminal", "quarto", "notas", "pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", ...window.PROJETOS.map((p) => "proj:" + p.id), "ajustes"];
+    const todos = ["chat", "kez", "peep", "concord", "terminal", "quarto", "notas", "pasta:sobre", "pasta:projetos", "pasta:contatos", "pasta:skills", ...window.PROJETOS.map((p) => "proj:" + p.id), "ajustes"];
     launcher.innerHTML = `
       <div class="la-head"><img src="${esc(P.foto)}" alt=""><strong>${esc(P.nome)}</strong></div>
       <div class="la-body">
