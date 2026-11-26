@@ -11,7 +11,7 @@
     ["memoria", "Memória de elefante"], ["pato-evoluiu", "O pato evoluiu"], ["nudge", "Chamando atenção"], ["luminaria", "Iluminado"],
     ["turista", "Turista do quarto"], ["desligar", "Pode desligar"], ["professor", "Professor de bot"], ["bonzinho", "Amizade com Zizi"],
     ["ebaa", "Membro do fórum"], ["recado", "Deixou recado"], ["segunda", "Odeio segunda-feira"], ["barrel", "Deu um giro"], ["musikzify", "Trilha sonora"],
-    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"], ["tema", "Nostalgia de 2009"], ["banco", "Rico de experiência"], ["ligacao", "Alô?"], ["toques", "Toque polifônico"], ["clima-local", "Previsão sob medida"], ["ritmo-coral", "Mergulhador"],
+    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"], ["tema", "Nostalgia de 2009"], ["banco", "Rico de experiência"], ["ligacao", "Alô?"], ["toques", "Toque polifônico"], ["clima-local", "Previsão sob medida"], ["ritmo-coral", "Mergulhador"],, ["concord-prompts", "Bastidores"], ["concord-bot", "Falou com um bot"], ["concord-voz", "Madrugada no Concord"]
   ];
   // títulos e descrições em inglês, por id (vale para qualquer lugar que chame ALU.conquista)
   const CONQ_EN = {
@@ -27,7 +27,7 @@
     barrel: ["Do a barrel roll", "Asked Alulugle to spin."], musikzify: ["Soundtrack", "Opened the playlist on musikzify."], voador: ["Duck wings", "Scored 10 in Flappy Duck."],
     plantao: ["Survived the shift", "Made it to 6 AM in Night Watch."], ritmo: ["Battle rhythm", "Hit a 25 combo in Rhythm Battle."], ligadin: ["Organic engagement", "Interacted on LigadIn."],
     commit: ["First commit", "Signed the guestbook in Peep Studio."], talentos: ["Talent pool", "Read 5 identical rejections in imaíu's spam."], tema: ["2009 nostalgia", "Changed the aluOS theme."],
-    banco: ["Rich in experience", "Opened the bank app."], ligacao: ["Hello?", "Made a call."], toques: ["Polyphonic ringtone", "Said YES to the carrier."], "clima-local": ["Tailor-made forecast", "Checked the weather where you are on climaselva."], "ritmo-coral": ["Deep diver", "Beat Coral Reef on hard."],
+    banco: ["Rich in experience", "Opened the bank app."], ligacao: ["Hello?", "Made a call."], toques: ["Polyphonic ringtone", "Said YES to the carrier."], "concord-prompts": ["Behind the scenes", "Read the prompts behind aluOS."], "concord-bot": ["Talked to a bot", "Chatted with Zizi or Peep on Concord."], "concord-voz": ["Late night on Concord", "Joined the Concord voice channel."], "clima-local": ["Tailor-made forecast", "Checked the weather where you are on climaselva."], "ritmo-coral": ["Deep diver", "Beat Coral Reef on hard."],
   };
   const EM_EN = ALU.lang === "en";
   if (EM_EN) ALU.CONQUISTAS.forEach((c) => { if (CONQ_EN[c[0]]) c[1] = CONQ_EN[c[0]][0]; });

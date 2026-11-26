@@ -62,6 +62,40 @@
       c.rect(10, 10, 1, 3, "#3b2414").rect(9, 9, 3, 1, "#4b3018");
       return c.outline(K);
     },
+    // Concord: o "controle sorridente" de camelô. impressão desalinhada, um olho maior que o outro,
+    // um chifre torto e o roxo errado. é paródia, não é o logo de ninguém.
+    concord() {
+      const c = new Px();
+      c.rect(0, 0, 16, 16, "#6f5ff7").cantos().rect(0, 13, 16, 3, "#5a49e0").cantos();
+      c.rect(1, 1, 3, 1, "#8f84ff");
+      const CARA = [
+        "..w.......w.",
+        ".ww......ww.",
+        ".wwwwwwwwwww",
+        "wwwwwwwwwwww",
+        "wwbbwwwwbbww",
+        "wwbbwwwwbwww",
+        "wwwwwwwwwwww",
+        "wbwwwwwwwwbw",
+        "wwbbbbbbbbww",
+        "wwwwwwwwwwww",
+        "www......www",
+        "ww........ww",
+      ];
+      c.grid(3, 2, CARA, { w: "#ff5fa2", b: "#ff5fa2" }); // a cor "vazando" da impressão torta
+      c.grid(2, 2, CARA, { w: "#f4f1e6", b: "#6f5ff7" });
+      c.px(12, 1, "#f4f1e6"); // o chifre que entortou na fábrica
+      return c;
+    },
+    // claude: um bichinho de pixel cor de terracota, com bracinhos e quatro patinhas (é como eu me desenho ✦)
+    claude() {
+      const c = new Px();
+      c.rect(3, 4, 10, 7, "#d9774f").rect(1, 6, 2, 2, "#d9774f").rect(13, 6, 2, 2, "#d9774f");
+      c.rect(3, 11, 1, 3, "#d9774f").rect(5, 11, 1, 3, "#d9774f").rect(10, 11, 1, 3, "#d9774f").rect(12, 11, 1, 3, "#d9774f");
+      c.rect(3, 4, 10, 1, "#ec9a76");
+      c.rect(5, 6, 1, 2, "#1b1426").rect(10, 6, 1, 2, "#1b1426");
+      return c.outline("#5a2a18");
+    },
     peep() {
       const c = new Px();
       c.oval(7, 10.5, 6, 4, "#9b6bff").oval(10.5, 5.5, 3.2, 3.2, "#9b6bff");

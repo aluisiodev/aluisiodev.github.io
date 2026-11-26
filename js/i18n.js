@@ -125,7 +125,7 @@
   // mais traduções (sites, jogos, terminal) chegam por aqui
   ALU.i18nMais = (dic, rx) => { Object.assign(D, dic || {}); (rx || []).forEach((r) => RX.push(r)); };
   // não traduz o que a pessoa ou o bot escrevem, nem código
-  const PULA = ".chat-log,.peep-code,.src,script,style,.sms-log,.no-tr";
+  const PULA = ".chat-log,.peep-code,.src,script,style,.sms-log,.no-tr,.cc-msgs";
   function traduzir(raiz) {
     if (raiz.nodeType === 3) { if (raiz.parentElement && (raiz.parentElement.closest(PULA) || raiz.parentElement.tagName === "TEXTAREA")) return; const r = tr(raiz.nodeValue); if (r !== null && r !== raiz.nodeValue) raiz.nodeValue = r; return; }
     if (raiz.nodeType !== 1 || (raiz.closest && raiz.closest(PULA))) return;
