@@ -5,7 +5,7 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 
 **[Abrir o aluOS](https://aluisiodev.github.io/)**
 
-![aluOS com a janela do projeto Nexo Assist aberta](docs/aluos.webp)
+![aluOS com a janela do projeto Deskmate aberta](docs/aluos.webp)
 
 ## O que tem no desktop
 

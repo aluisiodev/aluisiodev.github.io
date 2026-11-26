@@ -103,38 +103,6 @@ window.PROJETOS = [
     demo: "https://mirav.aluisioalves6.workers.dev/",
   },
   {
-    id: "nexo",
-    nome: "Nexo Assist",
-    curto: "Nexo Assist",
-    cor: ["#1E3A8A", "#2563EB"],
-    sigla: "Nx",
-    contexto: { tipo: "Primeira versão do Deskmate", texto: "Projeto meu, feito do zero com o meu tempo e os meus recursos, para uma empresa fictícia (a Nexo) com um sistema de chamados legado simulado e instável de propósito. Ele virou a base do Deskmate, que estou reescrevendo como open source." },
-    resumo: "Agent de IA que atende o service desk de TI e chama um analista quando precisa.",
-    problema: "Boa parte dos chamados de TI são perguntas repetidas (\"qual o status do meu chamado?\", \"a VPN não conecta\"). O funcionário espera, e o analista perde tempo com o que uma consulta resolveria. A ideia era automatizar isso sem deixar o modelo inventar prazo, prioridade ou mexer em chamado de outra pessoa.",
-    descricao:
-      "O funcionário descreve o problema num chat. O agent consulta os chamados dele, busca na central de ajuda, prepara rascunhos de chamado para ele confirmar e transfere para um analista quando precisa. O analista acompanha tudo num console, com o motivo de cada decisão do agent. Princípio do projeto: o LLM entende a conversa; o código decide as regras.",
-    destaques: [
-      "Agent no Mastra com 7 ferramentas; prazo, prioridade e duplicidade ficam em código testado",
-      "Gemini como principal, Groq como plano B e um modo básico sem IA quando os dois caem",
-      "Botão \"por quê?\" em cada resposta e console do analista com o registro de decisões",
-      "Evals contra a IA real: 44/44 no Gemini; testes unitários, de integração e Playwright",
-    ],
-    aprendizados: [
-      "Deixar o LLM interpretar e o código decidir: as regras de negócio não dependem do modelo",
-      "Medir um agent com evals de comportamento (ferramentas chamadas), não de texto",
-      "Idempotência e retry com backoff contra um sistema legado que cai",
-    ],
-    imagens: [
-      { src: "img/projetos/nexo-chat.webp", legenda: "Chamado com prazo vencido: o agent oferece chamar um analista" },
-      { src: "img/projetos/nexo-chat-handoff.webp", legenda: "Transferência para o Suporte N2" },
-      { src: "img/projetos/nexo-decisoes.webp", legenda: "Console do analista com o registro de decisões" },
-      { src: "img/projetos/nexo-login.webp", legenda: "Login" },
-    ],
-    stack: ["Next.js 16", "TypeScript", "Mastra", "Gemini", "Groq", "Hono", "SQLite (libSQL)", "zod", "Vitest", "Playwright"],
-    repo: "https://github.com/aluisiodev/nexo-assist",
-    demo: "",
-  },
-  {
     id: "doce",
     nome: "Doce & Afeto",
     curto: "Doce & Afeto",
@@ -172,9 +140,9 @@ window.PROJETOS = [
     curto: "Deskmate",
     cor: ["#0F766E", "#22D3EE"],
     sigla: "Dm",
-    contexto: { tipo: "Projeto pessoal · em construção", texto: "Open source (MIT). As imagens são mockups do design da v0.1, não o app rodando." },
+    contexto: { tipo: "Projeto pessoal · em construção", texto: "Ideia, design e código meus, do zero. Open source (MIT). As imagens são mockups do design da v0.1, não o app rodando." },
     resumo: "Agent de IA open-source que se pluga em qualquer service desk: atende o usuário e ajuda o analista.",
-    problema: "O Nexo Assist, a primeira versão, atendia um service desk específico. O Deskmate pega o que funcionou nele e vira um produto open source para qualquer empresa: auto-hospedado, sem custo para rodar e plugável no service desk que ela já usa (GLPI, Jira, Zammad ou um sistema próprio).",
+    problema: "Boa parte dos chamados de TI são perguntas repetidas (\"qual o status do meu chamado?\", \"a VPN não conecta\"). O funcionário espera e o analista perde tempo com o que uma consulta resolveria. O Deskmate automatiza isso para qualquer empresa: auto-hospedado, sem custo para rodar e plugável no service desk que ela já usa (GLPI, Jira, Zammad ou um sistema próprio).",
     descricao:
       "Um agent de IA auto-hospedável e de código aberto (MIT) para service desks de TI. O funcionário descreve o problema num chat; o agent classifica a prioridade, procura chamados parecidos e abre ou acompanha o chamado. O analista vê tudo num painel. O agent não depende de um sistema específico: conversa com uma interface ITicketSystem, e cada service desk ganha um adaptador. Em construção, com o domínio escrito primeiro e coberto por testes.",
     destaques: [

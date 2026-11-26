@@ -59,15 +59,6 @@
       aprendizados: ["Writing a Go API without a framework, with hand-made rate limiting and CORS", "Deploying the static site on Cloudflare and the API in Docker, each on its own free tier", "Translating a whole site into three languages without duplicating pages"],
       legendas: ["Home with the interactive mirror and Miro", "Navy dark theme", "The five mirror shapes", "Careers, with 17 openings", "On a phone"],
     },
-    nexo: {
-      tipo: "First version of Deskmate", contexto: "My own project, built from scratch with my own time and resources, for a fictional company (Nexo) with a simulated legacy ticket system that is unstable on purpose. It became the foundation of Deskmate, which I'm rewriting as open source.",
-      resumo: "AI agent that handles the IT service desk and calls an analyst when needed.",
-      problema: "Many IT tickets are repeated questions (\"what's the status of my ticket?\", \"the VPN won't connect\"). Employees wait, and analysts spend time on what a lookup would solve. The idea was to automate that without letting the model make up deadlines or priorities, or touch someone else's ticket.",
-      descricao: "The employee describes the problem in a chat. The agent checks their tickets, searches the help center, drafts tickets for them to confirm and hands off to an analyst when needed. The analyst follows everything in a console, with the reason behind each agent decision. The project's principle: the LLM understands the conversation; the code decides the rules.",
-      destaques: ["Mastra agent with 7 tools; deadlines, priority and duplicates live in tested code", "Gemini as the main model, Groq as plan B and a basic mode without AI when both fail", "A \"why?\" link on every answer and an analyst console with the decision log", "Evals against the real AI: 44/44 on Gemini; unit, integration and Playwright tests"],
-      aprendizados: ["Letting the LLM interpret and the code decide: business rules don't depend on the model", "Measuring an agent with behavior evals (which tools it called), not text", "Idempotency and retry with backoff against a legacy system that goes down"],
-      legendas: ["Overdue ticket: the agent offers to call an analyst", "Handoff to Tier 2 support", "Analyst console with the decision log", "Sign in"],
-    },
     doce: {
       tipo: "Client", contexto: "Site built for Ana Beatriz, a baker, and deployed on Vercel.",
       resumo: "Bakery showcase where the order ends up ready on WhatsApp.",
@@ -78,9 +69,9 @@
       legendas: ["Home page", "Menu with category filter", "Building a cake order", "On a phone"],
     },
     deskmate: {
-      tipo: "Personal project · in progress", contexto: "Open source (MIT). The images are design mockups of v0.1, not the running app.",
+      tipo: "Personal project · in progress", contexto: "My idea, design and code, from scratch. Open source (MIT). The images are design mockups of v0.1, not the running app.",
       resumo: "Open-source AI agent that plugs into any service desk: it helps the end user and the analyst.",
-      problema: "Nexo Assist, the first version, served one specific service desk. Deskmate takes what worked there and turns it into an open-source product for any company: self-hosted, free to run and pluggable into the service desk it already uses (GLPI, Jira, Zammad or an in-house system).",
+      problema: "Many IT tickets are repeated questions (\"what's the status of my ticket?\", \"the VPN won't connect\"). Employees wait and analysts spend time on what a lookup would solve. Deskmate automates that for any company: self-hosted, free to run and pluggable into the service desk it already uses (GLPI, Jira, Zammad or an in-house system).",
       descricao: "A self-hostable, open-source (MIT) AI agent for IT service desks. The employee describes the problem in a chat; the agent sets the priority, looks for similar tickets and opens or follows up on the ticket. The analyst sees everything in a dashboard. The agent isn't tied to one system: it talks to an ITicketSystem interface, and each service desk gets an adapter. Work in progress, with the domain written first and covered by tests.",
       destaques: ["ASP.NET Core (.NET 10) back end rewritten from scratch, with domain rules tested in xUnit", "One adapter per service desk behind the ITicketSystem interface; GLPI comes first", "Swappable AI providers (Gemini, Groq and Ollama) behind IChatModel, plus a basic mode without AI", "Its own agent loop instead of a framework, so there is no hidden behavior"],
       aprendizados: ["Designing for contributors: CI, Conventional Commits and community files from day one", "Dependency inversion in practice: swap Gemini for Ollama or GLPI for Jira without touching the agent", "Planning a small v0.1 and saying no (YAGNI) to queues, Redis and microservices"],
