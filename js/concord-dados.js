@@ -128,12 +128,12 @@ Sobre as perguntas para o celular:
       "emails, LigadIn and yakurt now talk about the Savanna Museum."],
     ["2026-11-23T13:53:36Z", `* Geral: A Zizi está muito "burra" no jogo da velha, precisa estar mais inteligente.
 * Celular: Alguns jogos não funcionam, como é o caso do jogo da batalha de ritmo. O jogo da cobrinha também está dificil de usar […]
-* Tambem quero que já altere o "nexo-assist" para "Deskmate" que é como eu irei chamar este próximo projeto.
+* Tambem quero que já coloque o "Deskmate", que é como eu irei chamar este próximo projeto.
 * Também não é possível usar a localização no site "Clima"
 * Os toques também não estão funcionando no meu celular. […] Adicione também a música que você fez na dificuldade dificil da batalha de ritmo.`,
       "A smarter Zizi, phone fixes and the Deskmate project.",
-      "Zizi com minimax, jogos funcionando no celular, Deskmate no lugar do Nexo Assist e o Recife de Coral como toque.",
-      "Zizi with minimax, games working on the phone, Deskmate instead of Nexo Assist and Coral Reef as a ringtone."],
+      "Zizi com minimax, jogos funcionando no celular, o projeto Deskmate e o Recife de Coral como toque.",
+      "Zizi with minimax, games working on the phone, the Deskmate project and Coral Reef as a ringtone."],
     ["2026-11-26T03:16:02Z", `Eu na verdade gostaria de adicionar como este portfolio foi feito nos servidores/conversas do concord. Neste caso, como eu fiz para utilizar a IA neste projeto, você pode mostrar meus prompts, dizer qual modelo de IA eu usei e especificar que foi totalmente vibecodado, apenas com minhas ideias.
 Os bots usarão também das APIs do GROQ e Gemini né?
 Gostei do canal de voz fake`,

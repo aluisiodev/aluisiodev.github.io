@@ -20,7 +20,7 @@
     lixeira:  { titulo: "Lixeira", icone: "lixeira", w: 460, h: 320 },
     ajustes:  { titulo: "Painel de controle", icone: "ajustes", w: 540, h: 460 },
   };
-  PROJ.forEach((p) => (APPS["proj:" + p.id] = { titulo: p.nome, curto: p.curto, projeto: p, w: 640, h: 560 }));
+  PROJ.forEach((p) => (APPS["proj:" + p.id] = { titulo: p.nome, curto: p.curto, projeto: p, w: 760, h: 620 }));
   window.SKILLS.forEach((s) => (APPS["skill:" + s.id] = { titulo: "Propriedades de " + s.nome, curto: s.nome, icone: s.icone, item: s, w: 420, h: 300 }));
   window.CERTIFICADOS.forEach((c) => (APPS["cert:" + c.id] = { titulo: "Propriedades de " + c.nome, curto: c.curto || c.emissor, icone: "cert", item: c, w: 440, h: 300 }));
 
@@ -105,23 +105,64 @@
 
   // ---------- Projeto ----------
   function renderProjeto(el, ctx, p) {
-    const repo = p.repo.replace("https://github.com/aluisiodev/", "");
+    const T = ALU.T || ((pt) => pt);
+    const repo = p.repo.split("/").pop();
+    const imgs = p.imagens || [];
+    const lista = (xs) => `<ul class="lista">${xs.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`;
+    const selo = (im) => (im.mockup ? `<span class="pj-selo">MOCKUP</span>` : "");
     el.innerHTML = `
-      <div class="projeto">
-        <div class="hero" style="--c1:${p.cor[0]};--c2:${p.cor[1]}">${projIcone(p)}<div><h1>${esc(p.nome)}</h1><p>${esc(p.resumo)}</p></div></div>
-        <div class="pad">
-          <p>${esc(p.descricao)}</p>
-          <fieldset><legend>Destaques</legend><ul class="lista">${p.destaques.map((d) => `<li>${esc(d)}</li>`).join("")}</ul></fieldset>
-          <fieldset><legend>Stack</legend><div class="chips">${p.stack.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div></fieldset>
-          <div class="row">
-            <button class="btn" data-a="doghub">${ALU.pix("doghub")}<span>Ver no DogHub</span></button>
-            <button class="btn" data-a="peep">${ALU.pix("peep")}<span>Abrir no Peep Studio</span></button>
-            ${p.demo ? `<a class="btn" href="${esc(p.demo)}" target="_blank" rel="noopener">${ALU.pix("kez")}<span>Abrir site</span></a>` : ""}
+      <div class="projeto-wrap">
+        <div class="projeto">
+          <div class="hero" style="--c1:${p.cor[0]};--c2:${p.cor[1]}">${projIcone(p)}<div><h1>${esc(p.nome)}</h1><p>${esc(p.resumo)}</p></div></div>
+          <div class="pad">
+            ${p.contexto ? `<p class="pj-ctx"><span class="pj-tag" style="--c1:${p.cor[0]}">${esc(p.contexto.tipo)}</span>${esc(p.contexto.texto)}</p>` : ""}
+            ${imgs.length ? `
+            <figure class="pj-gal">
+              <button class="pj-main" data-i="0" aria-label="${T("Ampliar imagem", "Enlarge image")}"><img src="${esc(imgs[0].src)}" alt="${esc(imgs[0].legenda)}" loading="lazy">${selo(imgs[0])}</button>
+              <figcaption>${esc(imgs[0].legenda)}</figcaption>
+              ${imgs.length > 1 ? `<div class="pj-thumbs">${imgs.map((im, i) => `<button data-t="${i}" class="${i ? "" : "on"}" aria-label="${esc(im.legenda)}"><img src="${esc(im.src)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
+            </figure>` : ""}
+            ${p.problema ? `<fieldset><legend>${T("O problema", "The problem")}</legend><p class="pj-txt">${esc(p.problema)}</p></fieldset>` : ""}
+            <fieldset><legend>${T("Como funciona", "How it works")}</legend><p class="pj-txt">${esc(p.descricao)}</p></fieldset>
+            <fieldset><legend>${T("Destaques", "Highlights")}</legend>${lista(p.destaques)}</fieldset>
+            ${p.aprendizados ? `<fieldset><legend>${T("O que aprendi", "What I learned")}</legend>${lista(p.aprendizados)}</fieldset>` : ""}
+            ${p.equipe ? `<fieldset><legend>${T("Equipe", "Team")}</legend><div class="chips">${p.equipe.map((n) => `<span class="chip">${esc(n)}</span>`).join("")}</div></fieldset>` : ""}
+            <fieldset><legend>Stack</legend><div class="chips">${p.stack.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div></fieldset>
+            <div class="row">
+              ${p.demo ? `<a class="btn real" href="${esc(p.demo)}" target="_blank" rel="noopener">${ALU.pix("kez")}<span>${T("Abrir site", "Open site")}</span></a>` : ""}
+              <button class="btn" data-a="doghub">${ALU.pix("doghub")}<span>${T("Ver no DogHub", "See on DogHub")}</span></button>
+              <button class="btn" data-a="peep">${ALU.pix("peep")}<span>${T("Abrir no Peep Studio", "Open in Peep Studio")}</span></button>
+            </div>
           </div>
+        </div>
+        <div class="pj-lb" hidden role="dialog" aria-label="${T("Imagem ampliada", "Enlarged image")}">
+          <button class="pj-x" aria-label="${T("Fechar", "Close")}">×</button>
+          <button class="pj-nav" data-d="-1" aria-label="${T("Anterior", "Previous")}">◀</button>
+          <figure><img alt=""><figcaption></figcaption></figure>
+          <button class="pj-nav" data-d="1" aria-label="${T("Próxima", "Next")}">▶</button>
         </div>
       </div>`;
     el.querySelector('[data-a="doghub"]').onclick = () => ctx.abrir("kez", "doghub.com/aluisiodev/" + repo);
     el.querySelector('[data-a="peep"]').onclick = () => ctx.abrir("peep", "projetos/" + p.id + ".md");
+    if (!imgs.length) return;
+    const main = el.querySelector(".pj-main"), cap = el.querySelector(".pj-gal figcaption"), lb = el.querySelector(".pj-lb");
+    let atual = 0;
+    const mostrar = (i) => {
+      atual = (i + imgs.length) % imgs.length; const im = imgs[atual];
+      main.querySelector("img").src = im.src; main.querySelector("img").alt = im.legenda; main.classList.toggle("cel", !!im.celular);
+      main.querySelector(".pj-selo")?.remove(); main.insertAdjacentHTML("beforeend", selo(im));
+      cap.textContent = im.legenda;
+      el.querySelectorAll(".pj-thumbs button").forEach((b, j) => b.classList.toggle("on", j === atual));
+      if (!lb.hidden) ampliar();
+    };
+    const ampliar = () => { const im = imgs[atual]; lb.querySelector("img").src = im.src; lb.querySelector("img").alt = im.legenda; lb.querySelector("figcaption").textContent = `${im.legenda}${im.mockup ? " · mockup" : ""}  (${atual + 1}/${imgs.length})`; lb.hidden = false; lb.querySelector(".pj-x").focus(); };
+    main.classList.toggle("cel", !!imgs[0].celular);
+    el.querySelectorAll(".pj-thumbs button").forEach((b) => (b.onclick = () => mostrar(+b.dataset.t)));
+    main.onclick = ampliar;
+    lb.querySelectorAll(".pj-nav").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); mostrar(atual + +b.dataset.d); }));
+    lb.onclick = (e) => { if (e.target === lb || e.target.classList.contains("pj-x")) lb.hidden = true; };
+    lb.onkeydown = (e) => { if (e.key === "Escape") lb.hidden = true; else if (e.key === "ArrowLeft") mostrar(atual - 1); else if (e.key === "ArrowRight") mostrar(atual + 1); };
+    lb.querySelectorAll(".pj-nav").forEach((b) => (b.hidden = imgs.length < 2));
   }
 
   // ---------- Propriedades (skill / certificado) ----------

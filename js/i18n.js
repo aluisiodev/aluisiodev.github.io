@@ -48,21 +48,71 @@
     janela: ["Window · late afternoon", "The best time of the day. I live in Brazil and work remotely."],
   };
   ((window.QUARTO || {}).pontos || []).forEach((p) => { const t = QT[p.id]; if (t) { p.titulo = t[0]; p.texto = t[1]; if (t[2]) p.linkTexto = t[2]; } });
+  // projetos: os campos do data.js em inglês (as legendas seguem a ordem de imagens)
   const PJ = {
-    mirav: ["Marketing site for VisaVision, MiraV's smart mirror.",
-      "Company site with an interactive 3D mirror on the home page, product, about, contact and careers pages, plus a QR code screen for the big display. Contact and application forms go to a custom Go API, with validation, per-visitor rate limiting and anonymized IPs.",
-      ["Interactive mirror in three.js and a mascot on the home page", "Light theme and navy dark theme", "Go API using only the standard library, with tests", "Exported as a static site; API in Docker"]],
-    deskmate: ["Open-source AI agent that plugs into any service desk: it helps the end user and the analyst.",
-      "A self-hostable, open-source (MIT) AI agent for IT service desks. The employee describes the problem in a chat; the agent sets the priority, looks for similar tickets and opens or follows up on the ticket. The analyst sees everything in a dashboard. The agent isn't tied to one system: it talks to an ITicketSystem interface, and each service desk (GLPI, Jira, Zammad or an in-house system) gets an adapter. Work in progress, with the domain written first and covered by tests.",
-      ["ASP.NET Core (.NET 10) back end rewritten from scratch, with domain rules tested in xUnit", "One adapter per service desk behind the ITicketSystem interface; GLPI comes first", "Swappable AI providers (Gemini, Groq and Ollama) behind IChatModel, plus a basic mode without AI", "PostgreSQL with EF Core and migrations, Docker Compose for contributors"]],
-    doce: ["Bakery showcase where the order ends up ready on WhatsApp.",
-      "People browse the menu, build their order (quantity, flavor, customization) and finish by chatting with the baker on WhatsApp, with the message already written. No cart, login or payment: the site presents the work and hands over a ready conversation.",
-      ["Data-driven menu: each product defines its own questions", "Quantity, single choice, multiple choice and free text fields", "wa.me link built from the modal's choices", "Tests with Vitest and Playwright"]],
-    contentstack: ["ASP.NET Core app that renders content from a headless CMS.",
-      "Razor Pages app that consumes structured content from Contentstack through the Content Delivery API and renders it on the server. No content is hardcoded. The client is registered once through dependency injection, which keeps presentation separate from data access.",
-      ["Content model with a reference (author) and a global field (SEO)", "Contentstack client injected via DI as a singleton", "Credentials kept out of the repo with User Secrets", "Server-side rendering in C#"]],
+    mirav: {
+      tipo: "Course project", contexto: "Team project: the class created MiraV, a beauty-tech startup. I was the CTO and built the website and the API.",
+      resumo: "Marketing site for VisaVision, MiraV's smart mirror.",
+      problema: "In salons and barbershops, clients hesitate and skip a service because they can't picture the result. VisaVision shows the cut, color or beard on their own reflection before the appointment, and the site had to sell that idea to salon owners.",
+      descricao: "Company site with an interactive mirror on the home page, product, about, contact and careers pages, plus a QR code screen for the big display. Contact and application forms go to a custom Go API, with validation, per-visitor rate limiting and anonymized IPs.",
+      destaques: ["Interactive mirror on the home page: switch between cut, color, beard and aesthetics", "Miro, a pixel art robot that explains each section", "Light theme and navy dark theme, in Portuguese, English and Spanish", "Go API using only the standard library, with tests; site exported as static"],
+      aprendizados: ["Writing a Go API without a framework, with hand-made rate limiting and CORS", "Deploying the static site on Cloudflare and the API in Docker, each on its own free tier", "Translating a whole site into three languages without duplicating pages"],
+      legendas: ["Home with the interactive mirror and Miro", "Navy dark theme", "The five mirror shapes", "Careers, with 17 openings", "On a phone"],
+    },
+    tcc: {
+      tipo: "Team capstone (TCC)", contexto: "Final project for my Computer Science degree at UNIP (2026), advised by Prof. Marco Gomes. I was the researcher and writer, and presented the problem, the hypothesis and the AI pipeline.",
+      resumo: "Wearable belt that detects falls in older adults with AI, estimates the room area and alerts on Telegram.",
+      problema: "After a fall, what matters most is how long it takes for someone to notice. Panic buttons depend on the person who fell, GPS fails indoors and cameras invade privacy. The project aims for an automatic alert, with no camera and cheap parts (frugal innovation).",
+      descricao: "The belt (ESP32-C3 with an MPU6050 accelerometer and an AD8232 ECG) sends readings at 100 Hz over Bluetooth to antennas, which forward them over MQTT. On the computer, a Streamlit dashboard builds 2.5 s windows, computes 8 motion features and runs a Random Forest trained on the public SisFall dataset. When it detects a fall, it estimates the room quadrant from the antennas' signal strength and sends an alert on Telegram.",
+      destaques: ["Random Forest validated per volunteer: 98.8% of falls detected and 95.3% accuracy on normal activities", "Indoor location from the RSSI of 3 BLE antennas, with confidence and hysteresis", "Low-cost hardware in 3D-printed cases", "Automatic Telegram alert and history in SQLite"],
+      aprendizados: ["Adapting a public dataset to our sensor (200 to 100 Hz, same ranges as the MPU6050)", "Validating per volunteer so the model doesn't memorize the people it was trained on", "Writing and documenting scientific work as a team, including what hasn't been proven yet"],
+      legendas: ["Streamlit monitoring dashboard", "Fall alert on Telegram", "The belt assembled in its 3D-printed case", "Belt schematic: ESP32-C3, MPU6050, AD8232 and batteries", "Five-layer architecture", "Detector confusion matrix"],
+      equipe: ["Aluísio Alves · research and writing", "Enzo Orlandi · embedded system", "Erick Carvalho · architecture and software", "Kayky Crespo · PO and management"],
+    },
+    doce: {
+      tipo: "Client", contexto: "Site built for Ana Beatriz, a baker, and deployed on Vercel.",
+      resumo: "Bakery showcase where the order ends up ready on WhatsApp.",
+      problema: "Orders came in by message and each one needed the same questions: size, flavor, quantity, delivery. The site asks those questions up front and hands over a ready conversation, without changing the way Ana already sells.",
+      descricao: "People browse the menu, build their order (quantity, flavor, customization) and finish by chatting with the baker on WhatsApp, with the message already written. No cart, login or payment: the site presents the work and hands over a ready conversation.",
+      destaques: ["Data-driven menu: each product defines its own questions", "Quantity, single choice, multiple choice and free text fields", "wa.me link built from the modal's choices", "Tests with Vitest and Playwright"],
+      aprendizados: ["Listening to the client and cutting what she didn't need (cart, login, payment)", "Making content editable by a non-programmer: contact and menu in two files", "Shipping and maintaining a site someone uses for work"],
+      legendas: ["Home page", "Menu with category filter", "Building a cake order", "On a phone"],
+    },
+    deskmate: {
+      tipo: "Personal project · in progress", contexto: "My idea, design and code, from scratch. Open source (MIT). The images are design mockups of v0.1, not the running app.",
+      resumo: "Open-source AI agent that plugs into any service desk: it helps the end user and the analyst.",
+      problema: "Many IT tickets are repeated questions (\"what's the status of my ticket?\", \"the VPN won't connect\"). Employees wait and analysts spend time on what a lookup would solve. Deskmate automates that for any company: self-hosted, free to run and pluggable into the service desk it already uses (GLPI, Jira, Zammad or an in-house system).",
+      descricao: "A self-hostable, open-source (MIT) AI agent for IT service desks. The employee describes the problem in a chat; the agent sets the priority, looks for similar tickets and opens or follows up on the ticket. The analyst sees everything in a dashboard. The agent isn't tied to one system: it talks to an ITicketSystem interface, and each service desk gets an adapter. Work in progress, with the domain written first and covered by tests.",
+      destaques: ["ASP.NET Core (.NET 10) back end rewritten from scratch, with domain rules tested in xUnit", "One adapter per service desk behind the ITicketSystem interface; GLPI comes first", "Swappable AI providers (Gemini, Groq and Ollama) behind IChatModel, plus a basic mode without AI", "Its own agent loop instead of a framework, so there is no hidden behavior"],
+      aprendizados: ["Designing for contributors: CI, Conventional Commits and community files from day one", "Dependency inversion in practice: swap Gemini for Ollama or GLPI for Jira without touching the agent", "Planning a small v0.1 and saying no (YAGNI) to queues, Redis and microservices"],
+      legendas: ["Mockup: employee chat", "Mockup: analyst console", "Mockup: sign in"],
+    },
+    pedidos: {
+      tipo: "Team assignment (APS)", contexto: "Assignment for the Distributed Systems Development course (Computer Science, 8th semester).",
+      resumo: "Orders API in FastAPI with PostgreSQL and a React interface for customers and admins.",
+      problema: "The assignment asked for an orders API with real persistence, running in containers and reproducible with a single command, plus a web interface that used it.",
+      descricao: "The customer picks a product from the catalog and places the order; the admin area lists, filters and changes order statuses. The FastAPI API follows layers (API, Service, Repository), computes the total with Decimal and stores it in PostgreSQL with a schema versioned by Alembic. The built frontend is served by the API itself, so everything starts with docker compose up.",
+      destaques: ["API → Service → Repository layers, with tested business rules", "Money as Decimal and NUMERIC, never float", "Alembic migrations that run on their own when the container starts", "Integration tests that only run on a database ending in _test"],
+      aprendizados: ["Persistence that survives a container restart (volume and stateless API)", "Serving the SPA and the API from the same origin without the fallback swallowing API routes", "Splitting the work in a team with a closed scope and a tag for the delivered version"],
+      legendas: ["Customer catalog", "Admin: overview", "Admin: order list with filters", "Page that explains the architecture"],
+    },
+    contentstack: {
+      tipo: "Study", contexto: "Project to learn how to work with a headless CMS in .NET.",
+      resumo: "ASP.NET Core app that renders content from a headless CMS.",
+      problema: "With a headless CMS, writers publish content without waiting for a deploy. The app has to fetch that content and build the pages, with nothing hardcoded.",
+      descricao: "Razor Pages app that consumes structured content from Contentstack through the Content Delivery API and renders it on the server. No content is hardcoded. The client is registered once through dependency injection, which keeps presentation separate from data access.",
+      destaques: ["Content model with a reference (author) and a global field (SEO)", "Contentstack client injected via DI as a singleton", "Credentials kept out of the repo with User Secrets", "Server-side rendering in C#, with failures handled without breaking the page"],
+      aprendizados: ["When to use a reference (shares data) and when to use a global field (shares schema)", "Dependency injection in ASP.NET Core and why the client is a singleton", "Keeping secrets out of Git from the very first commit"],
+      legendas: [],
+    },
   };
-  (window.PROJETOS || []).forEach((p) => { const t = PJ[p.id]; if (t) [p.resumo, p.descricao, p.destaques] = t; });
+  (window.PROJETOS || []).forEach((p) => {
+    const t = PJ[p.id]; if (!t) return;
+    Object.assign(p, { resumo: t.resumo, descricao: t.descricao, destaques: t.destaques, problema: t.problema, aprendizados: t.aprendizados });
+    if (p.contexto) p.contexto = { tipo: t.tipo, texto: t.contexto };
+    (p.imagens || []).forEach((im, i) => { if (t.legendas[i]) im.legenda = t.legendas[i]; });
+    if (t.equipe) p.equipe = t.equipe;
+  });
 
   // ---------- interface ----------
   const D = {

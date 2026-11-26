@@ -201,10 +201,37 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .notepad textarea { flex: 1; resize: none; border: 0; outline: 0; margin: 0; padding: 8px 10px; font: 20px/1.15 var(--txt); color: #000; background: #fff; box-shadow: var(--sunken); user-select: text; }
 
 /* ---------- projeto ---------- */
-.projeto .hero { display: flex; gap: 16px; align-items: center; padding: 18px 16px; color: #fff; background: linear-gradient(var(--c1) 0 60%, var(--c2) 60%); box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); }
+.projeto .hero { display: flex; gap: 16px; align-items: center; padding: 18px 16px; color: #fff; background: linear-gradient(var(--c1) 0 60%, color-mix(in srgb, var(--c2) 72%, #000) 60%); box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); }
 .projeto .hero .pxi.tile { width: 64px; height: 64px; } .projeto .hero .pxi.tile b { font-size: 26px; }
-.projeto .hero h1 { margin: 0 0 2px; text-shadow: 2px 2px 0 rgba(0,0,0,.3); } .projeto .hero p { margin: 0; }
+.projeto .hero h1 { margin: 0 0 2px; text-shadow: 2px 2px 0 rgba(0,0,0,.45); } .projeto .hero p { margin: 0; text-shadow: 1px 1px 0 rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.45); }
 .projeto .pad > p { font-family: var(--txt); font-size: 20px; line-height: 1.1; }
+.projeto-wrap { position: relative; display: flex; flex-direction: column; min-height: 0; }
+.projeto-wrap > .projeto { flex: 1; min-height: 0; overflow: auto; }
+.projeto .pj-txt { margin: 0; font-family: var(--txt); font-size: 20px; line-height: 1.1; }
+.projeto .pad > p.pj-ctx { margin: 0 0 4px; font-family: inherit; font-size: 14px; line-height: 1.4; }
+.pj-tag { display: inline-block; margin-right: 8px; padding: 1px 8px; color: #fff; background: var(--c1); font-weight: 700; box-shadow: 2px 2px 0 rgba(0,0,0,.25); }
+.pj-gal { margin: 12px 0 0; }
+.pj-main { position: relative; display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in; background: #1b1426; box-shadow: 0 0 0 2px var(--line), 4px 4px 0 rgba(0,0,0,.18); }
+.pj-main img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.pj-main.cel img { object-fit: contain; object-position: center; }
+.pj-selo { position: absolute; top: 8px; right: 8px; padding: 1px 8px; font-size: 12px; font-weight: 700; color: #1b1426; background: #ffd23f; box-shadow: 2px 2px 0 rgba(0,0,0,.3); }
+.pj-gal figcaption { margin-top: 6px; font-size: 13px; opacity: .8; }
+.pj-thumbs { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; padding: 2px; }
+.pj-thumbs button { flex: 0 0 auto; width: 88px; padding: 0; border: 0; cursor: pointer; background: #1b1426; box-shadow: 0 0 0 2px var(--line); opacity: .65; }
+.pj-thumbs button.on, .pj-thumbs button:hover { opacity: 1; box-shadow: 0 0 0 2px var(--accent); }
+.pj-thumbs img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.pj-lb { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: rgba(15,12,24,.92); }
+.pj-lb[hidden] { display: none; }
+.pj-lb figure { flex: 1; min-width: 0; height: 100%; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.pj-lb img { max-width: 100%; max-height: calc(100% - 30px); object-fit: contain; box-shadow: 0 0 0 2px #fff; }
+.pj-lb figcaption { max-width: 100%; color: #fff; font-size: 14px; text-align: center; overflow-wrap: anywhere; }
+.pj-lb button { border: 0; cursor: pointer; color: #fff; background: rgba(255,255,255,.12); font: inherit; }
+.pj-lb .pj-nav { padding: 10px 8px; font-size: 18px; }
+.pj-lb .pj-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; font-size: 22px; line-height: 1; }
+.pj-lb button:hover, .pj-lb button:focus-visible { background: var(--accent); }
+.m-body .projeto-wrap > .projeto { overflow: visible; }
+.m-body .pj-lb { position: fixed; z-index: 50; }
+.dh-shot { display: block; width: 100%; max-width: 720px; box-shadow: 0 0 0 1px #d0d7de; }
 
 /* ---------- propriedades ---------- */
 .props { display: flex; flex-direction: column; height: 100%; padding: 8px; }
