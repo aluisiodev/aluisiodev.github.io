@@ -120,7 +120,9 @@
           <div class="dh-readme">
             <div class="dh-file">README.md</div>
             <div class="pad">
-              <h1>${esc(p.nome)}</h1><p>${esc(p.descricao)}</p>
+              <h1>${esc(p.nome)}</h1>${p.contexto ? `<p><b>${esc(p.contexto.tipo)}.</b> ${esc(p.contexto.texto)}</p>` : ""}
+              ${(p.imagens || [])[0] ? `<p><img class="dh-shot" src="${esc(p.imagens[0].src)}" alt="${esc(p.imagens[0].legenda)}" loading="lazy"></p>` : ""}
+              <p>${esc(p.descricao)}</p>
               <h3>${T("Destaques", "Highlights")}</h3><ul class="lista">${p.destaques.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
               <h3>Stack</h3><div class="chips">${p.stack.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>
               <div class="row">${real(p.repo, T("Sair da savana: ver código real", "Leave the savanna: see real code"))}${p.demo ? real(p.demo, T("Abrir site", "Open site")) : ""}<button class="btn sec" data-proj="${p.id}">${T("Abrir no Peep Studio", "Open in Peep Studio")}</button></div>

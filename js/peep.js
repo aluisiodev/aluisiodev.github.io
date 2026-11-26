@@ -142,7 +142,12 @@ class Program
     const readme = [`# ${P.nome}`, "", `> ${P.cargo}`, "", ...P.bio.flatMap((b) => [b, ""]), T("## Projetos", "## Projects"), ...PROJ.map((p) => `- [${p.nome}](projetos/${p.id}.md): ${p.resumo}`)].join("\n");
     const files = { "Aluisio.cs": cs, [LIVRO]: "", "README.md": readme };
     PROJ.forEach((p) => {
-      files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", p.descricao, "", T("## Destaques", "## Highlights"), ...p.destaques.map((d) => `- ${d}`), "", "## Stack", p.stack.join(" · "), "", `${T("Repositório", "Repository")}: ${p.repo}`].join("\n");
+      files[`projetos/${p.id}.md`] = [`# ${p.nome}`, "", ...(p.contexto ? [`> ${p.contexto.tipo}: ${p.contexto.texto}`, ""] : []),
+        ...(p.problema ? [T("## O problema", "## The problem"), p.problema, ""] : []),
+        T("## Como funciona", "## How it works"), p.descricao, "", T("## Destaques", "## Highlights"), ...p.destaques.map((d) => `- ${d}`), "",
+        ...(p.aprendizados ? [T("## O que aprendi", "## What I learned"), ...p.aprendizados.map((d) => `- ${d}`), ""] : []),
+        ...(p.equipe ? [T("## Equipe", "## Team"), p.equipe.join(", "), ""] : []),
+        "## Stack", p.stack.join(" · "), "", `${T("Repositório", "Repository")}: ${p.repo}`, ...(p.demo ? [`${T("Site", "Live site")}: ${p.demo}`] : [])].join("\n");
     });
     return files;
   }

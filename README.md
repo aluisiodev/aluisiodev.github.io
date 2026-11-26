@@ -3,9 +3,14 @@
 Portfolio em forma de sistema operacional em pixel art, no clima dos desktops de 2004–2007
 e de jogos como *Emily is Away* e *Killer Frequency*.
 
+**[Abrir o aluOS](https://aluisiodev.github.io/)**
+
+![aluOS com a janela do projeto Nexo Assist aberta](docs/aluos.webp)
+
 ## O que tem no desktop
 
 - **Pastas:** Sobre mim, Projetos, Contatos e Skills, abertas num explorador de arquivos.
+- **Projetos:** cada projeto abre numa janela com capturas de tela (clique para ampliar), contexto (cliente, trabalho de curso, APS, desafio), o problema que resolve, como funciona, destaques, o que aprendi, equipe, stack e links para o site e o código.
 - **Sobre mim:** `sobre_mim.txt` (bloco de notas) e `quarto_360.png`, um quarto panorâmico 360° com objetos clicáveis.
 - **MessagerTale:** messenger que começa com notificações no canto da tela. O visitante escolhe as respostas,
   a frase é "digitada" (qualquer tecla acelera) e o `aluisio.dev` responde.
@@ -22,6 +27,8 @@ Feito só com HTML, CSS e JavaScript, sem build. O quarto 360° usa three.js r12
 ## Editar o conteúdo
 
 Tudo fica em [`js/data.js`](js/data.js): perfil, contatos, skills, certificações, projetos e os pontos clicáveis do quarto.
+As capturas dos projetos ficam em `img/projetos/` (WebP, 960 px de largura) e entram no campo `imagens` de cada projeto.
+A versão em inglês dos projetos fica em [`js/i18n.js`](js/i18n.js).
 Os campos com `TODO` ainda precisam do seu texto.
 
 ### Trocar a imagem do quarto
