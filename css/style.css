@@ -201,9 +201,9 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .notepad textarea { flex: 1; resize: none; border: 0; outline: 0; margin: 0; padding: 8px 10px; font: 20px/1.15 var(--txt); color: #000; background: #fff; box-shadow: var(--sunken); user-select: text; }
 
 /* ---------- projeto ---------- */
-.projeto .hero { display: flex; gap: 16px; align-items: center; padding: 18px 16px; color: #fff; background: linear-gradient(var(--c1) 0 60%, var(--c2) 60%); box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); }
+.projeto .hero { display: flex; gap: 16px; align-items: center; padding: 18px 16px; color: #fff; background: linear-gradient(var(--c1) 0 60%, color-mix(in srgb, var(--c2) 72%, #000) 60%); box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); }
 .projeto .hero .pxi.tile { width: 64px; height: 64px; } .projeto .hero .pxi.tile b { font-size: 26px; }
-.projeto .hero h1 { margin: 0 0 2px; text-shadow: 2px 2px 0 rgba(0,0,0,.3); } .projeto .hero p { margin: 0; }
+.projeto .hero h1 { margin: 0 0 2px; text-shadow: 2px 2px 0 rgba(0,0,0,.45); } .projeto .hero p { margin: 0; text-shadow: 1px 1px 0 rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.45); }
 .projeto .pad > p { font-family: var(--txt); font-size: 20px; line-height: 1.1; }
 .projeto-wrap { position: relative; display: flex; flex-direction: column; min-height: 0; }
 .projeto-wrap > .projeto { flex: 1; min-height: 0; overflow: auto; }

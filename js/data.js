@@ -173,7 +173,7 @@ window.PROJETOS = [
     id: "deskmate",
     nome: "Deskmate",
     curto: "Deskmate",
-    cor: ["#0F766E", "#22D3EE"],
+    cor: ["#FF2E88", "#7B2FF7"],
     sigla: "Dm",
     contexto: { tipo: "Projeto pessoal · em construção", texto: "Ideia, design e código meus, do zero. Open source (MIT). As imagens são mockups do design da v0.1, não o app rodando." },
     resumo: "Agent de IA open-source que se pluga em qualquer service desk: atende o usuário e ajuda o analista.",
