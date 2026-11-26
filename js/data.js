@@ -63,7 +63,7 @@ window.QUARTO = {
 };
 
 // Cada projeto vira uma janela em Projetos. Campos:
-//   contexto: { tipo, texto }  de onde veio o projeto (cliente, curso, APS, desafio, pessoal)
+//   contexto: { tipo, texto }  de onde veio o projeto (cliente, curso, APS, pessoal)
 //   problema: o problema que ele resolve
 //   aprendizados: o que eu aprendi fazendo
 //   imagens: capturas em img/projetos/ ({ src, legenda }); mockup: true marca imagens de design
@@ -108,9 +108,9 @@ window.PROJETOS = [
     curto: "Nexo Assist",
     cor: ["#1E3A8A", "#2563EB"],
     sigla: "Nx",
-    contexto: { tipo: "Desafio técnico", texto: "Agent de IA para o service desk de TI de uma empresa fictícia, a Nexo, com um sistema de chamados legado simulado e instável de propósito." },
+    contexto: { tipo: "Primeira versão do Deskmate", texto: "Projeto meu, feito do zero com o meu tempo e os meus recursos, para uma empresa fictícia (a Nexo) com um sistema de chamados legado simulado e instável de propósito. Ele virou a base do Deskmate, que estou reescrevendo como open source." },
     resumo: "Agent de IA que atende o service desk de TI e chama um analista quando precisa.",
-    problema: "Boa parte dos chamados de TI são perguntas repetidas (\"qual o status do meu chamado?\", \"a VPN não conecta\"). O funcionário espera, e o analista perde tempo com o que uma consulta resolveria. O desafio era automatizar isso sem deixar o modelo inventar prazo, prioridade ou mexer em chamado de outra pessoa.",
+    problema: "Boa parte dos chamados de TI são perguntas repetidas (\"qual o status do meu chamado?\", \"a VPN não conecta\"). O funcionário espera, e o analista perde tempo com o que uma consulta resolveria. A ideia era automatizar isso sem deixar o modelo inventar prazo, prioridade ou mexer em chamado de outra pessoa.",
     descricao:
       "O funcionário descreve o problema num chat. O agent consulta os chamados dele, busca na central de ajuda, prepara rascunhos de chamado para ele confirmar e transfere para um analista quando precisa. O analista acompanha tudo num console, com o motivo de cada decisão do agent. Princípio do projeto: o LLM entende a conversa; o código decide as regras.",
     destaques: [
@@ -174,7 +174,7 @@ window.PROJETOS = [
     sigla: "Dm",
     contexto: { tipo: "Projeto pessoal · em construção", texto: "Open source (MIT). As imagens são mockups do design da v0.1, não o app rodando." },
     resumo: "Agent de IA open-source que se pluga em qualquer service desk: atende o usuário e ajuda o analista.",
-    problema: "O Nexo Assist resolveu um service desk específico. O Deskmate é a versão para qualquer empresa: auto-hospedado, sem custo para rodar e plugável no service desk que ela já usa (GLPI, Jira, Zammad ou um sistema próprio).",
+    problema: "O Nexo Assist, a primeira versão, atendia um service desk específico. O Deskmate pega o que funcionou nele e vira um produto open source para qualquer empresa: auto-hospedado, sem custo para rodar e plugável no service desk que ela já usa (GLPI, Jira, Zammad ou um sistema próprio).",
     descricao:
       "Um agent de IA auto-hospedável e de código aberto (MIT) para service desks de TI. O funcionário descreve o problema num chat; o agent classifica a prioridade, procura chamados parecidos e abre ou acompanha o chamado. O analista vê tudo num painel. O agent não depende de um sistema específico: conversa com uma interface ITicketSystem, e cada service desk ganha um adaptador. Em construção, com o domínio escrito primeiro e coberto por testes.",
     destaques: [

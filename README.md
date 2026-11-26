@@ -10,7 +10,7 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 ## O que tem no desktop
 
 - **Pastas:** Sobre mim, Projetos, Contatos e Skills, abertas num explorador de arquivos.
-- **Projetos:** cada projeto abre numa janela com capturas de tela (clique para ampliar), contexto (cliente, trabalho de curso, APS, desafio), o problema que resolve, como funciona, destaques, o que aprendi, equipe, stack e links para o site e o código.
+- **Projetos:** cada projeto abre numa janela com capturas de tela (clique para ampliar), contexto (cliente, trabalho de curso, APS, projeto pessoal), o problema que resolve, como funciona, destaques, o que aprendi, equipe, stack e links para o site e o código.
 - **Sobre mim:** `sobre_mim.txt` (bloco de notas) e `quarto_360.png`, um quarto panorâmico 360° com objetos clicáveis.
 - **MessagerTale:** messenger que começa com notificações no canto da tela. O visitante escolhe as respostas,
   a frase é "digitada" (qualquer tecla acelera) e o `aluisio.dev` responde.
