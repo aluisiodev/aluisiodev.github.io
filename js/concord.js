@@ -45,7 +45,7 @@
   // uma mensagem no estilo do Concord
   const msg = (autor, corpo, hora = "", extra = "") => {
     const m = membro(autor);
-    return `<div class="cc-msg ${autor}"><span class="cc-av">${AV[autor] ? AV[autor]() : ""}</span><div class="cc-col">
+    return `<div class="cc-msg cc-de-${autor}"><span class="cc-av">${AV[autor] ? AV[autor]() : ""}</span><div class="cc-col">
       <div class="cc-quem"><b style="color:${m.cor}">${esc(m.nome)}</b>${m.tag ? `<i class="cc-tag${m.tag === "BOT" || m.tag === "IA" ? " bot" : ""}">${esc(m.tag)}</i>` : ""}<small>${esc(hora)}</small>${extra}</div>
       <div class="cc-txt">${corpo}</div></div></div>`;
   };

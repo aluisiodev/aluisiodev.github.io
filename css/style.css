@@ -917,7 +917,7 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .cc-tag.bot { background: #5865f2; color: #fff; }
 .cc-num { color: var(--cc-mu); font-size: 11px; } .cc-via { font-size: 10px; color: #8fe3cf; border: 1px solid #2fbfa8; padding: 0 4px; border-radius: 3px; }
 .cc-txt p { margin: 2px 0; } .cc-txt ul, .cc-txt ol { margin: 4px 0; padding-left: 20px; } .cc-txt li { margin: 3px 0; }
-.cc-msg.claude .cc-txt { text-transform: lowercase; color: #f3dccf; }
+.cc-msg.cc-de-claude .cc-txt { text-transform: lowercase; color: #f3dccf; }
 .cc-prompt { white-space: pre-wrap; margin: 4px 0; padding: 8px 10px; background: #1d1b2e; border-left: 3px solid #ffd23f; font: 17px/1.15 var(--txt); color: #f1eefc; border-radius: 0 4px 4px 0; }
 .cc-resumo { color: #ffd23f; } .cc-resp { color: #f3dccf; }
 .cc-par { border-bottom: 1px solid #2f2b48; padding-bottom: 4px; }
