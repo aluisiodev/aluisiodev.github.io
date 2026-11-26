@@ -3,7 +3,7 @@
 (function () {
   const ALU = window.ALU, esc = (s) => ALU.esc(s), T = (pt, en) => (ALU.lang === "en" ? en : pt);
   const P = window.PERFIL, PROJ = window.PROJETOS;
-  const repoDe = (p) => p.repo.replace("https://github.com/aluisiodev/", "");
+  const repoDe = (p) => p.repo.split("/").pop();
   const real = (href, txt) => `<a class="btn real" href="${esc(href)}" target="_blank" rel="noopener">${esc(txt)} ↗</a>`;
 
   const PAGINAS = [
@@ -116,7 +116,7 @@
         if (!p) return null;
         return `
         <div class="dh-page">
-          <header class="dh-top">${ALU.pix("doghub")}<b>DogHub</b><span><button class="link" data-ir="doghub.com/aluisiodev">aluisiodev</button> / <b>${esc(repoDe(p))}</b></span></header>
+          <header class="dh-top">${ALU.pix("doghub")}<b>DogHub</b><span>${p.repo.split("/")[3] === "aluisiodev" ? `<button class="link" data-ir="doghub.com/aluisiodev">aluisiodev</button>` : esc(p.repo.split("/")[3])} / <b>${esc(repoDe(p))}</b></span></header>
           <div class="dh-readme">
             <div class="dh-file">README.md</div>
             <div class="pad">

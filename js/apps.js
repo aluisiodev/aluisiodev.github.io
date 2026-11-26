@@ -106,7 +106,7 @@
   // ---------- Projeto ----------
   function renderProjeto(el, ctx, p) {
     const T = ALU.T || ((pt) => pt);
-    const repo = p.repo.replace("https://github.com/aluisiodev/", "");
+    const repo = p.repo.split("/").pop();
     const imgs = p.imagens || [];
     const lista = (xs) => `<ul class="lista">${xs.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`;
     const selo = (im) => (im.mockup ? `<span class="pj-selo">MOCKUP</span>` : "");

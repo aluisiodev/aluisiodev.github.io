@@ -59,6 +59,16 @@
       aprendizados: ["Writing a Go API without a framework, with hand-made rate limiting and CORS", "Deploying the static site on Cloudflare and the API in Docker, each on its own free tier", "Translating a whole site into three languages without duplicating pages"],
       legendas: ["Home with the interactive mirror and Miro", "Navy dark theme", "The five mirror shapes", "Careers, with 17 openings", "On a phone"],
     },
+    tcc: {
+      tipo: "Team capstone (TCC)", contexto: "Final project for my Computer Science degree at UNIP (2026), advised by Prof. Marco Gomes. I was the researcher and writer, and presented the problem, the hypothesis and the AI pipeline.",
+      resumo: "Wearable belt that detects falls in older adults with AI, estimates the room area and alerts on Telegram.",
+      problema: "After a fall, what matters most is how long it takes for someone to notice. Panic buttons depend on the person who fell, GPS fails indoors and cameras invade privacy. The project aims for an automatic alert, with no camera and cheap parts (frugal innovation).",
+      descricao: "The belt (ESP32-C3 with an MPU6050 accelerometer and an AD8232 ECG) sends readings at 100 Hz over Bluetooth to antennas, which forward them over MQTT. On the computer, a Streamlit dashboard builds 2.5 s windows, computes 8 motion features and runs a Random Forest trained on the public SisFall dataset. When it detects a fall, it estimates the room quadrant from the antennas' signal strength and sends an alert on Telegram.",
+      destaques: ["Random Forest validated per volunteer: 98.8% of falls detected and 95.3% accuracy on normal activities", "Indoor location from the RSSI of 3 BLE antennas, with confidence and hysteresis", "Low-cost hardware in 3D-printed cases", "Automatic Telegram alert and history in SQLite"],
+      aprendizados: ["Adapting a public dataset to our sensor (200 to 100 Hz, same ranges as the MPU6050)", "Validating per volunteer so the model doesn't memorize the people it was trained on", "Writing and documenting scientific work as a team, including what hasn't been proven yet"],
+      legendas: ["Streamlit monitoring dashboard", "Fall alert on Telegram", "The belt assembled in its 3D-printed case", "Belt schematic: ESP32-C3, MPU6050, AD8232 and batteries", "Five-layer architecture", "Detector confusion matrix"],
+      equipe: ["Aluísio Alves · research and writing", "Enzo Orlandi · embedded system", "Erick Carvalho · architecture and software", "Kayky Crespo · PO and management"],
+    },
     doce: {
       tipo: "Client", contexto: "Site built for Ana Beatriz, a baker, and deployed on Vercel.",
       resumo: "Bakery showcase where the order ends up ready on WhatsApp.",
@@ -101,6 +111,7 @@
     Object.assign(p, { resumo: t.resumo, descricao: t.descricao, destaques: t.destaques, problema: t.problema, aprendizados: t.aprendizados });
     if (p.contexto) p.contexto = { tipo: t.tipo, texto: t.contexto };
     (p.imagens || []).forEach((im, i) => { if (t.legendas[i]) im.legenda = t.legendas[i]; });
+    if (t.equipe) p.equipe = t.equipe;
   });
 
   // ---------- interface ----------

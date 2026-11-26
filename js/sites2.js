@@ -6,7 +6,7 @@
   const conq = (...a) => ALU.conquista && ALU.conquista(...a);
   const EN = ALU.lang === "en", T = (pt, en) => (EN ? en : pt);
   const ls = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-  const repoDe = (p) => p.repo.replace("https://github.com/aluisiodev/", "");
+  const repoDe = (p) => p.repo.split("/").pop();
   const sem = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
   // pixel art a partir de linhas de texto: cada caractere é uma cor da paleta ("." = vazio)
