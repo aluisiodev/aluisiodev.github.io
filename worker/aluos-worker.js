@@ -106,7 +106,8 @@ Pode mostrar um exemplo curto de código, uma instrução por linha, sem cercas 
 
 const JOGOS = ["velha", "voador", "ritmo"];
 // pontuação máxima que dá para fazer em cada jogo (ritmo: 128 notas × 300 × 2,5 no difícil = 96.000)
-const TETO = { velha: 1000, voador: 2000, ritmo: 100000 };
+const TETO = { velha: 1000, voador: 2000, ritmo: 96000 };
+const NOMES_POR_PESSOA = 3; // quantos nomes a mesma pessoa (IP) pode ter em cada ranking
 // a IA às vezes continua a conversa sozinha ("pessoa: ... você: ..."): corta isso
 const PARAR = ["\npessoa:", "\nvisitante:", "\nvocê:", "\nuser:", "\nPessoa:"];
 function so_minha_fala(txt) {
@@ -127,6 +128,17 @@ const limpa = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, "").trim()
 
 // limite por IP guardado na memória do Worker (cada servidor da Cloudflare conta separado; é um freio, não um muro)
 const BALDES = new Map();
+// placar do jogo da velha: partidas que ainda não foram gravadas no KV (veja a rota /placar)
+const PLACAR_PENDENTE = { todos: 0, zizi: 0, velha: 0 }, PLACAR_GRAVADO = { em: 0 };
+// IPv6: cada casa/servidor recebe um bloco /64 inteiro (2^64 endereços). Se cada endereço contasse como uma pessoa,
+// uma só máquina teria identidades infinitas. Então IPv6 vale pelo bloco /64; IPv4 fica como está.
+function idDaRede(ip) {
+  if (!ip.includes(":")) return ip;
+  if (ip.includes(".")) return ip.slice(ip.lastIndexOf(":") + 1); // ::ffff:1.2.3.4 é IPv4
+  const [a, b = ""] = ip.split("::"), A = a ? a.split(":") : [], B = b ? b.split(":") : [];
+  const todos = ip.includes("::") ? [...A, ...Array(Math.max(0, 8 - A.length - B.length)).fill("0"), ...B] : A;
+  return todos.slice(0, 4).map((x) => (parseInt(x, 16) || 0).toString(16)).join(":") + "::/64";
+}
 function passouDoLimite(chave, max) {
   const min = Math.floor(Date.now() / 60000), k = chave + ":" + min, n = (BALDES.get(k) || 0) + 1;
   BALDES.set(k, n);
@@ -256,7 +268,7 @@ export default {
     // 2. Limite por IP em memória (não gasta escrita do KV, que no plano grátis é 1.000 por dia).
     //    Chat: 12 por minuto. Demais POSTs: 20 por minuto. Compilar C#: 6 por minuto.
     // 3. GET também tem limite (antes não tinha): 60 por minuto, e as rotas de admin só 5 por minuto (contra força bruta na chave).
-    const ip = req.headers.get("CF-Connecting-IP") || "?";
+    const ip = idDaRede(req.headers.get("CF-Connecting-IP") || "?");
     if (req.method === "POST") {
       if (!origens.includes("*") && !origens.includes(quem)) return json({ erro: "origem não permitida" }, 403); // POST sem Origin também é barrado
       const tipo = rota === "/" || rota === "/chat" || rota === "/concord" ? "chat" : rota === "/csharp" ? "cs" : "post", max = { chat: 12, cs: 6, post: 20 }[tipo];
@@ -272,11 +284,22 @@ export default {
     if (rota === "/placar") {
       const p = await ler("placar:velha", { todos: 0, zizi: 0, velha: 0 });
       if (req.method === "POST") {
-        const q = { todos: "todos", zizi: "zizi", velha: "velha" }[corpo.vencedor];
+        const q = Object.hasOwn(PLACAR_PENDENTE, corpo.vencedor) ? corpo.vencedor : null; // hasOwn: "constructor" etc. não passam
         if (!q) return json({ erro: "vencedor inválido" }, 400);
-        p[q] = (p[q] || 0) + 1; await gravar("placar:velha", p);
+        PLACAR_PENDENTE[q]++;
+        // junta as partidas e grava no máximo 1 vez por minuto por servidor: antes cada partida gastava 1 gravação
+        // da cota diária do KV, e um script esgotava a cota em menos de 1 hora. Se este servidor da Cloudflare for
+        // desligado antes de gravar, as partidas do último minuto dele se perdem (é só um placar de brincadeira).
+        if (Date.now() - PLACAR_GRAVADO.em > 60e3) {
+          for (const k in PLACAR_PENDENTE) { p[k] = (p[k] || 0) + PLACAR_PENDENTE[k]; PLACAR_PENDENTE[k] = 0; }
+          PLACAR_GRAVADO.em = Date.now();
+          await gravar("placar:velha", p);
+          return json(p);
+        }
       }
-      return json(p);
+      const soma = { ...p };
+      for (const k in PLACAR_PENDENTE) soma[k] = (soma[k] || 0) + PLACAR_PENDENTE[k];
+      return json(soma);
     }
 
     // ---------- ranking ----------
@@ -289,12 +312,18 @@ export default {
         if (pontos < 0 || pontos > TETO[jogo]) return json({ erro: "pontuação impossível" }, 400);
         const dono = await apelidoIP(ip, env);
         if (!dono) return json({ erro: "servidor sem IP_SAL/CHAVE_ADMIN configurada" }, 503);
-        // cada nome é de quem o publicou primeiro (pelo hash do IP); entradas antigas, sem dono, ficam como estão
+        // cada nome é de quem o publicou primeiro (pelo hash do IP). Entradas antigas, de antes do dono existir,
+        // ficam com quem publicar esse nome de novo primeiro (antes davam 409 para sempre).
         const i = r.findIndex((x) => x.nome.toLowerCase() === nome.toLowerCase());
-        if (i >= 0 && r[i].dono !== dono) return json({ erro: "esse nome já é de outra pessoa no ranking" }, 409);
-        if (i >= 0) r[i].pontos = Math.max(r[i].pontos, pontos); else r.push({ nome, pontos, quando: Date.now(), dono });
-        r = r.sort((a, b) => b.pontos - a.pontos).slice(0, 50);
-        await gravar("ranking:" + jogo, r);
+        if (i >= 0 && r[i].dono && r[i].dono !== dono) return json({ erro: "esse nome já é de outra pessoa no ranking" }, 409);
+        // cada pessoa tem no máximo 3 nomes por jogo: sem isso, um script enchia as 50 vagas com a pontuação máxima
+        if (i < 0 && r.filter((x) => x.dono === dono).length >= NOMES_POR_PESSOA) return json({ erro: "você já tem 3 nomes neste ranking" }, 409);
+        // só grava se algo mudou (cada gravação gasta a cota diária do KV)
+        const mudou = i < 0 || pontos > r[i].pontos || r[i].dono !== dono;
+        if (i >= 0) { r[i].pontos = Math.max(r[i].pontos, pontos); r[i].dono = dono; } else r.push({ nome, pontos, quando: Date.now(), dono });
+        // empate: quem fez primeiro fica na frente
+        r = r.sort((a, b) => b.pontos - a.pontos || (a.quando || 0) - (b.quando || 0)).slice(0, 50);
+        if (mudou) await gravar("ranking:" + jogo, r);
       }
       return json(r.slice(0, 20).map(({ dono: _, ...x }) => x));
     }
@@ -308,15 +337,21 @@ export default {
         const lista = await ler("visitas", []), hoje = v.quando.slice(0, 10), deHoje = lista.filter((x) => String(x.quando).startsWith(hoje));
         // anti-spam sem gastar escrita extra: cada pessoa (IP) assina até 3 vezes por dia. Não existe mais um teto
         // global por dia: antes ~34 IPs lotavam o livro e ninguém mais conseguia assinar até o dia seguinte.
-        if (deHoje.filter((x) => x.quem === v.quem).length >= 3) return json({ ok: true, repetido: true });
+        // "n" conta quantas vezes a assinatura foi enviada hoje: reassinar com o mesmo nome também conta no limite
+        // (antes reassinar substituía a anterior e o contador nunca chegava a 3, então cada envio gravava no KV)
+        if (deHoje.filter((x) => x.quem === v.quem).reduce((t, x) => t + (x.n || 1), 0) >= 3) return json({ ok: true, repetido: true });
         // a mesma pessoa assinando de novo com o mesmo nome só atualiza a assinatura
         const i = lista.findIndex((x) => x.quem === v.quem && x.nome.toLowerCase() === v.nome.toLowerCase());
-        if (i >= 0) lista.splice(i, 1);
-        lista.unshift(v); await gravar("visitas", lista.slice(0, 1000));
+        if (i >= 0) { if (String(lista[i].quando).startsWith(hoje)) v.n = (lista[i].n || 1) + 1; lista.splice(i, 1); }
+        lista.unshift(v);
+        // passou de 1000: as mais antigas vão para "visitas:arquivo" em vez de sumir (antes eram apagadas)
+        if (lista.length > 1000) { const arq = await ler("visitas:arquivo", []); await gravar("visitas:arquivo", [...lista.slice(1000), ...arq].slice(0, 10000)); }
+        await gravar("visitas", lista.slice(0, 1000));
         return json({ ok: true, total: lista.length });
       }
       if (!(await ehAdmin(req, url, env))) return json({ erro: "só o Aluísio pode ler 🙂" }, 403);
-      return json((await ler("visitas", [])).map(({ quem: _, ...v }) => v));
+      // ?arquivo mostra as assinaturas antigas, que saíram da lista principal
+      return json((await ler(url.searchParams.has("arquivo") ? "visitas:arquivo" : "visitas", [])).map(({ quem: _, n: __, ...v }) => v));
     }
 
     // ---------- chat com IA: Gemini primeiro, Groq de reserva ----------
@@ -453,7 +488,8 @@ export default {
       }
       if (!faixas) return cache ? json(cache) : json({ erro: "não consegui ler a playlist" }, 502);
       const res = { nome, capa, faixas, quando: Date.now() };
-      await gravar("musicas:" + id, res);
+      // se a cota do KV acabou, ainda devolve a playlist nova (antes virava 503 para todo mundo)
+      try { await gravar("musicas:" + id, res); } catch {}
       return json(res);
     }
 

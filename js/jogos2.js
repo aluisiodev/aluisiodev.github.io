@@ -43,7 +43,7 @@
       if (!ALU.api) return;
       const r = await ALU.api.enviarRanking(jogo, n, minhaMarca());
       if (r && r.erro) { // o servidor recusou: nome de outra pessoa (409) ou pontuação fora do possível (400)
-        aviso.textContent = r.status === 409 ? T("Esse nome já é de outra pessoa no ranking. Escolha outro 🙂", "That name already belongs to someone else. Pick another 🙂") : T("O servidor recusou essa pontuação.", "The server refused that score.");
+        aviso.textContent = r.status === 409 && /3 nomes/.test(r.erro) ? T("Você já tem 3 nomes neste ranking. Use um deles 🙂", "You already have 3 names on this leaderboard. Use one of them 🙂") : r.status === 409 ? T("Esse nome já é de outra pessoa no ranking. Escolha outro 🙂", "That name already belongs to someone else. Pick another 🙂") : T("O servidor recusou essa pontuação.", "The server refused that score.");
         nome.focus(); return;
       }
       aviso.textContent = avisoPadrao;
