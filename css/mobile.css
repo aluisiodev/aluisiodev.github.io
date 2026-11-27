@@ -272,3 +272,9 @@
 .m-body .ex-main { display: block; }
 .m-body .ex-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .peep.mob:not(.saida) .po-body { display: none; }
+
+/* iPhone: o Safari dá zoom na página quando um campo com fonte menor que 16px recebe foco
+   (terminal, URL do Kez(i)avana, Concord, commit e ranking). 16px nos campos evita o zoom.
+   O textarea do editor fica de fora: ele precisa da mesma fonte do realce de sintaxe embaixo dele.
+   Só os campos menores que 16px entram aqui (o do MessagerTale já é maior). */
+body[data-modo="mobile"] :is(.term-in, .cc-in, .kz-url input, .pm-msg, .rk-nome) { font-size: 16px; }

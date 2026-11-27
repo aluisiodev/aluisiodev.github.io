@@ -37,9 +37,9 @@
   async function assinar(dados) {
     ls.set("alu.visitante", dados);
     const r = await chamar("/visitas", { ...dados, idioma: ALU.lang });
-    // sem servidor, o GoatCounter também registra o nome (a pessoa escolheu se identificar)
-    evento("livro-de-visitas/" + dados.nome.slice(0, 40), "Assinou o livro de visitas");
-    return !!r || !!CFG().goatcounter;
+    // o GoatCounter só conta que alguém assinou; o nome fica no servidor, protegido pela CHAVE_ADMIN
+    evento("livro-de-visitas", "Assinou o livro de visitas");
+    return !!r;
   }
 
   // ---------- GoatCounter (estatística de visitas, sem cookies) ----------

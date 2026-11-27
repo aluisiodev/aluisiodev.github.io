@@ -65,7 +65,7 @@
   ALU.bip = bip;
   ALU.chat = function (el, ctx) {
     const P = window.PERFIL, NOS = roteiro(ctx.mobile);
-    const eu = P.usuario, voce = "visitante";
+    const eu = P.usuario, voce = T("visitante", "visitor");
     el.innerHTML = `
       <div class="chat">
         <div class="menubar"><span>${T("Arquivo", "File")}</span><span>${T("Editar", "Edit")}</span><span>${T("Inserir", "Insert")}</span><span class="chat-pessoas-bt" role="button" tabindex="0">${T("Pessoas", "People")} ▾</span><button class="chat-som" aria-label="${T("Som", "Sound")}"></button></div>

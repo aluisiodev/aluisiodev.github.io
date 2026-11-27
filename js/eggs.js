@@ -11,7 +11,7 @@
     ["memoria", "Memória de elefante"], ["pato-evoluiu", "O pato evoluiu"], ["nudge", "Chamando atenção"], ["luminaria", "Iluminado"],
     ["turista", "Turista do quarto"], ["desligar", "Pode desligar"], ["professor", "Professor de bot"], ["bonzinho", "Amizade com Zizi"],
     ["ebaa", "Membro do fórum"], ["recado", "Deixou recado"], ["segunda", "Odeio segunda-feira"], ["barrel", "Deu um giro"], ["musikzify", "Trilha sonora"],
-    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"], ["tema", "Nostalgia de 2009"], ["banco", "Rico de experiência"], ["ligacao", "Alô?"], ["toques", "Toque polifônico"], ["clima-local", "Previsão sob medida"], ["ritmo-coral", "Mergulhador"],, ["concord-prompts", "Bastidores"], ["concord-bot", "Falou com um bot"], ["concord-voz", "Madrugada no Concord"]
+    ["voador", "Asas de pato"], ["plantao", "Sobreviveu ao plantão"], ["ritmo", "Ritmo de batalha"], ["ligadin", "Engajamento orgânico"], ["commit", "Primeiro commit"], ["talentos", "Banco de talentos"], ["tema", "Nostalgia de 2009"], ["banco", "Rico de experiência"], ["ligacao", "Alô?"], ["toques", "Toque polifônico"], ["clima-local", "Previsão sob medida"], ["ritmo-coral", "Mergulhador"], ["concord-prompts", "Bastidores"], ["concord-bot", "Falou com um bot"], ["concord-voz", "Madrugada no Concord"]
   ];
   // títulos e descrições em inglês, por id (vale para qualquer lugar que chame ALU.conquista)
   const CONQ_EN = {
