@@ -136,7 +136,8 @@
         if (st.proxBlitz <= 0) {
           st.proxBlitz = Math.max(450, 1100 - st.alerta * 120) * (0.8 + Math.random() * 0.4);
           const livre = Math.floor(Math.random() * 3);
-          st.objs = st.objs.filter((o) => o.z < st.z + 60 || o.z > st.z + 80);
+          // o que está longe some (ainda é um pontinho no horizonte), pra ninguém tampar a faixa livre na hora da blitz
+          st.objs = st.objs.filter((o) => o.z - st.z < 25);
           for (let f = 0; f < 3; f++) if (f !== livre) { surgir("blitz", f); surgir("cone", f, { z: st.z + 68.8, x: FAIXAS[f] - 0.14 }); surgir("cone", f, { z: st.z + 68.8, x: FAIXAS[f] + 0.14 }); }
           aviso(T("BLITZ À FRENTE!", "ROADBLOCK AHEAD!"), "#ffd23f"); tom(523, 0.12, "square", 0.04); tom(392, 0.18, "square", 0.04, 0.13);
         }
