@@ -6,7 +6,7 @@
 window.PERFIL = {
   nome: "Aluísio",
   nomeCompleto: "Aluísio Alves",     // aparece no LigadIn
-  headline: "Software Developer | C# / .NET | TypeScript & React | Redis | Docker | REST APIs",
+  headline: ".NET Developer | Backend Developer | C# · ASP.NET Core · PostgreSQL · REST APIs · Microservices · Redis · Docker | LLM Integration & AI Agents",
   usuario: "aluisio.dev",            // nome no MessagerTale
   foto: "img/aluisio.png",          // foto do MessagerTale e dos perfis
   cargo: "Desenvolvedor de software", // TODO: ajuste (ex.: "Desenvolvedor full stack")
@@ -46,9 +46,30 @@ window.CERTIFICADOS = [
 
 // Experiência (perfil do LigadIn).
 window.EXPERIENCIAS = [
-  { cargo: "Back-end Developer", empresa: "Intervalor", tipo: "Internship", periodo: "Oct 2025 - Aug 2026 · 11 mos" },
+  { cargo: "Dotnet Developer", empresa: "Intervalor", tipo: "Internship", periodo: "Oct 2025 - Aug 2026 · 11 mos" },
   { cargo: "Telemarketing Operational Support", empresa: "LBV - Legião da Boa Vontade", tipo: "1 yr 5 mos", periodo: "Oct 2024 - Sep 2025 · 1 yr" },
 ];
+
+// "Sobre" do perfil do LigadIn. "## " vira subtítulo e "- " vira item de lista.
+// A versão em inglês fica em i18n.js.
+window.SOBRE_LIGADIN = `Desenvolvo sistemas backend com C#, .NET e ASP.NET Core: APIs REST, integrações e serviços que rodam em produção.
+
+## Experiência
+Na Intervalor, mantive e evoluí aplicações .NET em produção para vários clientes corporativos:
+- Desenvolvi APIs REST e integrações numa arquitetura de microsserviços e middleware, incluindo integração com APIs de LLM
+- Melhorei a performance com cache em Redis e desacoplei serviços com RabbitMQ para processamento assíncrono
+- Depurei problemas em produção com Kibana e Grafana, reduzindo a recorrência de incidentes e o tempo de resolução
+- Apoiei releases de serviços em containers com Docker e Kubernetes e participei de code reviews
+
+## Projetos
+Deskmate – agente de IA open source para service desks de TI. ASP.NET Core, PostgreSQL, EF Core e React, com um agent loop próprio, adaptadores para provedores de LLM (Gemini, Groq, Ollama) e para service desks, regras de negócio com testes unitários e CI com GitHub Actions.
+
+Sistema vestível de baixo custo para detecção de quedas em idosos (TCC) – cinto IoT com ESP32, BLE e MQTT. Um modelo Random Forest detectou 98,8% das quedas com 95,3% de especificidade e envia alertas em tempo real.
+
+## Formação
+Bacharelado em Ciência da Computação – Universidade Paulista (UNIP)
+
+Stack: C# · .NET · ASP.NET Core · REST APIs · PostgreSQL · Redis · EF Core · RabbitMQ · Docker · Kubernetes · Microservices · xUnit · GitHub Actions · React · TypeScript · LLM Integration`;
 
 // Quarto 360° ("Sobre mim"). A imagem é equirretangular (2:1).
 // u e v são a posição do objeto na imagem, de 0 a 1 (u = horizontal, v = vertical).
@@ -272,6 +293,16 @@ window.ALU = window.ALU || {};
 window.POSTS_LIGADIN = [
   {
     quando: "nov 2026", reacoes: 0, comentarios: 0,
+    link: "https://www.linkedin.com/feed/update/urn:li:activity:7532223019910402048/",
+    // comentários exibidos no LigadIn: [nome, texto em PT, texto em EN]
+    comentariosLista: [
+      ["Kayky Crespo", "Brabo demais! O clicajogos já virou meu site favorito 😂", "Way too good! clicajogos is already my favorite site 😂"],
+      ["Phelip Logan", "Fiquei um tempão caçando os easter eggs. Que projeto absurdo, mano!", "I spent ages hunting for the easter eggs. What an insane project, man!"],
+      ["Kaique Araujo", "Muito criativo! O LigadIn me pegou de surpresa 🤣", "So creative! LigadIn caught me off guard 🤣"],
+      ["Gustavo Souza", "Conversei com o \"você\" do app de mensagens e ele respondeu melhor que muita gente kkkk. Ficou sensacional!", "I chatted with the \"you\" in the messaging app and it answers better than most people lol. It turned out amazing!"],
+      ["Erick Carvalho", "Parabéns, Aluísio! Dá pra ver o capricho em cada detalhe 👏", "Congrats, Aluísio! You can see the care in every detail 👏"],
+      ["Bruno Novais", "Que ideia boa transformar o portfólio num sistema operacional. Já mandei pros amigos 🚀", "Great idea turning the portfolio into an operating system. Already sent it to my friends 🚀"],
+    ],
     video: "img/posts/portfolio-aluos.mp4", capa: "img/posts/portfolio-aluos.jpg",
     texto: `Opa galera, tranquilo?
 
@@ -310,6 +341,10 @@ If you want to check it out and explore my portfolio, here's the link: https://l
   },
   {
     autor: "Kayky Crespo", colab: "Aluísio Alves", titulo: "Estudante de tecnologia · UNIP", quando: "set 2025", reacoes: 87, comentarios: 9,
+    comentariosLista: [
+      ["Erick Carvalho", "Foram três dias muito bons! Valeu pela parceria, pessoal 🤝", "Three really good days! Thanks for the partnership, everyone 🤝"],
+      ["Phelip Logan", "Parabéns pela iniciativa, pessoal! 👏", "Congrats on the initiative, everyone! 👏"],
+    ],
     texto: `🚀 Compartilhando conhecimento e promovendo a inovação na Jornada Tecnológica Integrada da UNIP!
 
 Nos dias 28, 29 e 30 de setembro, tive a oportunidade de atuar como instrutor na oficina “Programação e Eletrônica com Tinkercad”, durante a Jornada Tecnológica Integrada da UNIP, ao lado de Aluísio Alves, Erick Carvalho e Enzo Orlandi.

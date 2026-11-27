@@ -86,14 +86,14 @@
       <div class="lf-txt${curto ? " corta" : ""}">${corpo}</div>${curto ? `<button class="link lf-mais">${T("…ver mais", "…see more")}</button>` : ""}${midia && midia.video ? `<video class="lf-midia" src="${esc(midia.video)}"${midia.capa ? ` poster="${esc(midia.capa)}"` : ""} controls playsinline preload="none"></video>` : ""}
       <div class="lf-cont"><span class="lf-n" data-b="${reac}">👍❤️👏 ${fmt(reac + (curt ? 1 : 0))}</span><span>${fmt(coments)} ${T("comentários", "comments")}</span></div>
       <div class="lf-acoes"><button class="lf-curtir${curt ? " on" : ""}">👍 ${curt ? T("Gostei!", "Liked!") : T("Gostei", "Like")}</button><button class="lf-com">💬 ${T("Comentar", "Comment")}</button><button class="lf-comp">🔁 ${T("Compartilhar", "Repost")}</button><button class="lf-env">✈️ ${T("Enviar", "Send")}</button></div>
-      <div class="lf-coms" hidden>${(cs || []).map(([n, t]) => `<div class="lf-c"><b>${esc(n)}</b><p>${esc(t)}</p></div>`).join("")}</div>
+      <div class="lf-coms" hidden>${(cs || []).length ? cs.map(([n, t]) => `<div class="lf-c"><b>${esc(n)}</b><p>${esc(t)}</p></div>`).join("") : `<div class="lf-c lf-c-vazio"><p>${coments ? T("Os comentários deste post ficaram no LinkedIn de verdade.", "This post's comments live on the real LinkedIn.") : T("Ninguém comentou ainda. Seja o primeiro (no LinkedIn de verdade).", "No comments yet. Be the first (on the real LinkedIn).")}</p>${midia && midia.link ? `<a class="link" href="${esc(midia.link)}" target="_blank" rel="noopener">${T("Ver no LinkedIn ↗", "See on LinkedIn ↗")}</a>` : ""}</div>`}</div>
     </article>`;
   }
 
   ALU.kezSites.push({
     re: /^ligadin\.com(?:\/feed)?\/?$/, titulo: () => "Feed | LigadIn",
     html: () => {
-      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, [], p.video ? { video: p.video, capa: p.capa } : null]);
+      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, Math.max(p.comentarios || 0, (p.comentariosLista || []).length), (p.comentariosLista || []).map(([n, pt, en]) => [n, ALU.lang === "en" && en ? en : pt]), { video: p.video, capa: p.capa, link: p.link }]);
       const curt = ler();
       const lista = [...meus, ...FEED];
       return `<div class="li-page">
