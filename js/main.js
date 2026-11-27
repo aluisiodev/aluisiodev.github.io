@@ -26,7 +26,7 @@
   // cada tema vem com o seu papel de parede; depois dá pra trocar por qualquer outro
   const WALL_DO_TEMA = { pixel: "wp-aurora", aero: "wp-aero", metro: "wp-metro", estrada: "wp-estrada" };
   const wallDoTema = (t) => Math.max(0, ALU.WALLPAPERS.findIndex((w) => w.cls === WALL_DO_TEMA[t]));
-  ALU.setTema = (t) => { ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; ALU.setWall(wallDoTema(t)); };
+  ALU.setTema = (t) => { const mudou = t !== ALU.estado.tema; ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; if (mudou) ALU.setWall(wallDoTema(t)); };
   document.documentElement.dataset.tema = ALU.estado.tema;
   // antes o Aero e o Metro ignoravam o papel de parede: quem já usava um deles continua vendo o fundo do tema
   if (!ls.get("alu.v3.wall")) { ls.set("alu.v3.wall", "1"); if (ALU.estado.tema !== "pixel") ALU.estado.wall = wallDoTema(ALU.estado.tema); }

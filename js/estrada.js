@@ -86,7 +86,8 @@
   }
 
   // ---------- cenário ----------
-  const reduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mqMov = matchMedia("(prefers-reduced-motion: reduce)");
+  let reduzido = mqMov.matches;
   let cv = null, g = null, carro = null, W = 0, H = 0, raf = 0, ultimo = 0, tempo = 0;
   let camZ = 0, curva = 0, fundoX = 0;
   const palmeiras = [];
@@ -107,9 +108,9 @@
   }
 
   function dimensionar() {
-    const vw = innerWidth, vh = innerHeight;
+    const vw = Math.max(1, innerWidth), vh = Math.max(1, innerHeight);
     H = vw < vh ? 300 : 200;
-    W = Math.max(120, Math.round(H * vw / vh));
+    W = Math.min(1200, Math.max(120, Math.round(H * vw / vh)));
     cv.width = W; cv.height = H;
   }
 
@@ -197,7 +198,7 @@
 
     // o Bel Air
     const pula = Math.sin(tempo * 14) > 0.6 ? 1 : 0;
-    const cxCarro = Math.round(W / 2 - CW / 2 - curva * 5), cyCarro = Math.round(H * (retrato ? 0.8 : 0.93)) - CH - pula;
+    const cxCarro = Math.round(W / 2 - CW / 2 - curva * 5), cyCarro = Math.round(H * (retrato ? 0.8 : document.body.dataset.modo === "mobile" ? 0.74 : 0.93)) - CH - pula; // no celular deitado, acima do dock
     // moldura do para-brisa fica atrás dos dois, que ficam atrás da carroceria
     g.fillStyle = "#e3a4cf"; g.fillRect(cxCarro + 15, cyCarro + 7, 50, 1);
     g.fillStyle = "#a2679f"; g.fillRect(cxCarro + 15, cyCarro + 8, 1, 7); g.fillRect(cxCarro + 64, cyCarro + 8, 1, 7);
@@ -230,7 +231,8 @@
     // até ~30 quadros por segundo: o visual é de 16 bits, não precisa de mais
     if (ultimo && t - ultimo < 32) { raf = requestAnimationFrame(loop); return; }
     ultimo = t;
-    desenhar(dt);
+    // no celular, com um app aberto em tela cheia, a cena fica escondida: não desenha
+    if (!document.querySelector(".phone.em-app")) desenhar(dt);
     if (!reduzido && !document.hidden) raf = requestAnimationFrame(loop);
   }
 
@@ -255,6 +257,9 @@
   ALU.estrada = { aplicar };
   new MutationObserver(aplicar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-wall"] });
   document.addEventListener("DOMContentLoaded", aplicar);
+  // se a pessoa liga ou desliga "reduzir movimento" com a página aberta
+  const mudouMov = () => { reduzido = mqMov.matches; if (cv && cv.isConnected) { if (raf) cancelAnimationFrame(raf); raf = 0; ligar(); } };
+  mqMov.addEventListener ? mqMov.addEventListener("change", mudouMov) : mqMov.addListener(mudouMov);
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (cv && cv.isConnected) { dimensionar(); if (reduzido) desenhar(0); } }, 150); });
   document.addEventListener("visibilitychange", () => { if (!document.hidden && cv && cv.isConnected && !reduzido && !raf) { ultimo = 0; raf = requestAnimationFrame(loop); } });
 })();
