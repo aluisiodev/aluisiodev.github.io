@@ -253,6 +253,9 @@
     if (a.item) return renderProps(el, ctx, a);
     if (id.startsWith("pasta:")) return renderPasta(el, ctx, id.slice(6));
     const f = { notas: renderNotas, lixeira: renderLixeira, ajustes: renderAjustes, terminal: ALU.terminal, chat: ALU.chat, kez: ALU.kez, peep: ALU.peep, quarto: ALU.quarto, concord: ALU.concord }[id];
+    // apps que só existem no celular (Mensagens, Banco, Toques) também ficam em ALU.APPS: no desktop, em vez de travar,
+    // mostra um aviso (antes "abrir sms" no terminal dava erro e deixava a janela em branco)
+    if (!f) { el.innerHTML = `<p class="pad">${ALU.T("Esse app só existe no celular. Abra o aluOS no telefone 📱", "This app only exists on the phone. Open aluOS on your phone 📱")}</p>`; return; }
     return f(el, ctx, arg);
   }
 
