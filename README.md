@@ -77,6 +77,7 @@ js/peep.js        IDE Peep Studio
 js/concord*.js    Concord: canais, bots e canal de voz
 js/ligadin.js     feed do LigadIn
 js/jogos2.js      Jogo da velha contra Zizi, Pato Voador, Plantão Noturno, Batalha de Ritmo e ranking
+js/fuga.js        Fuga de Vice: o Bel Air da Estrada 57 fugindo da polícia (usa a estrada de js/estrada.js)
 js/servidor.js    conversa com o Worker (placar, ranking, livro de visitas) e com o GoatCounter
 js/quarto.js      visualizador 360°
 js/terminal.js    terminal

@@ -169,6 +169,7 @@
     { id: "memoria", nome: T("Memória da savana", "Savanna Memory"), desc: T("Ache os pares de ícones do aluOS.", "Find the matching aluOS icon pairs."), cor: "#e07b12", emoji: "🧠" },
     { id: "voador", nome: T("Pato Voador", "Flappy Duck"), desc: T("Bata as asas entre os canos. Espaço ou toque.", "Flap between the pipes. Space or tap."), cor: "#f2a25a", emoji: "🪽" },
     { id: "plantao", nome: T("Plantão Noturno", "Night Watch"), desc: T("Vigie o Museu da Savana até as 6h. Os robôs andam à noite.", "Guard the Savanna Museum until 6 AM. The robots move at night."), cor: "#3a2a5a", emoji: "🔦" },
+    { id: "fuga", nome: T("Fuga de Vice", "Escape from Vice"), desc: T("O Bel Air da Estrada 57 fugindo da polícia. Desvie, use o nitro e passe pelas blitze.", "The Estrada 57 Bel Air on the run from the police. Dodge, hit the nitro and get past the roadblocks."), cor: "#ff3f8e", emoji: "🚓" },
     { id: "ritmo", nome: T("Batalha de Ritmo", "Rhythm Battle"), desc: T("Duelo musical contra Zizi. Setas no tempo certo.", "A music duel against Zizi. Hit the arrows on beat."), cor: "#e0413a", emoji: "🎵" },
   ];
   ALU.kezSites.push({
@@ -177,7 +178,7 @@
     html: () => `
       <div class="cj">
         <header class="cj-top">${logoJogos}<b>clica<span>jogos</span></b><small>${T("jogos grátis!! sem vírus!! (confia)", "free games!! no viruses!! (trust me)")}</small></header>
-        <div class="cj-banner">${T("★ NOVO ★ Pato Voador, Plantão Noturno e Batalha de Ritmo! ★ Recorde da semana na Cobrinha:", "★ NEW ★ Flappy Duck, Night Watch and Rhythm Battle! ★ Snake high score of the week:")} ${(() => { try { return localStorage.getItem("alu.cobrinha") || 0; } catch { return 0; } })()} ★</div>
+        <div class="cj-banner">${T("★ NOVO ★ Fuga de Vice: fuja da polícia no Bel Air! ★ Recorde da semana na Cobrinha:", "★ NEW ★ Escape from Vice: outrun the police in the Bel Air! ★ Snake high score of the week:")} ${(() => { try { return localStorage.getItem("alu.cobrinha") || 0; } catch { return 0; } })()} ★</div>
         <div class="cj-grid">${JOGOS.map((j) => `<button class="cj-card" data-ir="clicajogos.com/${j.id}" style="--c:${j.cor}"><span>${j.emoji}</span><strong>${esc(j.nome)}</strong><small>${esc(j.desc)}</small></button>`).join("")}</div>
       </div>`,
   });

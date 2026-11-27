@@ -66,7 +66,7 @@
     { url: "yakurt.com/comunidade/segunda", t: T("Eu odeio segunda-feira · yakurt", "I hate Mondays · yakurt"), d: T("Comunidade com 1.204.333 membros que concordam com você.", "A community of 1,204,333 members who agree with you."), k: "segunda feira gato odeio comunidade monday cat hate" },
     { url: "youinthescreenofcomputerorphone.com", t: "YouInTheScreenOfComputerOrPhone", d: T("Vídeos. Muitos vídeos. Alguns de 10 horas.", "Videos. Lots of videos. Some of them 10 hours long."), k: "video youtube you assistir watch" },
     { url: "imaiu.com", t: T("imaíu · caixa de entrada", "imaíu · inbox"), d: T("E-mail grátis. Spam incluso sem custo adicional.", "Free email. Spam included at no extra cost."), k: "email mail imaiu caixa inbox" },
-    { url: "clicajogos.com", t: T("clicajogos · jogos grátis!!", "clicajogos · free games!!"), d: T("Cobrinha, Jogo da velha, Pato Clicker e Memória.", "Snake, Tic-tac-toe, Pato Clicker and Memory."), k: "jogo jogos game clicajogos cobrinha velha pato memoria games snake memory duck" },
+    { url: "clicajogos.com", t: T("clicajogos · jogos grátis!!", "clicajogos · free games!!"), d: T("Cobrinha, Jogo da velha, Pato Clicker, Memória e Fuga de Vice.", "Snake, Tic-tac-toe, Pato Clicker, Memory and Escape from Vice."), k: "jogo jogos game clicajogos cobrinha velha pato memoria games snake memory duck fuga vice policia police corrida racing" },
   ];
   const ATALHOS = () => [
     ["ligadin.com/in/aluisio-alves", ALU.pix("ligadin"), "LigadIn"], ["doghub.com/aluisiodev", ALU.pix("doghub"), "DogHub"],

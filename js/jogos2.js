@@ -503,4 +503,5 @@
   }
 
   Object.assign(ALU.JOGOS = ALU.JOGOS || {}, { velha, voador, plantao, ritmo });
+  ALU.ranking = ranking; // o Fuga de Vice (js/fuga.js) usa o mesmo ranking
 })();

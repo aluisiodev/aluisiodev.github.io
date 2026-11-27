@@ -123,6 +123,120 @@
     r(verm, 61, 9, 3, 3); r(pele, 62, 3, 2, 6); r(pele, 61 + b, 0, 3, 3); r(pele, 61 + b, -1, 1, 1); r(pele, 63 + b, -1, 1, 1);
   }
 
+  function palmeira(g, C, x, yBase, alt, lado) {
+    if (alt < 2) return;
+    const s = alt / 40; // a palmeira "padrão" tem 40 px
+    const px = (c, dx, dy, w, h) => { g.fillStyle = c; g.fillRect(Math.round(x + dx * s), Math.round(yBase - dy * s), Math.max(1, Math.ceil(w * s)), Math.max(1, Math.ceil(h * s))); };
+    for (let i = 0; i < 34; i += 2) { const dx = lado * Math.pow(i / 34, 2) * 6; px(i % 4 ? C.palmeira : C.palmeira2, dx - 1.2, i + 2, 2.6 - i * 0.02, 2.2); }
+    const tx = lado * 6 - 0.2, ty = 36;
+    for (const [hx, vy] of [[-1, 0.15], [-0.8, 0.6], [-0.3, 1], [0.3, 1], [0.8, 0.6], [1, 0.15]]) {
+      for (let k = 0; k <= 13; k++) {
+        const dx = hx * k * 1.15, dy = vy * k * 0.8 - k * k * 0.045 * (1.3 - vy * 0.6);
+        const esp = 2.6 - k * 0.13;
+        px(k % 3 ? C.palmeira : C.palmeira2, tx + dx - esp / 2, ty + dy + esp / 2, esp, esp * 0.8);
+      }
+    }
+    px(C.coco, tx - 1.5, ty, 3, 2.4);
+  }
+
+  // céu, sol, nuvens e a cidade no horizonte (o fundo e o jogo Fuga de Vice desenham com isto)
+  function ceuECidade(g, E, C, W, H, hy, tempo, curva, fundoX, predios) {
+    const retrato = H > W;
+    // céu
+    if (E.ceu === "degrade") {
+      const gr = g.createLinearGradient(0, 0, 0, hy);
+      C.ceu.forEach((c, i) => gr.addColorStop(i / (C.ceu.length - 1), c));
+      g.fillStyle = gr; g.fillRect(0, 0, W, hy);
+    } else if (E.ceu === "chapado") {
+      const cs = C.ceuMetro;
+      cs.forEach((c, i) => { g.fillStyle = c; g.fillRect(0, Math.floor(hy * i / cs.length), W, Math.ceil(hy / cs.length) + 1); });
+      // faixas diagonais claras, como no papel de parede do Metro
+      g.fillStyle = "rgba(255,255,255,.07)";
+      g.beginPath(); g.moveTo(W * 0.55, 0); g.lineTo(W * 0.7, 0); g.lineTo(W * 0.5, hy); g.lineTo(W * 0.35, hy); g.fill();
+    } else {
+      const nb = C.ceu.length;
+      for (let i = 0; i < nb; i++) {
+        const y0 = Math.floor(hy * Math.pow(i / nb, 0.75)), y1 = Math.floor(hy * Math.pow((i + 1) / nb, 0.75));
+        g.fillStyle = C.ceu[i]; g.fillRect(0, y0, W, y1 - y0 + 1);
+        if (i < nb - 1) { g.fillStyle = C.ceu[i + 1]; for (let x = (y1 & 1); x < W; x += 2) g.fillRect(x, y1 - 1, 1, 1); }
+      }
+    }
+    // estrelas piscando no alto
+    if (C.estrela.length) {
+      const rs = semente(7);
+      for (let i = 0; i < 40; i++) {
+        const x = Math.floor(rs() * W), y = Math.floor(rs() * hy * 0.35), f = rs();
+        if (Math.sin(tempo * (1 + f * 2) + f * 9) > -0.3) { g.fillStyle = f > 0.8 ? C.estrela[0] : C.estrela[1]; g.fillRect(x, y, 1, 1); }
+      }
+    }
+
+    // sol
+    const sr = Math.round(Math.min(W * (retrato ? 0.36 : 0.2), H * 0.24));
+    const sx = Math.round(W / 2 - curva * W * 0.04 + Math.sin(fundoX * 0.01) * 4), sy = hy - Math.round(sr * 0.25);
+    g.save(); g.beginPath(); g.rect(0, 0, W, hy); g.clip();
+    if (E.sol === "brilho") {
+      const gl = g.createRadialGradient(sx, sy, sr * 0.2, sx, sy, sr * 3.2);
+      gl.addColorStop(0, "rgba(255,255,240,.95)"); gl.addColorStop(0.25, "rgba(255,250,220,.55)"); gl.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = gl; g.fillRect(0, 0, W, hy);
+      g.fillStyle = C.sol[0]; g.beginPath(); g.arc(sx, sy, sr * 0.62, 0, Math.PI * 2); g.fill();
+      // reflexos de lente, bem 2007
+      [[0.6, 0.18, ".35"], [1.25, 0.1, ".25"], [1.7, 0.26, ".18"]].forEach(([d, r, a]) => {
+        g.fillStyle = `rgba(255,255,255,${a})`; g.beginPath(); g.arc(sx + (W * 0.15 - sx) * d * 0.5, sy + (hy * 0.2 - sy) * d * 0.5, sr * r, 0, Math.PI * 2); g.fill();
+      });
+    } else if (E.sol === "chapado") {
+      g.fillStyle = C.sol[0]; g.beginPath(); g.arc(sx, sy, sr * 0.8, 0, Math.PI * 2); g.fill();
+    } else {
+      for (let y = -sr; y <= sr; y++) {
+        const yy = sy + y; if (yy >= hy) break;
+        const k = (y + sr) / (2 * sr);
+        if (E.sol === "listrado" && k > 0.5) { const per = 6, faixa = Math.floor((k - 0.5) * 10) + 1; if (((yy - sy + Math.floor(tempo * 3)) % per + per) % per < Math.min(faixa, 4)) continue; }
+        const meia = Math.floor(Math.sqrt(sr * sr - y * y));
+        g.fillStyle = C.sol[Math.min(C.sol.length - 1, Math.floor(k * C.sol.length))];
+        g.fillRect(sx - meia, yy, meia * 2, 1);
+      }
+    }
+    g.restore();
+    // nuvens
+    if (E.nuvem) {
+      const rn = semente(23);
+      for (let i = 0; i < 7; i++) {
+        const w = 20 + Math.floor(rn() * 50), y = Math.floor(hy * (0.25 + rn() * 0.6) * (E.nuvem === "elipse" ? 0.7 : 1));
+        const x = Math.floor(((rn() * (W + 120) + tempo * (2 + i * 0.6) - fundoX * 0.2) % (W + 120) + (W + 120)) % (W + 120)) - 60;
+        g.fillStyle = C.nuvem[i % C.nuvem.length];
+        if (E.nuvem === "elipse") {
+          g.beginPath(); g.ellipse(x + w / 2, y, w / 2, w / 7, 0, 0, Math.PI * 2); g.ellipse(x + w * 0.35, y - w / 9, w / 4, w / 6, 0, 0, Math.PI * 2); g.ellipse(x + w * 0.65, y - w / 12, w / 5, w / 7, 0, 0, Math.PI * 2); g.fill();
+        } else { g.fillRect(x, y, w, 1); g.fillRect(x + 6, y + 1, w - 14, 1); }
+      }
+    }
+
+    // cidade no horizonte (paralaxe lenta)
+    const off = ((Math.floor(fundoX * 0.5) % 520) + 520) % 520;
+    for (const p of predios) {
+      for (const k of [-520, 0, 520]) {
+        const x = p.x - off + k; if (x + p.w < 0 || x > W) continue;
+        const perto = Math.max(0, 1 - Math.abs(x + p.w / 2 - sx) / (sr * 1.4));
+        const h = Math.max(2, Math.round(p.h * (1 - perto * 0.85)));
+        g.fillStyle = p.alt ? C.predio : C.predio2; g.fillRect(x, hy - h, p.w, h);
+        if (E.suave) { g.fillStyle = "rgba(255,255,255,.28)"; g.fillRect(x, hy - h, p.w * 0.35, h); } // vidro com reflexo
+        const rj = semente(p.j + 1);
+        for (let jy = hy - h + 2; jy < hy - 2; jy += 3) for (let jx = x + 1; jx < x + p.w - 1; jx += 2) {
+          const v = rj(); if (v > 0.82) { g.fillStyle = C.janela[Math.floor(v * 100) % 3]; g.fillRect(jx, jy, 1, 1); }
+        }
+      }
+    }
+  }
+
+  // a silhueta da cidade no horizonte: 520 px que se repetem
+  function gerarPredios(rnd) {
+    const predios = [];
+    for (let x = 0; x < 520;) {
+      const w = 6 + Math.floor(rnd() * 12), h = 6 + Math.floor(rnd() * 26) + (x > 150 && x < 260 ? 14 : 0);
+      predios.push({ x, w, h, alt: rnd() > 0.5, j: Math.floor(rnd() * 1000) });
+      x += w + (rnd() > 0.7 ? 6 + Math.floor(rnd() * 30) : 0);
+    }
+    return predios;
+  }
+
   function semente(n) { let s = n; return () => ((s = (s * 16807) % 2147483647) / 2147483647); }
   let carro = null;
   const mqMov = matchMedia("(prefers-reduced-motion: reduce)");
@@ -137,11 +251,7 @@
     const gs = sprite.getContext("2d");
     let C = E.pal(), W = 0, H = 0, tempo = 0, camZ = 0, curva = 0, fundoX = 0, celular = false;
     const rnd = semente(57), predios = [], palmeiras = [];
-    for (let x = 0; x < 520;) {
-      const w = 6 + Math.floor(rnd() * 12), h = 6 + Math.floor(rnd() * 26) + (x > 150 && x < 260 ? 14 : 0);
-      predios.push({ x, w, h, alt: rnd() > 0.5, j: Math.floor(rnd() * 1000) });
-      x += w + (rnd() > 0.7 ? 6 + Math.floor(rnd() * 30) : 0);
-    }
+    predios.push(...gerarPredios(rnd));
     for (let i = 0; i < 14; i++) palmeiras.push({ d: 1.2 + i * 2.2, lado: i % 2 ? 1 : -1, var: rnd() });
 
     function dimensionar(vw, vh, ehCelular) {
@@ -150,22 +260,6 @@
       W = Math.min(1200, Math.max(120, Math.round(H * vw / vh)));
       cv.width = W * E.k; cv.height = H * E.k;
       C = E.pal();
-    }
-
-    function palmeira(x, yBase, alt, lado) {
-      if (alt < 2) return;
-      const s = alt / 40; // a palmeira "padrão" tem 40 px
-      const px = (c, dx, dy, w, h) => { g.fillStyle = c; g.fillRect(Math.round(x + dx * s), Math.round(yBase - dy * s), Math.max(1, Math.ceil(w * s)), Math.max(1, Math.ceil(h * s))); };
-      for (let i = 0; i < 34; i += 2) { const dx = lado * Math.pow(i / 34, 2) * 6; px(i % 4 ? C.palmeira : C.palmeira2, dx - 1.2, i + 2, 2.6 - i * 0.02, 2.2); }
-      const tx = lado * 6 - 0.2, ty = 36;
-      for (const [hx, vy] of [[-1, 0.15], [-0.8, 0.6], [-0.3, 1], [0.3, 1], [0.8, 0.6], [1, 0.15]]) {
-        for (let k = 0; k <= 13; k++) {
-          const dx = hx * k * 1.15, dy = vy * k * 0.8 - k * k * 0.045 * (1.3 - vy * 0.6);
-          const esp = 2.6 - k * 0.13;
-          px(k % 3 ? C.palmeira : C.palmeira2, tx + dx - esp / 2, ty + dy + esp / 2, esp, esp * 0.8);
-        }
-      }
-      px(C.coco, tx - 1.5, ty, 3, 2.4);
     }
 
     function desenhar(dt) {
@@ -179,88 +273,7 @@
       g.setTransform(E.k, 0, 0, E.k, 0, 0);
       g.imageSmoothingEnabled = !!E.suave;
 
-      // céu
-      if (E.ceu === "degrade") {
-        const gr = g.createLinearGradient(0, 0, 0, hy);
-        C.ceu.forEach((c, i) => gr.addColorStop(i / (C.ceu.length - 1), c));
-        g.fillStyle = gr; g.fillRect(0, 0, W, hy);
-      } else if (E.ceu === "chapado") {
-        const cs = C.ceuMetro;
-        cs.forEach((c, i) => { g.fillStyle = c; g.fillRect(0, Math.floor(hy * i / cs.length), W, Math.ceil(hy / cs.length) + 1); });
-        // faixas diagonais claras, como no papel de parede do Metro
-        g.fillStyle = "rgba(255,255,255,.07)";
-        g.beginPath(); g.moveTo(W * 0.55, 0); g.lineTo(W * 0.7, 0); g.lineTo(W * 0.5, hy); g.lineTo(W * 0.35, hy); g.fill();
-      } else {
-        const nb = C.ceu.length;
-        for (let i = 0; i < nb; i++) {
-          const y0 = Math.floor(hy * Math.pow(i / nb, 0.75)), y1 = Math.floor(hy * Math.pow((i + 1) / nb, 0.75));
-          g.fillStyle = C.ceu[i]; g.fillRect(0, y0, W, y1 - y0 + 1);
-          if (i < nb - 1) { g.fillStyle = C.ceu[i + 1]; for (let x = (y1 & 1); x < W; x += 2) g.fillRect(x, y1 - 1, 1, 1); }
-        }
-      }
-      // estrelas piscando no alto
-      if (C.estrela.length) {
-        const rs = semente(7);
-        for (let i = 0; i < 40; i++) {
-          const x = Math.floor(rs() * W), y = Math.floor(rs() * hy * 0.35), f = rs();
-          if (Math.sin(tempo * (1 + f * 2) + f * 9) > -0.3) { g.fillStyle = f > 0.8 ? C.estrela[0] : C.estrela[1]; g.fillRect(x, y, 1, 1); }
-        }
-      }
-
-      // sol
-      const sr = Math.round(Math.min(W * (retrato ? 0.36 : 0.2), H * 0.24));
-      const sx = Math.round(W / 2 - curva * W * 0.04 + Math.sin(fundoX * 0.01) * 4), sy = hy - Math.round(sr * 0.25);
-      g.save(); g.beginPath(); g.rect(0, 0, W, hy); g.clip();
-      if (E.sol === "brilho") {
-        const gl = g.createRadialGradient(sx, sy, sr * 0.2, sx, sy, sr * 3.2);
-        gl.addColorStop(0, "rgba(255,255,240,.95)"); gl.addColorStop(0.25, "rgba(255,250,220,.55)"); gl.addColorStop(1, "rgba(255,255,255,0)");
-        g.fillStyle = gl; g.fillRect(0, 0, W, hy);
-        g.fillStyle = C.sol[0]; g.beginPath(); g.arc(sx, sy, sr * 0.62, 0, Math.PI * 2); g.fill();
-        // reflexos de lente, bem 2007
-        [[0.6, 0.18, ".35"], [1.25, 0.1, ".25"], [1.7, 0.26, ".18"]].forEach(([d, r, a]) => {
-          g.fillStyle = `rgba(255,255,255,${a})`; g.beginPath(); g.arc(sx + (W * 0.15 - sx) * d * 0.5, sy + (hy * 0.2 - sy) * d * 0.5, sr * r, 0, Math.PI * 2); g.fill();
-        });
-      } else if (E.sol === "chapado") {
-        g.fillStyle = C.sol[0]; g.beginPath(); g.arc(sx, sy, sr * 0.8, 0, Math.PI * 2); g.fill();
-      } else {
-        for (let y = -sr; y <= sr; y++) {
-          const yy = sy + y; if (yy >= hy) break;
-          const k = (y + sr) / (2 * sr);
-          if (E.sol === "listrado" && k > 0.5) { const per = 6, faixa = Math.floor((k - 0.5) * 10) + 1; if (((yy - sy + Math.floor(tempo * 3)) % per + per) % per < Math.min(faixa, 4)) continue; }
-          const meia = Math.floor(Math.sqrt(sr * sr - y * y));
-          g.fillStyle = C.sol[Math.min(C.sol.length - 1, Math.floor(k * C.sol.length))];
-          g.fillRect(sx - meia, yy, meia * 2, 1);
-        }
-      }
-      g.restore();
-      // nuvens
-      if (E.nuvem) {
-        const rn = semente(23);
-        for (let i = 0; i < 7; i++) {
-          const w = 20 + Math.floor(rn() * 50), y = Math.floor(hy * (0.25 + rn() * 0.6) * (E.nuvem === "elipse" ? 0.7 : 1));
-          const x = Math.floor(((rn() * (W + 120) + tempo * (2 + i * 0.6) - fundoX * 0.2) % (W + 120) + (W + 120)) % (W + 120)) - 60;
-          g.fillStyle = C.nuvem[i % C.nuvem.length];
-          if (E.nuvem === "elipse") {
-            g.beginPath(); g.ellipse(x + w / 2, y, w / 2, w / 7, 0, 0, Math.PI * 2); g.ellipse(x + w * 0.35, y - w / 9, w / 4, w / 6, 0, 0, Math.PI * 2); g.ellipse(x + w * 0.65, y - w / 12, w / 5, w / 7, 0, 0, Math.PI * 2); g.fill();
-          } else { g.fillRect(x, y, w, 1); g.fillRect(x + 6, y + 1, w - 14, 1); }
-        }
-      }
-
-      // cidade no horizonte (paralaxe lenta)
-      const off = ((Math.floor(fundoX * 0.5) % 520) + 520) % 520;
-      for (const p of predios) {
-        for (const k of [-520, 0, 520]) {
-          const x = p.x - off + k; if (x + p.w < 0 || x > W) continue;
-          const perto = Math.max(0, 1 - Math.abs(x + p.w / 2 - sx) / (sr * 1.4));
-          const h = Math.max(2, Math.round(p.h * (1 - perto * 0.85)));
-          g.fillStyle = p.alt ? C.predio : C.predio2; g.fillRect(x, hy - h, p.w, h);
-          if (E.suave) { g.fillStyle = "rgba(255,255,255,.28)"; g.fillRect(x, hy - h, p.w * 0.35, h); } // vidro com reflexo
-          const rj = semente(p.j + 1);
-          for (let jy = hy - h + 2; jy < hy - 2; jy += 3) for (let jx = x + 1; jx < x + p.w - 1; jx += 2) {
-            const v = rj(); if (v > 0.82) { g.fillStyle = C.janela[Math.floor(v * 100) % 3]; g.fillRect(jx, jy, 1, 1); }
-          }
-        }
-      }
+      ceuECidade(g, E, C, W, H, hy, tempo, curva, fundoX, predios);
 
       // chão e pista, linha a linha (projeção clássica dos jogos de corrida)
       const base = H - hy, meiaPista = W * (retrato ? 0.62 : 0.42);
@@ -282,7 +295,7 @@
       for (const pm of palmeiras) {
         const p = 1 / pm.d; if (p > 1.6) continue;
         const y = hy + p * base, x = centro(Math.min(p, 1)) + pm.lado * meiaPista * p * 1.45;
-        palmeira(x, y, p * (retrato ? 70 : 80) * (0.85 + pm.var * 0.3), pm.lado);
+        palmeira(g, C, x, y, p * (retrato ? 70 : 80) * (0.85 + pm.var * 0.3), pm.lado);
       }
 
       // o Bel Air (montado num sprite e colado na cena; em alta resolução fica liso)
@@ -334,7 +347,8 @@
     const c = criarCena(estilo); c.dimensionar(w, h, false); c.tempo = 8; c.desenhar(0); return c.cv;
   }
 
-  ALU.estrada = { ligar, desligar, quadro };
+  // peças reaproveitadas pelo jogo Fuga de Vice (js/fuga.js)
+  ALU.estrada = { ligar, desligar, quadro, pecas: { ESTILOS, mix, semente, ceuECidade, palmeira, gerarPredios, carro: () => carro || (carro = desenharCarro()), casal: desenharCasal, CW, CH } };
   // se a pessoa liga ou desliga "reduzir movimento" com a página aberta
   const mudouMov = () => { reduzido = mqMov.matches; if (cena && cena.cv.isConnected) { if (raf) cancelAnimationFrame(raf); raf = 0; ligar(cena.estilo); } };
   mqMov.addEventListener ? mqMov.addEventListener("change", mudouMov) : mqMov.addListener(mudouMov);

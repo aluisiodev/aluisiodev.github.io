@@ -104,9 +104,9 @@ ajuda com dúvidas de código, explica com calma e às vezes devolve uma pergunt
 Pode mostrar um exemplo curto de código, uma instrução por linha, sem cercas de markdown (aí pode passar de 3 linhas, até umas 8).\n` + ESTILO_BOT + "\n" + COMO_FOI_FEITO,
 };
 
-const JOGOS = ["velha", "voador", "ritmo"];
+const JOGOS = ["velha", "voador", "ritmo", "fuga"];
 // pontuação máxima que dá para fazer em cada jogo (ritmo: 128 notas × 300 × 2,5 no difícil = 96.000)
-const TETO = { velha: 1000, voador: 2000, ritmo: 96000 };
+const TETO = { velha: 1000, voador: 2000, ritmo: 96000, fuga: 300000 }; // fuga: metros + bônus; ~1 h de fuga sem ser pego
 const NOMES_POR_PESSOA = 3; // quantos nomes a mesma pessoa (IP) pode ter em cada ranking
 // a IA às vezes continua a conversa sozinha ("pessoa: ... você: ..."): corta isso
 const PARAR = ["\npessoa:", "\nvisitante:", "\nvocê:", "\nuser:", "\nPessoa:"];
