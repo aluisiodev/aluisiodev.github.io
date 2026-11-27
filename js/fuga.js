@@ -114,7 +114,8 @@
     }
     // a curva da pista depende de onde você está (a mesma estrada toda vez)
     const curvaEm = (z) => Math.sin(z * 0.012) * 0.9 + Math.sin(z * 0.0041 + 1) * 0.6;
-    const centro = (p, curva) => W / 2 + curva * (1 - p) * (1 - p) * W * 0.55 - curva * W * 0.05 * p;
+    let cam = 0; // a câmera acompanha o carro de lado, um pouco atrasada
+    const centro = (p, curva) => W / 2 + curva * (1 - p) * (1 - p) * W * 0.55 - curva * W * 0.05 * p - cam * MEIA * p;
     const metros = () => Math.floor(st.dist);
     const pontos = () => metros() + st.bonus;
     function aviso(txt, cor) { st.avisos.push({ txt, cor, t: 1.4 }); }
@@ -220,6 +221,7 @@
     function desenhar() {
       aplicarEstilo();
       const k = E.k, curva = curvaEm(st.z);
+      cam += (st.x * 0.55 - cam) * 0.15;
       const tr = st.tremor > 0 ? (Math.random() - 0.5) * 4 : 0;
       g.setTransform(k, 0, 0, k, tr * k, 0); g.imageSmoothingEnabled = !!E.suave;
       pecas.ceuECidade(g, E, C, W, H, HY, st.tempo, curva, st.z * 0.6 + curva * 30, predios);
