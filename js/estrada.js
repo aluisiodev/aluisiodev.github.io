@@ -198,7 +198,7 @@
 
     // o Bel Air
     const pula = Math.sin(tempo * 14) > 0.6 ? 1 : 0;
-    const cxCarro = Math.round(W / 2 - CW / 2 - curva * 5), cyCarro = Math.round(H * (retrato ? 0.8 : document.body.dataset.modo === "mobile" ? 0.74 : 0.93)) - CH - pula; // no celular deitado, acima do dock
+    const cxCarro = Math.round(W / 2 - CW / 2 - curva * 5), cyCarro = Math.round(H * (retrato ? 0.8 : document.body.dataset.modo === "mobile" ? 0.8 : 0.93)) - CH - pula; // no celular deitado, acima do dock
     // moldura do para-brisa fica atrás dos dois, que ficam atrás da carroceria
     g.fillStyle = "#e3a4cf"; g.fillRect(cxCarro + 15, cyCarro + 7, 50, 1);
     g.fillStyle = "#a2679f"; g.fillRect(cxCarro + 15, cyCarro + 8, 1, 7); g.fillRect(cxCarro + 64, cyCarro + 8, 1, 7);
