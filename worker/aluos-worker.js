@@ -289,10 +289,11 @@ export default {
         if (pontos < 0 || pontos > TETO[jogo]) return json({ erro: "pontuação impossível" }, 400);
         const dono = await apelidoIP(ip, env);
         if (!dono) return json({ erro: "servidor sem IP_SAL/CHAVE_ADMIN configurada" }, 503);
-        // cada nome é de quem o publicou primeiro (pelo hash do IP); entradas antigas, sem dono, ficam como estão
+        // cada nome é de quem o publicou primeiro (pelo hash do IP). Entradas antigas, de antes do dono existir,
+        // ficam com quem publicar esse nome de novo primeiro (antes davam 409 para sempre).
         const i = r.findIndex((x) => x.nome.toLowerCase() === nome.toLowerCase());
-        if (i >= 0 && r[i].dono !== dono) return json({ erro: "esse nome já é de outra pessoa no ranking" }, 409);
-        if (i >= 0) r[i].pontos = Math.max(r[i].pontos, pontos); else r.push({ nome, pontos, quando: Date.now(), dono });
+        if (i >= 0 && r[i].dono && r[i].dono !== dono) return json({ erro: "esse nome já é de outra pessoa no ranking" }, 409);
+        if (i >= 0) { r[i].pontos = Math.max(r[i].pontos, pontos); r[i].dono = dono; } else r.push({ nome, pontos, quando: Date.now(), dono });
         r = r.sort((a, b) => b.pontos - a.pontos).slice(0, 50);
         await gravar("ranking:" + jogo, r);
       }
