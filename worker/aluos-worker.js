@@ -33,10 +33,11 @@
 // (sobre você, seus projetos, respostas prontas). O chat lê esse texto em toda conversa. Dá pra editar pelo painel, sem novo deploy.
 //   6. Copie a URL do Worker (ex.: https://aluos.SEU-USUARIO.workers.dev) para ALU.CONFIG.api em js/data.js.
 //
-// Para ler quem assinou o livro de visitas, abra no navegador:
-//   https://aluos.SEU-USUARIO.workers.dev/visitas?chave=SUA_CHAVE_ADMIN
+// Para ler quem assinou o livro de visitas (use uma CHAVE_ADMIN longa e aleatória, 32+ caracteres):
+//   curl -H "Authorization: Bearer SUA_CHAVE_ADMIN" https://aluos.SEU-USUARIO.workers.dev/visitas
+// (?chave=SUA_CHAVE_ADMIN na URL ainda funciona, mas fica no histórico do navegador e nos logs)
 // Se o chat ficar "offline", veja o motivo (cota, chave, modelo) em:
-//   https://aluos.SEU-USUARIO.workers.dev/diagnostico?chave=SUA_CHAVE_ADMIN
+//   curl -H "Authorization: Bearer SUA_CHAVE_ADMIN" https://aluos.SEU-USUARIO.workers.dev/diagnostico
 
 const PERSONA = `Você é o Aluísio Alves, desenvolvedor de software brasileiro, conversando pelo MessagerTale,
 um mensageiro estilo anos 2000 dentro do portfolio dele (o aluOS, um sistema operacional de mentira no navegador).
@@ -70,7 +71,7 @@ Sobre ele:
 - experiência: Back-end Developer na Intervalor (estágio, out/2025 a ago/2026); Telemarketing Operational Support na LBV - Legião da Boa Vontade (out/2024 a set/2025)
 - certificações: Claude 101 (Anthropic), Introduction to Cybersecurity (Cisco), EF SET 55/100 (B2), Linux 100: Fundamentals (TCM Security), Formação Iniciante em Programação T6 - ONE
 - foi instrutor na oficina "Programação e Eletrônica com Tinkercad" na Jornada Tecnológica Integrada da UNIP
-- projetos: MiraV (site 3D do espelho inteligente VisaVision, Next.js + three.js + API em Go), Deskmate (agent de IA open-source e auto-hospedável que se pluga em service desks como GLPI, Jira e Zammad; ASP.NET Core .NET 10 + React, PostgreSQL, em construção), Doce & Afeto (vitrine de confeitaria que fecha o pedido no WhatsApp, React), Contentstack Delivery App (ASP.NET Core + CMS headless)
+- projetos: MiraV (site 3D do espelho inteligente VisaVision, Next.js + three.js + API em Go), Cinto Inteligente (TCC em equipe na UNIP: cinto com ESP32 que detecta quedas de idosos com Random Forest e avisa no Telegram; ele foi pesquisador e redator), Pedido Já (API de pedidos em FastAPI + PostgreSQL com interface em React), Deskmate (agent de IA open-source e auto-hospedável que se pluga em service desks como GLPI, Jira e Zammad; ASP.NET Core .NET 10 + React, PostgreSQL, em construção), Doce & Afeto (vitrine de confeitaria que fecha o pedido no WhatsApp, React), Contentstack Delivery App (ASP.NET Core + CMS headless)
 - gosta de Arctic Monkeys, Bella e o Olmo da Bruxa, Lil Peep, Cartola, Radiohead e Joji, de Sekiro, de anime (Chainsaw Man, Jujutsu Kaisen, Berserk) e de Hora de Aventura
 - contato: LinkedIn linkedin.com/in/aluisio-alves e GitHub github.com/aluisiodev
 - no aluOS tem: pasta Projetos, Peep Studio (IDE que roda Python, JS e C#; dá pra assinar o livro de visitas com um commit), Kez(i)avana (navegador com jogos e paródias), quarto_360 e a Zizi, assistente virtual de cabelo azul
@@ -125,6 +126,15 @@ function passouDoLimite(chave, max) {
   BALDES.set(k, n);
   if (BALDES.size > 5000) for (const x of BALDES.keys()) if (!x.endsWith(":" + min)) BALDES.delete(x);
   return n > max;
+}
+// chave de admin: aceita "Authorization: Bearer <chave>" (preferível) ou ?chave= (legado, fica no histórico do navegador).
+// Compara pelo hash, em tempo constante, para não vazar a chave pelo tempo de resposta.
+async function ehAdmin(req, url, env) {
+  if (!env.CHAVE_ADMIN) return false;
+  const h = req.headers.get("Authorization") || "", dada = h.startsWith("Bearer ") ? h.slice(7) : url.searchParams.get("chave") || "";
+  const [a, b] = await Promise.all([dada, env.CHAVE_ADMIN].map(async (x) => new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(x)))));
+  let dif = 0; for (let i = 0; i < a.length; i++) dif |= a[i] ^ b[i];
+  return dif === 0;
 }
 // identifica a pessoa sem guardar o IP: um resumo (hash) do IP com uma "pitada" secreta
 async function apelidoIP(ip, env) {
@@ -183,28 +193,37 @@ async function groq(env, sistema, hist, msg, log) {
 
 export default {
   async fetch(req, env) {
-    const origens = String(env.ORIGEM || "*").split(",").map((x) => x.trim()).filter(Boolean), quem = req.headers.get("Origin") || "";
+    // sem ORIGEM configurada, só o próprio site pode usar o servidor ("*" só se for escrito de propósito)
+    const origens = String(env.ORIGEM || "https://aluisiodev.github.io").split(",").map((x) => x.trim()).filter(Boolean), quem = req.headers.get("Origin") || "";
     const permitida = origens.includes("*") ? "*" : origens.includes(quem) ? quem : origens[0];
-    const cors = { "Access-Control-Allow-Origin": permitida, "Vary": "Origin", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };
+    const cors = { "Access-Control-Allow-Origin": permitida, "Vary": "Origin", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" };
     const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...cors, "Content-Type": "application/json; charset=utf-8" } });
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
     const url = new URL(req.url), rota = url.pathname.replace(/\/+$/, "") || "/";
-    const corpo = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    let corpo = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    if (!corpo || typeof corpo !== "object" || Array.isArray(corpo)) corpo = {}; // "null", números e listas viram corpo vazio
     const db = env.DADOS;
     const ler = async (k, d) => (db ? (await db.get(k, "json")) ?? d : d);
-    const gravar = (k, v) => db && db.put(k, JSON.stringify(v));
+    // se a cota diária de gravações do KV acabar, db.put falha: vira um 503 com JSON em vez de erro 1101
+    const gravar = async (k, v) => { if (!db) return; try { await db.put(k, JSON.stringify(v)); } catch (e) { throw Object.assign(new Error("kv"), { kv: true }); } };
 
     // ---------- proteção contra abuso ----------
     // 1. POST só vem do próprio site (se ORIGEM estiver configurada). Scripts podem mentir o Origin, mas isso já
     //    barra outros sites usando o seu servidor pelo navegador de quem os visita.
     // 2. Limite por IP em memória (não gasta escrita do KV, que no plano grátis é 1.000 por dia).
     //    Chat: 12 por minuto. Demais POSTs: 20 por minuto. Compilar C#: 6 por minuto.
+    // 3. GET também tem limite (antes não tinha): 60 por minuto, e as rotas de admin só 5 por minuto (contra força bruta na chave).
     const ip = req.headers.get("CF-Connecting-IP") || "?";
     if (req.method === "POST") {
-      if (!origens.includes("*") && quem && !origens.includes(quem)) return json({ erro: "origem não permitida" }, 403);
+      if (!origens.includes("*") && !origens.includes(quem)) return json({ erro: "origem não permitida" }, 403); // POST sem Origin também é barrado
       const tipo = rota === "/" || rota === "/chat" || rota === "/concord" ? "chat" : rota === "/csharp" ? "cs" : "post", max = { chat: 12, cs: 6, post: 20 }[tipo];
       if (passouDoLimite(tipo + ":" + ip, max)) return json({ erro: "devagar 🙂" }, 429);
+    } else {
+      const admin = (rota === "/visitas" || rota === "/diagnostico" || url.searchParams.has("atualizar"));
+      if (passouDoLimite((admin ? "admin:" : "get:") + ip, admin ? 5 : 60)) return json({ erro: "devagar 🙂" }, 429);
     }
+    try { return await rotas(); } catch (e) { if (e && e.kv) return json({ erro: "o servidor atingiu o limite de hoje. tente amanhã 🙂" }, 503); throw e; }
+    async function rotas() {
 
     // ---------- placar global do jogo da velha ----------
     if (rota === "/placar") {
@@ -247,7 +266,7 @@ export default {
         lista.unshift(v); await gravar("visitas", lista.slice(0, 1000));
         return json({ ok: true, total: lista.length });
       }
-      if (!env.CHAVE_ADMIN || url.searchParams.get("chave") !== env.CHAVE_ADMIN) return json({ erro: "só o Aluísio pode ler 🙂" }, 403);
+      if (!(await ehAdmin(req, url, env))) return json({ erro: "só o Aluísio pode ler 🙂" }, 403);
       return json((await ler("visitas", [])).map(({ quem: _, ...v }) => v));
     }
 
@@ -299,7 +318,7 @@ export default {
     // ---------- diagnóstico do chat: mostra por que o Gemini/Groq falham ----------
     // abra https://aluos.SEU-USUARIO.workers.dev/diagnostico?chave=SUA_CHAVE_ADMIN
     if (rota === "/diagnostico") {
-      if (!env.CHAVE_ADMIN || url.searchParams.get("chave") !== env.CHAVE_ADMIN) return json({ erro: "só o Aluísio pode ver 🙂" }, 403);
+      if (!(await ehAdmin(req, url, env))) return json({ erro: "só o Aluísio pode ver 🙂" }, 403);
       const r = await perguntarIA(env, "Responda só: ok", [], "teste", true);
       return json({ kv: !!db, origem: env.ORIGEM || "(vazio = qualquer site)", gemini_chave: !!env.GEMINI_API_KEY, groq_chave: !!env.GROQ_API_KEY, respondeu: r.via || "ninguém", resposta: r.resposta, tentativas: r.log });
     }
@@ -348,9 +367,10 @@ export default {
 
     // ---------- climaselva: tempo real (Open-Meteo, sem chave) ----------
     if (rota === "/clima") {
-      const lat = Number(url.searchParams.get("lat")), lon = Number(url.searchParams.get("lon"));
-      if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return json({ erro: "lat/lon inválidos" }, 400);
-      const dado = await comCache(`clima:${lat.toFixed(2)},${lon.toFixed(2)}`, 600, async () => {
+      const lat0 = Number(url.searchParams.get("lat")), lon0 = Number(url.searchParams.get("lon"));
+      if (!isFinite(lat0) || !isFinite(lon0) || Math.abs(lat0) > 90 || Math.abs(lon0) > 180) return json({ erro: "lat/lon inválidos" }, 400);
+      const lat = lat0.toFixed(2), lon = lon0.toFixed(2); // o mesmo arredondamento no cache e na busca: variar a 3ª casa não fura o cache
+      const dado = await comCache(`clima:${lat},${lon}`, 600, async () => {
         const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
         return r.ok ? r.json() : null;
       });
@@ -361,7 +381,9 @@ export default {
     if (rota === "/musicas") {
       const id = env.PLAYLIST_ID || "6kNcU6KqmK0X4zxYZCuhMq";
       const cache = await ler("musicas:" + id, null);
-      if (cache && Date.now() - cache.quando < 600e3 && !url.searchParams.has("atualizar")) return json(cache); // 10 min: mudou a playlist, aparece logo
+      // ?atualizar ignora o cache e grava no KV: só o Aluísio pode (antes qualquer um esgotava a cota de gravações assim)
+      const forcar = url.searchParams.has("atualizar") && (await ehAdmin(req, url, env));
+      if (cache && Date.now() - cache.quando < 600e3 && !forcar) return json(cache); // 10 min: mudou a playlist, aparece logo
       let faixas = null, capa = "", nome = "";
       if (env.SPOTIFY_CLIENT_ID && env.SPOTIFY_CLIENT_SECRET) {
         try {
@@ -395,5 +417,6 @@ export default {
     }
 
     return json({ ok: true, servico: "aluOS" });
+    }
   },
 };

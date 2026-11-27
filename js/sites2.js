@@ -106,7 +106,7 @@
     html: (m) => {
       const q = decodeURIComponent(m[1]), qs = sem(q);
       let extra = "", lista = resultados(q);
-      if (/barrel roll|giro|gira|spin/.test(qs)) extra = `<p class="al-dica">🌀 Uau.</p>`;
+      if (/barrel roll|giro|gira|spin/.test(qs)) extra = `<p class="al-dica">🌀 ${T("Uau.", "Whoa.")}</p>`;
       if (qs === "alulugle" || qs === "recursao" || qs === "recursion") extra = `<p class="al-dica">${T("Você quis dizer", "Did you mean")}: <button class="link" data-ir="alulugle.com/busca?q=${encodeURIComponent(q)}">${esc(q)}</button></p>`;
       if (/^(quack|pato|duck)/.test(qs)) extra = `<p class="al-dica">🦆 ${T("Aproximadamente 9.999.999 quacks (0,01 segundo)", "About 9,999,999 quacks (0.01 seconds)")}</p>`;
       return `
@@ -333,9 +333,10 @@
           loc.disabled = false; loc.textContent = T("📍 Sua localização", "📍 Your location"); carregar(lat, lon);
           conq("clima-local", T("Previsão sob medida", "Tailor-made forecast"), T("Viu o clima de onde você está no climaselva.", "Checked the weather where you are on climaselva."));
         };
-        // plano B: sem GPS (negado, desligado ou demorando), usa a cidade aproximada da conexão
+        // plano B: sem GPS (desligado, indisponível ou demorando), usa a cidade aproximada da conexão.
+        // Se a pessoa NEGOU a localização (código 1), respeita a escolha e não procura pela conexão.
         const pelaConexao = (motivo) => {
-          if (!base) return falhou(motivo);
+          if (!base || motivo === 1) return falhou(motivo);
           fetch(base + "/onde").then((r) => (r.ok ? r.json() : Promise.reject()))
             .then((d) => usar(d.lat, d.lon, T(`Perto de ${d.cidade || "você"}${d.estado ? " (" + d.estado + ")" : ""} · pela sua conexão · agora`, `Near ${d.cidade || "you"}${d.estado ? " (" + d.estado + ")" : ""} · from your connection · now`)))
             .catch(() => falhou(motivo));

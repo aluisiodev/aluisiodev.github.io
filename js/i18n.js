@@ -60,6 +60,7 @@
       legendas: ["Home with the interactive mirror and Miro", "Navy dark theme", "The five mirror shapes", "Careers, with 17 openings", "On a phone"],
     },
     tcc: {
+      nome: "Cinto Inteligente · fall detection",
       tipo: "Team capstone (TCC)", contexto: "Final project for my Computer Science degree at UNIP (2026), advised by Prof. Marco Gomes. I was the researcher and writer, and presented the problem, the hypothesis and the AI pipeline.",
       resumo: "Wearable belt that detects falls in older adults with AI, estimates the room area and alerts on Telegram.",
       problema: "After a fall, what matters most is how long it takes for someone to notice. Panic buttons depend on the person who fell, GPS fails indoors and cameras invade privacy. The project aims for an automatic alert, with no camera and cheap parts (frugal innovation).",
@@ -109,6 +110,7 @@
   (window.PROJETOS || []).forEach((p) => {
     const t = PJ[p.id]; if (!t) return;
     Object.assign(p, { resumo: t.resumo, descricao: t.descricao, destaques: t.destaques, problema: t.problema, aprendizados: t.aprendizados });
+    if (t.nome) p.nome = t.nome;
     if (p.contexto) p.contexto = { tipo: t.tipo, texto: t.contexto };
     (p.imagens || []).forEach((im, i) => { if (t.legendas[i]) im.legenda = t.legendas[i]; });
     if (t.equipe) p.equipe = t.equipe;

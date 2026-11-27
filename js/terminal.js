@@ -25,7 +25,7 @@
       abrir: (a) => {
         const p = PROJ.find((x) => a && (x.id.startsWith(a.toLowerCase()) || x.nome.toLowerCase().includes(a.toLowerCase())));
         if (p) { print(`${T("abrindo", "opening")} <span class="k">${esc(p.nome)}</span>…`); ctx.abrir("proj:" + p.id); }
-        else if (window.ALU.APPS[a]) { print(`${T("abrindo", "opening")} ${esc(a)}…`); ctx.abrir(a); }
+        else if (a && window.ALU.APPS[a.toLowerCase()]) { print(`${T("abrindo", "opening")} ${esc(a.toLowerCase())}…`); ctx.abrir(a.toLowerCase()); }
         else print(T(`projeto não encontrado: ${esc(a || "")}. Tente <span class="k">projetos</span>.`, `project not found: ${esc(a || "")}. Try <span class="k">projects</span>.`), "err");
       },
       stack: () => print([...window.SKILLS.map((s) => s.nome), ...window.CERTIFICADOS.map((c) => c.curto || c.emissor)].map((s) => `<span class="chip">${esc(s)}</span>`).join(" ")),
@@ -37,7 +37,7 @@
   █  ▀  █
    ▀▄▄▄▀</span>
 <span class="k">${EU.replace(":~$", "")}</span>
-${T("SO ........", "OS ........")} aluOS 1.0
+${T("SO ........", "OS ........")} aluOS 2.0
 Kernel .... HTML + CSS + JS
 Shell ..... alush
 ${T("Projetos ..", "Projects ..")} ${PROJ.length}
@@ -93,7 +93,7 @@ ${T("Autor .....", "Author ....")} ${esc(P.nome)}`, "pre"),
     });
     box.addEventListener("click", () => { if (!getSelection().toString()) inp.focus({ preventScroll: true }); });
 
-    print(`aluOS 1.0 — terminal <span class="muted">(alush)</span>`);
+    print(`aluOS 2.0 — terminal <span class="muted">(alush)</span>`);
     print(T(`Digite <span class="k">ajuda</span> para ver os comandos. Sugestão: <span class="k">neofetch</span>`, `Type <span class="k">help</span> to see the commands. Try: <span class="k">neofetch</span>`));
     if (!ctx.mobile) setTimeout(() => inp.focus({ preventScroll: true }), 50);
   };

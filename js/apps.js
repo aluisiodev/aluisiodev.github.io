@@ -175,7 +175,7 @@
           <div class="props-top">${ALU.pix(a.icone)}<strong>${esc(it.nome)}</strong></div>
           <hr>
           <dl>
-            <dt>Tipo:</dt><dd>${cert ? "Curso" : "Habilidade"}</dd>
+            <dt>Tipo:</dt><dd>${cert ? ALU.T("Curso", "Course") : ALU.T("Habilidade", "Skill")}</dd>
             ${cert && it.emissor ? `<dt>Emissor:</dt><dd>${esc(it.emissor)}</dd>` : ""}
             <dt>Descrição:</dt><dd>${esc(cert ? it.detalhe : it.texto)}</dd>
           </dl>

@@ -15,11 +15,12 @@ e de jogos como *Emily is Away* e *Killer Frequency*.
 - **MessagerTale:** messenger que começa com notificações no canto da tela. O visitante escolhe as respostas,
   a frase é "digitada" (qualquer tecla acelera) e o `aluisio.dev` responde.
 - **Kez(i)avana:** navegador da savana, com as páginas *bootleg* LigadIn e DogHub (os botões "Sair da savana" levam aos perfis reais), o buscador Alulugle (página inicial), o YouInTheScreenOfComputerOrPhone, o e-mail imaíu, o clicajogos (Cobrinha, Jogo da velha, Pato Clicker e Memória), o musikzify (playlist com prévia pelo player do Spotify), o fórum ebaa!, o Clima da Selva de Pedra (dados reais do Open-Meteo), a rede social yakurt e a Kezpédia.
-- **Peep Studio:** IDE de verdade. Na pasta `meus-codigos` dá pra criar arquivos `.py`, `.js` e `.cs` e executar no navegador: Python pelo Pyodide (em `js/vendor/pyodide`, código aberto), JavaScript num Web Worker e C# pela API do Piston, com um "C# de bolso" (tradução para JavaScript) quando o servidor não responde.
+- **Peep Studio:** IDE de verdade. Na pasta `meus-codigos` dá pra criar arquivos `.py`, `.js` e `.cs` e executar no navegador: Python pelo Pyodide (em `js/vendor/pyodide`, código aberto), JavaScript num Web Worker e C# compilado no Wandbox (grátis, sem chave), com um "C# de bolso" (tradução para JavaScript) quando o servidor não responde.
 - **MessagerTale:** além do roteiro, tem conversa livre com um bot no estilo SimSimi, que aprende frases (`ensina: frase = resposta`). Para usar uma IA de verdade, veja "Servidor do aluOS" abaixo.
 - **Zizi:** a assistente virtual do aluOS. Mostra o sistema, ensina a assinar o livro de visitas com um commit no Peep Studio, dá dicas e joga Jogo da velha provocando você.
-- **Segredos:** 22 conquistas escondidas pelo sistema. O Painel de controle mostra quantas você já achou.
-- **Peep Studio:** IDE do patinho roxo, com `Aluisio.cs` e um README de cada projeto. O botão ▶ Executar "roda" o código.
+- **Segredos:** 44 conquistas escondidas pelo sistema (algumas só no celular). O Painel de controle mostra quantas você já achou.
+- **Concord:** servidor de chat que conta como o aluOS foi feito (leia-me, prompts, ferramentas, linha do tempo), com os bots Zizi e Peep respondendo por IA e um canal de voz com lo-fi gerado na hora.
+- **Celular (aluPhone):** em telas pequenas o aluOS vira um celular, com Mensagens, Banco Savana, Toques e ligação surpresa.
 - **Terminal**, **Painel de controle** (papel de parede e cor das janelas) e **Lixeira**.
 
 Feito só com HTML, CSS e JavaScript, sem build. O quarto 360° usa three.js r128 (em `js/vendor`, licença MIT).
@@ -42,8 +43,8 @@ A imagem atual foi gerada por código como placeholder.
 Tudo funciona sem servidor, mas aí placar, ranking e livro de visitas ficam só no navegador de cada pessoa.
 
 - **Servidor (grátis, Cloudflare Workers):** `worker/aluos-worker.js` guarda o placar global do Jogo da velha ("All users" × "Zizi"), o ranking dos jogos, o livro de visitas e, opcionalmente, o chat com IA. O passo a passo está no topo do arquivo. Depois coloque a URL em `ALU.CONFIG.api` (`js/data.js`).
-- **Quem assinou o livro de visitas:** abra `https://SEU-WORKER.workers.dev/visitas?chave=SUA_CHAVE_ADMIN`.
-- **GoatCounter (visitas, sem cookies):** crie a conta em https://www.goatcounter.com/signup e coloque o código em `ALU.CONFIG.goatcounter`. Ele conta visitas, países, de onde a pessoa veio e quais apps ela abriu. Quem assina o livro de visitas também aparece lá como evento.
+- **Quem assinou o livro de visitas:** `curl -H "Authorization: Bearer SUA_CHAVE_ADMIN" https://SEU-WORKER.workers.dev/visitas` (use uma chave longa e aleatória; `?chave=` na URL ainda funciona, mas fica no histórico).
+- **GoatCounter (visitas, sem cookies):** crie a conta em https://www.goatcounter.com/signup e coloque o código em `ALU.CONFIG.goatcounter`. Ele conta visitas, países, de onde a pessoa veio e quais apps ela abriu. Quem assina o livro de visitas conta como evento, sem o nome.
 
 ## Rodar no computador
 
@@ -73,9 +74,13 @@ js/buddy.js       Zizi, a assistente virtual
 js/peep*.js       Peep Studio, o executor (worker) e o C# de bolso
 worker/           Cloudflare Worker opcional para a IA do chat
 js/peep.js        IDE Peep Studio
+js/concord*.js    Concord: canais, bots e canal de voz
+js/ligadin.js     feed do LigadIn
+js/jogos2.js      Jogo da velha contra Zizi, Pato Voador, Plantão Noturno, Batalha de Ritmo e ranking
+js/servidor.js    conversa com o Worker (placar, ranking, livro de visitas) e com o GoatCounter
 js/quarto.js      visualizador 360°
 js/terminal.js    terminal
 js/desktop.js     janelas, barra de tarefas, menu iniciar, notificações
-js/mobile.js      modo celular (em pausa por enquanto)
+js/mobile.js      modo celular (aluPhone)
 js/main.js        estado, papéis de parede, boot
 ```

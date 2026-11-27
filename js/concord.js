@@ -260,7 +260,7 @@
       const r = await perguntar(bot, limpo, hist);
       dig.remove(); ocupado = false;
       const via = r.via ? `<span class="cc-via">via ${esc(r.via.replace(/^gemini /, "Gemini · "))}</span>` : `<span class="cc-via">${T("respostas prontas", "canned replies")}</span>`;
-      const html = msg(bot, esc(r.texto).split("\n").map((l) => `<p>${l || "&nbsp;"}</p>`).join(""), T("agora", "now"), via);
+      const html = msg(bot, esc(r.texto).split("\n").map((l) => `<p class="cc-l">${l || "&nbsp;"}</p>`).join(""), T("agora", "now"), via);
       conversa.push({ de: "bot", texto: r.texto, html });
       if (atual === "bots" && el.isConnected) { msgs.insertAdjacentHTML("beforeend", html); msgs.scrollTop = msgs.scrollHeight; }
       conq("concord-bot", T("Falou com um bot", "Talked to a bot"), T("Conversou com a Zizi ou o Peep no Concord.", "Chatted with Zizi or Peep on Concord."));

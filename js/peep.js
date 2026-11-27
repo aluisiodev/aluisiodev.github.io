@@ -177,6 +177,11 @@ class Program
   }
 
   // ---------- execução ----------
+  // avisos fixos que o executor (js/peep-worker.js) escreve em português
+  const TRAD_EXEC = {
+    "Carregando Python (só na primeira vez, uns segundos)…\n": "Loading Python (first time only, a few seconds)…\n",
+    "Dica: o input() leu tudo que tinha em ENTRADA (stdin). Escreva uma resposta por linha lá do lado. →\n": "Tip: input() read everything in INPUT (stdin). Write one answer per line over there. →\n",
+  };
   let worker = null;
   function novoWorker() { if (worker) worker.terminate(); worker = new Worker("js/peep-worker.js"); return worker; }
 
@@ -443,7 +448,7 @@ class Program
     function terminou(ok, ms, extra) {
       rodando = false; clearTimeout(timerParar);
       btnStop.hidden = true; btnRun.disabled = false;
-      escrever(`\n${ok ? "✔" : "✖"} ${ok ? "terminou" : "parou com erro"} em ${ms} ms${extra ? " · " + extra : ""}\n`, "info");
+      escrever(`\n${ok ? "✔" : "✖"} ${ok ? T("terminou", "finished") : T("parou com erro", "stopped with an error")} ${T("em", "in")} ${ms} ms${extra ? " · " + extra : ""}\n`, "info");
     }
     function parar(motivo) {
       if (!rodando) return;
@@ -495,7 +500,7 @@ class Program
         const d = e.data;
         if (d.tipo === "fim") return terminou(d.ok, d.ms, ext === "cs" ? "C# de bolso" : "");
         if (d.tipo === "iniciou") { jaCarregou = true; iniciarTimer(); return; }
-        escrever(d.t, d.tipo);
+        escrever(ALU.lang === "en" && TRAD_EXEC[d.t] || d.t, d.tipo); // avisos do executor vêm em português
       };
       w.onerror = (e) => { escrever((e.message || "Erro ao iniciar o executor.") + "\n", "erro"); worker = null; terminou(false, 0); };
       if (ext === "py") setTimeout(() => { if (rodando && !jaCarregou) { jaCarregou = true; iniciarTimer(); } }, 15000);
