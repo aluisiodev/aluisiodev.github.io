@@ -236,6 +236,7 @@
       el.querySelectorAll(".wall-opt").forEach((b) => b.classList.toggle("on", +b.dataset.w === ALU.estado.wall));
       el.querySelectorAll(".acc").forEach((b) => b.classList.toggle("on", b.dataset.c === ALU.estado.accent));
       el.querySelectorAll(".tema-opt").forEach((b) => b.classList.toggle("on", b.dataset.tema === ALU.estado.tema));
+      ALU.fundos && ALU.fundos.previas(el); // as miniaturas dos papéis de parede seguem o estilo do tema
     };
     el.querySelectorAll(".wall-opt").forEach((b) => (b.onclick = () => { ALU.setWall(+b.dataset.w); marcar(); }));
     el.querySelectorAll(".acc").forEach((b) => (b.onclick = () => { ALU.setAccent(b.dataset.c); marcar(); }));

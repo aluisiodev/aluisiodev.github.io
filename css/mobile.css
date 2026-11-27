@@ -3,9 +3,10 @@
    ===================================================================== */
 .phone { --ph-txt: #fff; --glass: rgba(255,255,255,.22); --glass-b: rgba(255,255,255,.55);
   font-family: "Segoe UI", "Selawik", system-ui, -apple-system, sans-serif; font-size-adjust: none; background: transparent; }
-/* o fundo do celular é o papel de parede escolhido (#wallpaper, atrás de tudo); o "Céu Aero" ganha a colina e as bolhas animadas */
-:root[data-wall="wp-aero"] .phone { background: linear-gradient(#2c8fe0 0%, #6cc4f5 38%, #bfe8ff 62%, #8fd36a 63%, #3f9e2c 100%); }
-:root:not([data-wall="wp-aero"]) .ph-fundo { display: none; }
+/* o fundo do celular é o papel de parede escolhido (#wallpaper, atrás de tudo), já no estilo do tema;
+   no Aero, as bolhas animadas e o brilho de vidro passam por cima de qualquer fundo */
+:root:not([data-tema="aero"]) .ph-fundo { display: none; }
+.ph-fundo::before { display: none; }
 .ph-fundo { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .ph-fundo::before { content: ""; position: absolute; left: -30%; right: -30%; top: 58%; height: 70%; border-radius: 50% 50% 0 0;
   background: radial-gradient(ellipse at 50% 0%, #b8f28a, #5dbb3a 45%, #2f8a22); box-shadow: 0 -6px 30px rgba(255,255,255,.5); }
@@ -173,7 +174,7 @@
 .tq-ligar { width: 100%; padding: 12px; font-size: 1rem; border-radius: 14px; }
 
 /* ================= Frutiger Metro no celular ================= */
-:root[data-wall="wp-metro"] .phone { background: #101318; }
+:root[data-tema="metro"][data-wall="wp-metro"] .phone { background: #101318; }
 :root[data-tema="metro"] .phone .status { text-shadow: none; }
 :root[data-tema="metro"] .phone .widget { border-radius: 0; background: var(--accent, #2f6bff); border: 0; box-shadow: none; text-shadow: none; backdrop-filter: none; }
 :root[data-tema="metro"] .phone .w-card { border-radius: 0; background: rgba(0,0,0,.18); border: 0; }
@@ -196,7 +197,7 @@
 :root[data-tema="metro"] .phone .m-back { background: none; border: 2px solid #12304d; border-radius: 50%; width: 34px; height: 34px; padding: 0; justify-content: center; color: #12304d; box-shadow: none; }
 :root[data-tema="metro"] .phone .m-back span { display: none; }
 :root[data-tema="metro"] .phone .lock { background: rgba(0,0,0,.3); text-shadow: none; }
-:root[data-wall="wp-metro"] .phone .lock { background: #0078d7; }
+:root[data-tema="metro"][data-wall="wp-metro"] .phone .lock { background: #0078d7; }
 :root[data-tema="metro"] .phone .lk-notif { border-radius: 0; background: rgba(0,0,0,.25); color: #fff; border: 0; box-shadow: none; }
 :root[data-tema="metro"] .lk-slider { border-radius: 0; background: rgba(0,0,0,.25); border: 0; box-shadow: none; }
 :root[data-tema="metro"] .lk-knob { border-radius: 0; background: #fff; box-shadow: none; }
