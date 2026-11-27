@@ -33,14 +33,17 @@
   ALU.setAccent = (c) => { ALU.estado.accent = c; ls.set("alu.v2.accent", c); document.documentElement.style.setProperty("--accent", c); };
 
   const isMobile = () => matchMedia("(max-width: 760px), (pointer: coarse) and (max-width: 1024px)").matches;
-  let modo = null;
+  let modo = null, desligar = null;
   function montar() {
     const m = isMobile() ? "mobile" : "desktop";
     if (m === modo) return;
     modo = m;
     document.body.dataset.modo = m;
+    // desliga o modo anterior (relógio e timers do celular) antes de trocar: senão eles continuavam rodando
+    // sem a tela e davam erro no console a cada 10 segundos
+    if (typeof desligar === "function") try { desligar(); } catch {}
     document.getElementById("os").innerHTML = "";
-    (m === "mobile" ? ALU.mobile : ALU.desktop)(document.getElementById("os"));
+    desligar = (m === "mobile" ? ALU.mobile : ALU.desktop)(document.getElementById("os"));
   }
 
   // ----- boot -----
