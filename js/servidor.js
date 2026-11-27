@@ -56,7 +56,9 @@
     if (preview || !codigo) return;
     window.goatcounter = { no_onload: false, allow_local: false };
     const s = document.createElement("script");
-    s.async = true; s.src = "https://gc.zgo.at/count.js";
+    s.async = true; s.src = "https://gc.zgo.at/count.v4.js";
+    // SRI: o navegador só roda o script se ele for exatamente esta versão (se o GoatCounter for invadido, não roda)
+    s.integrity = "sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"; s.crossOrigin = "anonymous";
     s.dataset.goatcounter = /^https?:/.test(codigo) ? codigo : `https://${codigo}.goatcounter.com/count`;
     document.head.appendChild(s);
   }
