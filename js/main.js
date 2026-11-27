@@ -20,8 +20,8 @@
     wp.className = "wallpaper " + ALU.WALLPAPERS[i].cls;
     document.documentElement.dataset.wall = ALU.WALLPAPERS[i].cls; // o celular e o js/estrada.js leem daqui
   };
-  // temas: pixel (padrão), aero (Frutiger Aero), metro (Frutiger Metro) e estrada (Bel Air 57 ao pôr do sol, js/estrada.js)
-  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"], ["estrada", "Estrada 57"]];
+  // temas: pixel (padrão), aero (Frutiger Aero), metro (Frutiger Metro) e estrada ("Retrowave": pixel art neon; o papel de parede dele é a Estrada 57)
+  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"], ["estrada", "Retrowave"]];
   ALU.estado.tema = ALU.TEMAS.some(([t]) => t === ls.get("alu.tema")) ? ls.get("alu.tema") : "pixel";
   // cada tema vem com o seu papel de parede; depois dá pra trocar por qualquer outro
   const WALL_DO_TEMA = { pixel: "wp-aurora", aero: "wp-aero", metro: "wp-metro", estrada: "wp-estrada" };
