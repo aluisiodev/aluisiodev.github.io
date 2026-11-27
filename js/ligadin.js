@@ -93,7 +93,7 @@
   ALU.kezSites.push({
     re: /^ligadin\.com(?:\/feed)?\/?$/, titulo: () => "Feed | LigadIn",
     html: () => {
-      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, p.comentariosLista || [], { video: p.video, capa: p.capa, link: p.link }]);
+      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, Math.max(p.comentarios || 0, (p.comentariosLista || []).length), (p.comentariosLista || []).map(([n, pt, en]) => [n, ALU.lang === "en" && en ? en : pt]), { video: p.video, capa: p.capa, link: p.link }]);
       const curt = ler();
       const lista = [...meus, ...FEED];
       return `<div class="li-page">

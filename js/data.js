@@ -294,6 +294,15 @@ window.POSTS_LIGADIN = [
   {
     quando: "nov 2026", reacoes: 0, comentarios: 0,
     link: "https://www.linkedin.com/feed/update/urn:li:activity:7532223019910402048/",
+    // comentários exibidos no LigadIn: [nome, texto em PT, texto em EN]
+    comentariosLista: [
+      ["Kayky Crespo", "Brabo demais! O clicajogos já virou meu site favorito 😂", "Way too good! clicajogos is already my favorite site 😂"],
+      ["Phelip Logan", "Fiquei um tempão caçando os easter eggs. Que projeto absurdo, mano!", "I spent ages hunting for the easter eggs. What an insane project, man!"],
+      ["Kaique Araujo", "Muito criativo! O LigadIn me pegou de surpresa 🤣", "So creative! LigadIn caught me off guard 🤣"],
+      ["Gustavo Souza", "Conversei com o \"você\" do app de mensagens e ele respondeu melhor que muita gente kkkk. Ficou sensacional!", "I chatted with the \"you\" in the messaging app and it answers better than most people lol. It turned out amazing!"],
+      ["Erick Carvalho", "Parabéns, Aluísio! Dá pra ver o capricho em cada detalhe 👏", "Congrats, Aluísio! You can see the care in every detail 👏"],
+      ["Bruno Novais", "Que ideia boa transformar o portfólio num sistema operacional. Já mandei pros amigos 🚀", "Great idea turning the portfolio into an operating system. Already sent it to my friends 🚀"],
+    ],
     video: "img/posts/portfolio-aluos.mp4", capa: "img/posts/portfolio-aluos.jpg",
     texto: `Opa galera, tranquilo?
 
@@ -332,6 +341,10 @@ If you want to check it out and explore my portfolio, here's the link: https://l
   },
   {
     autor: "Kayky Crespo", colab: "Aluísio Alves", titulo: "Estudante de tecnologia · UNIP", quando: "set 2025", reacoes: 87, comentarios: 9,
+    comentariosLista: [
+      ["Erick Carvalho", "Foram três dias muito bons! Valeu pela parceria, pessoal 🤝", "Three really good days! Thanks for the partnership, everyone 🤝"],
+      ["Phelip Logan", "Parabéns pela iniciativa, pessoal! 👏", "Congrats on the initiative, everyone! 👏"],
+    ],
     texto: `🚀 Compartilhando conhecimento e promovendo a inovação na Jornada Tecnológica Integrada da UNIP!
 
 Nos dias 28, 29 e 30 de setembro, tive a oportunidade de atuar como instrutor na oficina “Programação e Eletrônica com Tinkercad”, durante a Jornada Tecnológica Integrada da UNIP, ao lado de Aluísio Alves, Erick Carvalho e Enzo Orlandi.
