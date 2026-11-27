@@ -34,13 +34,20 @@
     const lista = caixa.querySelector(".rk-lista"), m = caixa.querySelector(".rk-m"), nome = caixa.querySelector(".rk-nome");
     const pintar = (r) => { const eu = nome.value.trim().toLowerCase(); lista.innerHTML = (r || []).slice(0, 10).map((x, i) => `<li class="${x.nome.toLowerCase() === eu ? "eu" : ""}"><span>${["🥇", "🥈", "🥉"][i] || i + 1 + "."}</span><b>${esc(x.nome)}</b><i>${x.pontos}</i></li>`).join("") || `<li class="muted">${T("Ninguém ainda. Seja o primeiro!", "Nobody yet. Be the first!")}</li>`; };
     const atualizar = () => { m.textContent = minhaMarca(); };
+    const aviso = caixa.querySelector(".rk-aviso"), avisoPadrao = aviso.textContent;
     caixa.querySelector(".rk-form").onsubmit = async (e) => {
       e.preventDefault();
       const n = nome.value.trim().slice(0, 20);
       if (!n) { nome.focus(); nome.placeholder = T("Escreva um nome primeiro 🙂", "Type a name first 🙂"); return; }
       ls.set("alu.rk.nome", n);
       if (!ALU.api) return;
-      pintar(await ALU.api.enviarRanking(jogo, n, minhaMarca()));
+      const r = await ALU.api.enviarRanking(jogo, n, minhaMarca());
+      if (r && r.erro) { // o servidor recusou: nome de outra pessoa (409) ou pontuação fora do possível (400)
+        aviso.textContent = r.status === 409 ? T("Esse nome já é de outra pessoa no ranking. Escolha outro 🙂", "That name already belongs to someone else. Pick another 🙂") : T("O servidor recusou essa pontuação.", "The server refused that score.");
+        nome.focus(); return;
+      }
+      aviso.textContent = avisoPadrao;
+      pintar(r);
     };
     if (ALU.api) ALU.api.ranking(jogo).then(pintar); else pintar([]);
     atualizar();

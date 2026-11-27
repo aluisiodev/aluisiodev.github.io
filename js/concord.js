@@ -130,7 +130,7 @@
       try {
         const r = await fetch(String(api).replace(/\/+$/, "") + "/concord", { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bot, mensagem: texto, historico: hist.slice(-8), idioma: ALU.lang || "pt" }) });
-        if (r.ok) { const j = await r.json(); if (j.resposta) return { texto: j.resposta, via: j.via || "" }; }
+        if (r.ok) { const j = await r.json(); if (j.resposta) return { texto: j.resposta, via: j.via || "", sig: j.sig || "" }; }
       } catch {} finally { clearTimeout(t); }
     }
     return { texto: respostaOffline(bot, texto), via: "" };
@@ -252,7 +252,7 @@
       inp.value = ""; ocupado = true;
       const bot = /^@?peep\b|^@pato\b|\bquack\b/i.test(texto) ? "peep" : "zizi";
       const limpo = texto.replace(/^@(peep|zizi|pato)\s*/i, "") || texto;
-      const hist = conversa.map((m) => ({ de: m.de, texto: m.texto }));
+      const hist = conversa.map((m) => ({ de: m.de, texto: m.texto, ...(m.sig ? { sig: m.sig } : {}) }));
       const eu = { de: "eu", texto: limpo, html: `<div class="cc-msg"><span class="cc-av">${AV.voce()}</span><div class="cc-col"><div class="cc-quem"><b>${T("você", "you")}</b><small>${T("agora", "now")}</small></div><div class="cc-txt"><p>${esc(texto)}</p></div></div></div>` };
       conversa.push(eu); if (atual === "bots") { msgs.insertAdjacentHTML("beforeend", eu.html); }
       const dig = document.createElement("p"); dig.className = "cc-digitando"; dig.textContent = `${membro(bot).nome} ${T("está digitando…", "is typing…")}`;
@@ -261,7 +261,7 @@
       dig.remove(); ocupado = false;
       const via = r.via ? `<span class="cc-via">via ${esc(r.via.replace(/^gemini /, "Gemini · "))}</span>` : `<span class="cc-via">${T("respostas prontas", "canned replies")}</span>`;
       const html = msg(bot, esc(r.texto).split("\n").map((l) => `<p class="cc-l">${l || "&nbsp;"}</p>`).join(""), T("agora", "now"), via);
-      conversa.push({ de: "bot", texto: r.texto, html });
+      conversa.push({ de: "bot", texto: r.texto, sig: r.sig, html }); // a assinatura volta para o servidor no histórico
       if (atual === "bots" && el.isConnected) { msgs.insertAdjacentHTML("beforeend", html); msgs.scrollTop = msgs.scrollHeight; }
       conq("concord-bot", T("Falou com um bot", "Talked to a bot"), T("Conversou com a Zizi ou o Peep no Concord.", "Chatted with Zizi or Peep on Concord."));
     };

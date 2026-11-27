@@ -217,8 +217,10 @@
       let t = 350;
       resp.forEach((frase, i) => {
         t += Math.min(1800, 450 + frase.length * 18);
-        later(() => { typing.textContent = i < resp.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t);
+        later(() => { typing.textContent = i < resp.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); }, t);
       });
+      // vai para o histórico a resposta inteira com a assinatura do servidor (sem ela, o servidor ignora a fala)
+      historico.push(resp.sig ? { de: eu, texto: resp.original, sig: resp.sig } : { de: eu, texto: resp.join("\n") });
       later(() => { pensando = false; if (!opsEl.children.length) mostrarOps(NOS.menu.ops); }, t);
     }
     send.onclick = enviarLivre;
@@ -252,7 +254,8 @@
         if (!vivo) return;
         if (!r) { pensando = false; typing.textContent = ""; falar("inicio"); return; }
         let t = 300;
-        r.forEach((frase, i) => { t += Math.min(1800, 450 + frase.length * 18); later(() => { typing.textContent = i < r.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); historico.push({ de: eu, texto: frase }); }, t); });
+        r.forEach((frase, i) => { t += Math.min(1800, 450 + frase.length * 18); later(() => { typing.textContent = i < r.length - 1 ? T(`${eu} está digitando...`, `${eu} is typing...`) : ""; linha(eu, frase); bip("in"); }, t); });
+        historico.push(r.sig ? { de: eu, texto: r.original, sig: r.sig } : { de: eu, texto: r.join("\n") });
         later(() => { pensando = false; mostrarOps(NOS.menu.ops); }, t);
       });
     } else later(() => falar("inicio"), 700);
