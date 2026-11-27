@@ -137,13 +137,54 @@
 :root[data-tema="metro"] .toast, :root[data-tema="metro"] .ctx-menu, :root[data-tema="metro"] .urso-balao, :root[data-tema="metro"] .zv-balao { background: #fff; box-shadow: 0 0 0 1px #c8c8c8, 0 6px 18px rgba(0,0,0,.25); }
 :root[data-tema="metro"] .toast-bar { background: var(--accent); }
 
+/* =====================================================================
+   ESTRADA 57: Bel Air 1957 numa estrada ao pôr do sol (cena em js/estrada.js)
+   Pixel por pixel como o tema padrão, mas com a paleta do fim de tarde:
+   violeta, magenta, rosa, laranja e turquesa.
+   ===================================================================== */
+:root[data-tema="estrada"] { --bg: #1d0b3d; --face: #fff4ec; --face2: #fffaf6; --line: #d9a9bd; --dark: #8a4f7d; --muted: #7a4f6c;
+  --a1: #ffb3d1; --a2: #ff7fb0; --a3: #d63c8f; --a4: #9c2a85; --a5: #5e1a6e; }
+:root[data-tema="estrada"] .wallpaper { background: #1d0b3d !important; }
+.estrada-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+:root[data-tema="estrada"] .win-bar { background: linear-gradient(#ffd27a 0 2px, #ff9a5a 2px 6px, #ff5f86 6px 20px, #d63c8f 20px 30px, #8e2a8a 30px); }
+:root[data-tema="estrada"] .win:not(.focus) .win-bar { background: linear-gradient(#c7a8d6 0 2px, #b293c6 2px 6px, #9a7bb6 6px 20px, #866aa5 20px 30px, #6f5590 30px); color: #f1e6f7; }
+:root[data-tema="estrada"] .win:not(.focus) { background: #866aa5; }
+:root[data-tema="estrada"] .win-btns button { background: linear-gradient(#8ff7ea 0 50%, #1faea2 50%); }
+:root[data-tema="estrada"] .win-btns button[data-b="close"] { background: linear-gradient(#ffb08a 0 50%, #ff4f5e 50%); }
+:root[data-tema="estrada"] .taskbar { background: linear-gradient(#ff7ab8 0 2px, #7a1f86 2px 4px, #3f1366 4px 26px, #2c0d4e 26px 36px, #1d0b3d 36px); }
+:root[data-tema="estrada"] .tb-start { background: linear-gradient(#a6fff3 0 3px, #2ec4b6 3px 22px, #189488 22px 34px, #0d6660 34px); }
+:root[data-tema="estrada"] .orb::after { background: linear-gradient(90deg, #ff5f86 0 50%, #ffbd5a 50%) top / 100% 50% no-repeat, linear-gradient(90deg, #8e2a8a 0 50%, #2ec4b6 50%) bottom / 100% 50% no-repeat; }
+:root[data-tema="estrada"] .launcher { background: #8e2a8a; }
+:root[data-tema="estrada"] .la-head { background: linear-gradient(90deg, #8e2a8a, #d63c8f 55%, #ff8a5c); }
+:root[data-tema="estrada"] legend { color: #b02d7f; }
+:root[data-tema="estrada"] .d-icon .lbl { text-shadow: 1px 1px 0 #2c0d4e, 2px 2px 0 rgba(44,13,78,.6); }
+
+/* aluPhone: a cena aparece atrás do vidro, que fica rosado */
+:root[data-tema="estrada"] .phone { background: transparent; }
+:root[data-tema="estrada"] .ph-fundo { display: none; }
+:root[data-tema="estrada"] .phone .status { text-shadow: 0 1px 2px rgba(44,13,78,.8); }
+:root[data-tema="estrada"] .phone .widget { background: linear-gradient(rgba(255,180,215,.42), rgba(214,60,143,.18) 50%, rgba(94,26,110,.3)); border-color: rgba(255,210,235,.7);
+  box-shadow: inset 0 1px 0 rgba(255,230,245,.9), 0 8px 24px rgba(44,13,78,.35); text-shadow: 0 1px 3px rgba(60,10,70,.7); }
+:root[data-tema="estrada"] .phone .w-card { background: rgba(255,220,240,.22); border-color: rgba(255,210,235,.55); }
+:root[data-tema="estrada"] .w-av { background: radial-gradient(circle at 35% 30%, #a6fff3, #2ec4b6 60%, #0d6660); }
+:root[data-tema="estrada"] .phone .m-dock { background: rgba(44,13,78,.45); border-color: rgba(255,170,215,.45); }
+:root[data-tema="estrada"] .phone .m-nome { text-shadow: 0 1px 2px #2c0d4e, 0 0 4px rgba(44,13,78,.8); }
+:root[data-tema="estrada"] .phone .lock { background: linear-gradient(rgba(29,11,61,.45), rgba(29,11,61,0) 38%, rgba(29,11,61,0) 70%, rgba(29,11,61,.35)); text-shadow: 0 2px 6px rgba(44,13,78,.7); }
+:root[data-tema="estrada"] .phone .m-bar { color: #5e1a6e; border-bottom-color: #f2b6d2; background: linear-gradient(#ffffff, #ffe9f2 50%, #ffd6e8 51%, #ffeaf3); }
+:root[data-tema="estrada"] .phone .m-back { color: #c42f8c; border-color: #f2b6d2; background: linear-gradient(#fff, #ffe3ef); }
+
 /* seletor de tema no Painel de controle */
-.temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.temas { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
 .tema-opt { display: flex; flex-direction: column; gap: 4px; align-items: center; padding: 6px; font-size: 13px; }
 .tema-opt.on { outline: 2px solid var(--accent); }
 .tema-prev { width: 100%; height: 54px; display: block; }
 .tema-prev.pixel { background: linear-gradient(#2f6bff 0 12px, #ece9d8 12px) 10px 10px / 60% 34px no-repeat, url(../img/wp-aurora.png) center / cover; image-rendering: pixelated; }
 .tema-prev.aero { background: radial-gradient(circle at 25% 35%, rgba(255,255,255,.7) 0 6%, transparent 7%), radial-gradient(ellipse 90% 40% at 50% 115%, #6fd14f 0 60%, transparent 61%), linear-gradient(#2b9be8, #bfe9ff); border-radius: 6px; }
+.tema-prev.estrada { background:
+  radial-gradient(circle at 50% 100%, #ffe27a 0 8px, #ff7f64 9px 13px, transparent 14px) 0 0 / 100% 54% no-repeat,
+  linear-gradient(112deg, #f0956f 0 46%, transparent 46%) 0 100% / 50% 46% no-repeat,
+  linear-gradient(-112deg, #f0956f 0 46%, transparent 46%) 100% 100% / 50% 46% no-repeat,
+  linear-gradient(#2c0f52, #97228a 26%, #ff5f7e 42%, #ffbd5a 54%, #4b3566 54%); }
 .tema-prev.metro { background: linear-gradient(#2f6bff 0 0) 10px 10px / 26px 26px no-repeat, linear-gradient(#e07b12 0 0) 40px 10px / 26px 26px no-repeat, linear-gradient(#0e9f6e 0 0) 70px 10px / 56px 26px no-repeat, #1d1d1d; }
 
 /* a IDE mantém o visual escuro em qualquer tema */

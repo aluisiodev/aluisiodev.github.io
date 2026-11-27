@@ -16,8 +16,8 @@
     const wp = document.getElementById("wallpaper");
     wp.className = "wallpaper " + ALU.WALLPAPERS[i].cls;
   };
-  // temas: pixel (padrão), aero (Frutiger Aero) e metro (Frutiger Metro)
-  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"]];
+  // temas: pixel (padrão), aero (Frutiger Aero), metro (Frutiger Metro) e estrada (Bel Air 57 ao pôr do sol, js/estrada.js)
+  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"], ["estrada", "Estrada 57"]];
   ALU.estado.tema = ALU.TEMAS.some(([t]) => t === ls.get("alu.tema")) ? ls.get("alu.tema") : "pixel";
   ALU.setTema = (t) => { ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; };
   document.documentElement.dataset.tema = ALU.estado.tema;
