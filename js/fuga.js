@@ -82,11 +82,12 @@
     const pecas = ALU.estrada && ALU.estrada.pecas;
     if (!pecas) { area.innerHTML = `<p class="muted">${T("A estrada ainda não carregou. Recarregue a página.", "The road hasn't loaded yet. Reload the page.")}</p>`; return; }
     area.innerHTML = `<div class="jg-hud fg-hud"><span>${T("Distância", "Distance")}: <b class="fg-m">0</b> m</span><span><b class="fg-v">0</b> km/h</span><span>${T("Recorde", "Best")}: <b class="fg-rc">${ls.get(RECORDE, 0)}</b> m</span></div>
-      <div class="fg"><canvas class="jg-canvas fg-cv" aria-label="${T("Fuga de Vice", "Escape from Vice")}"></canvas>
-      <div class="fg-pad"><button data-c="e" aria-label="${T("Esquerda", "Left")}">◀</button><button data-c="n" class="fg-nitro" aria-label="Nitro">⚡ NITRO</button><button data-c="d" aria-label="${T("Direita", "Right")}">▶</button></div></div>
+      <div class="pv-wrap"><div class="fg"><canvas class="jg-canvas fg-cv" aria-label="${T("Fuga de Vice", "Escape from Vice")}"></canvas>
+      <div class="fg-pad"><button data-c="e" aria-label="${T("Esquerda", "Left")}">◀</button><button data-c="n" class="fg-nitro" aria-label="Nitro">⚡ NITRO</button><button data-c="d" aria-label="${T("Direita", "Right")}">▶</button></div></div><div class="zv-rk"></div></div>
       <p class="muted">${T("A polícia de Vice quer multar o Bel Air por excesso de estilo. Desvie do trânsito, pegue as latas de nitro ⚡, passe pelo buraco das blitze e não deixe a viatura de trás encostar. ← → ou A D para dirigir, ↑, W ou espaço para o nitro. No celular, use os botões ou toque nos lados da tela.", "Vice police want to fine the Bel Air for excessive style. Dodge the traffic, grab the nitro cans ⚡, go through the gap in the roadblocks and don't let the cruiser behind you catch up. ← → or A D to steer, ↑, W or space for nitro. On mobile, use the buttons or tap the sides of the screen.")}</p>`;
     const cv = area.querySelector("canvas"), g = cv.getContext("2d");
     const $ = (s) => area.querySelector(s);
+    const attRk = ALU.ranking ? ALU.ranking($(".zv-rk"), "fuga", T("recorde na Fuga de Vice", "Escape from Vice high score"), () => ls.get(RECORDE, 0)) : () => {};
     const S = sprites(), carro = pecas.carro();
     const eu = document.createElement("canvas"); eu.width = pecas.CW; eu.height = pecas.CH + 4;
     const ge = eu.getContext("2d");
@@ -160,7 +161,7 @@
       st.fase = "pego"; st.motivo = motivo; st.v = 0; st.avisos = [];
       tom(330, 0.18, "square", 0.05); tom(262, 0.18, "square", 0.05, 0.2); tom(196, 0.4, "square", 0.05, 0.4);
       const p = pontos();
-      if (p > ls.get(RECORDE, 0)) { ls.set(RECORDE, p); $(".fg-rc").textContent = p; st.recorde = true; }
+      if (p > ls.get(RECORDE, 0)) { ls.set(RECORDE, p); $(".fg-rc").textContent = p; st.recorde = true; attRk(); }
     }
 
     function passo(dt) {
