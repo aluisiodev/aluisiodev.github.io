@@ -1,6 +1,6 @@
 // Papel de parede "Estrada 57": um Bel Air conversível 1957 com o Aluísio e a Kezia numa estrada,
 // no estilo pseudo-3D dos jogos de corrida antigos. A cena se adapta ao tema (js/fundos.js escolhe o estilo):
-//   retro  (tema Estrada 57): pôr do sol neon, pixel art com pontilhado e sol listrado
+//   retro  (tema Retrowave):  pôr do sol neon, pixel art com pontilhado e sol listrado
 //   pixel  (Pixel 2006):      fim de tarde dourado com campo verde, pixel art
 //   aero   (Frutiger Aero):   dia azul e brilhante, em alta resolução, com sol radiante e nuvens fofas
 //   metro  (Frutiger Metro):  cores chapadas na cor das janelas, sem degradê

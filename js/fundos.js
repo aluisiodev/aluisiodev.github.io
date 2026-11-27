@@ -4,7 +4,7 @@
 //                            (Aurora, Savana e Noite usam os PNGs originais em pixel art)
 //   aero   (Frutiger Aero):  alta resolução, degradês lisos, brilho, reflexo e bolhas de vidro
 //   metro  (Frutiger Metro): alta resolução, cores chapadas, formas retas, sem brilho nem sombra
-//   retro  (Estrada 57):     pixel art com a paleta do pôr do sol (violeta, magenta, laranja, turquesa)
+//   retro  (Retrowave):      pixel art com a paleta do pôr do sol (violeta, magenta, laranja, turquesa)
 // O desenho é feito uma vez (e de novo ao redimensionar, trocar de tema ou de cor); só a Estrada anima.
 (function () {
   const ALU = window.ALU;
