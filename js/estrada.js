@@ -1,4 +1,4 @@
-// Tema "Estrada 57": um Bel Air conversível 1957 com o Aluísio e a Kezia
+// Papel de parede "Estrada 57" (o do tema de mesmo nome): um Bel Air conversível 1957 com o Aluísio e a Kezia
 // numa estrada ao pôr do sol, no estilo dos jogos de corrida em pseudo-3D.
 // Tudo desenhado por código num canvas de baixa resolução, ampliado sem suavizar.
 // Fica parado se a pessoa pediu menos movimento e pausa quando a aba some.
@@ -250,10 +250,10 @@
     if (raf) cancelAnimationFrame(raf); raf = 0;
     if (cv && cv.isConnected) cv.remove();
   }
-  function aplicar() { document.documentElement.dataset.tema === "estrada" ? ligar() : desligar(); }
+  function aplicar() { document.documentElement.dataset.wall === "wp-estrada" ? ligar() : desligar(); }
 
   ALU.estrada = { aplicar };
-  new MutationObserver(aplicar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-tema"] });
+  new MutationObserver(aplicar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-wall"] });
   document.addEventListener("DOMContentLoaded", aplicar);
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (cv && cv.isConnected) { dimensionar(); if (reduzido) desenhar(0); } }, 150); });
   document.addEventListener("visibilitychange", () => { if (!document.hidden && cv && cv.isConnected && !reduzido && !raf) { ultimo = 0; raf = requestAnimationFrame(loop); } });

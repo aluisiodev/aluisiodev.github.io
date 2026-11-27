@@ -2,8 +2,10 @@
    aluPhone: identidade Frutiger Aero (padrão) e Frutiger Metro (tema metro)
    ===================================================================== */
 .phone { --ph-txt: #fff; --glass: rgba(255,255,255,.22); --glass-b: rgba(255,255,255,.55);
-  font-family: "Segoe UI", "Selawik", system-ui, -apple-system, sans-serif; font-size-adjust: none;
-  background: linear-gradient(#2c8fe0 0%, #6cc4f5 38%, #bfe8ff 62%, #8fd36a 63%, #3f9e2c 100%); }
+  font-family: "Segoe UI", "Selawik", system-ui, -apple-system, sans-serif; font-size-adjust: none; background: transparent; }
+/* o fundo do celular é o papel de parede escolhido (#wallpaper, atrás de tudo); o "Céu Aero" ganha a colina e as bolhas animadas */
+:root[data-wall="wp-aero"] .phone { background: linear-gradient(#2c8fe0 0%, #6cc4f5 38%, #bfe8ff 62%, #8fd36a 63%, #3f9e2c 100%); }
+:root:not([data-wall="wp-aero"]) .ph-fundo { display: none; }
 .ph-fundo { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .ph-fundo::before { content: ""; position: absolute; left: -30%; right: -30%; top: 58%; height: 70%; border-radius: 50% 50% 0 0;
   background: radial-gradient(ellipse at 50% 0%, #b8f28a, #5dbb3a 45%, #2f8a22); box-shadow: 0 -6px 30px rgba(255,255,255,.5); }
@@ -171,8 +173,7 @@
 .tq-ligar { width: 100%; padding: 12px; font-size: 1rem; border-radius: 14px; }
 
 /* ================= Frutiger Metro no celular ================= */
-:root[data-tema="metro"] .phone { background: #101318; }
-:root[data-tema="metro"] .ph-fundo { display: none; }
+:root[data-wall="wp-metro"] .phone { background: #101318; }
 :root[data-tema="metro"] .phone .status { text-shadow: none; }
 :root[data-tema="metro"] .phone .widget { border-radius: 0; background: var(--accent, #2f6bff); border: 0; box-shadow: none; text-shadow: none; backdrop-filter: none; }
 :root[data-tema="metro"] .phone .w-card { border-radius: 0; background: rgba(0,0,0,.18); border: 0; }
@@ -194,7 +195,8 @@
 :root[data-tema="metro"] .phone .m-bar strong { font-weight: 300; font-size: 1.3rem; text-transform: lowercase; }
 :root[data-tema="metro"] .phone .m-back { background: none; border: 2px solid #12304d; border-radius: 50%; width: 34px; height: 34px; padding: 0; justify-content: center; color: #12304d; box-shadow: none; }
 :root[data-tema="metro"] .phone .m-back span { display: none; }
-:root[data-tema="metro"] .phone .lock { background: #0078d7; text-shadow: none; }
+:root[data-tema="metro"] .phone .lock { background: rgba(0,0,0,.3); text-shadow: none; }
+:root[data-wall="wp-metro"] .phone .lock { background: #0078d7; }
 :root[data-tema="metro"] .phone .lk-notif { border-radius: 0; background: rgba(0,0,0,.25); color: #fff; border: 0; box-shadow: none; }
 :root[data-tema="metro"] .lk-slider { border-radius: 0; background: rgba(0,0,0,.25); border: 0; box-shadow: none; }
 :root[data-tema="metro"] .lk-knob { border-radius: 0; background: #fff; box-shadow: none; }
@@ -272,3 +274,37 @@
 .m-body .ex-main { display: block; }
 .m-body .ex-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .peep.mob:not(.saida) .po-body { display: none; }
+
+/* =====================================================================
+   Pixel 2006 e Estrada 57 no celular: os mesmos blocos chapados, bordas em
+   relevo e fonte pixelada das janelas do desktop (antes o celular ficava
+   igual ao Aero nesses temas). As cores vêm de --a1…--a5.
+   ===================================================================== */
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone { font-family: var(--ui); -webkit-font-smoothing: none; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .status { font-family: var(--ui); text-shadow: 2px 2px 0 rgba(0,0,0,.45); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .lk-time,
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .w-clock { font: 700 clamp(64px, 20vw, 92px)/1 var(--ui); letter-spacing: 0; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .w-clock { font-size: 3rem; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .lock { text-shadow: 3px 3px 0 rgba(0,0,0,.45); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .widget { border-radius: 0; border: 0; clip-path: var(--corner); padding-top: 22px; text-shadow: 2px 2px 0 rgba(0,0,0,.45);
+  background: linear-gradient(var(--a1) 0 2px, var(--a2) 2px 5px, var(--a3) 5px 10px, var(--a5) 10px 12px, rgba(10,14,40,.55) 12px); box-shadow: none; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .w-card { border-radius: 0; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .w-av { border-radius: 0; background: var(--a3); box-shadow: inset -3px -3px 0 rgba(0,0,0,.3), inset 3px 3px 0 rgba(255,255,255,.4); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-icon { font-weight: 400; font-size: .8rem; text-shadow: 2px 2px 0 rgba(0,0,0,.6); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-ic { border-radius: 0; border: 0; background: var(--face);
+  box-shadow: inset -3px -3px 0 var(--dark), inset 3px 3px 0 #fff, 4px 4px 0 rgba(0,0,0,.35); image-rendering: pixelated; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-ic::after { display: none; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-dock { border-radius: 0; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none;
+  background: linear-gradient(var(--a1) 0 2px, var(--a2) 2px 4px, var(--a3) 4px 70%, var(--a4) 70% 88%, var(--a5) 88%); box-shadow: 0 4px 0 rgba(0,0,0,.35); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .m-dots i { border-radius: 0; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .lk-notif { border-radius: 0; border: 0; color: var(--text); background: var(--face);
+  box-shadow: inset 0 6px 0 var(--a3), inset -2px -2px 0 var(--dark), 4px 4px 0 rgba(0,0,0,.35); padding-top: 14px; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .lk-slider { border-radius: 0; background: rgba(10,14,40,.6); border: 0; box-shadow: inset 3px 3px 0 rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.35); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .lk-knob { border-radius: 0; color: var(--text); background: var(--face); box-shadow: inset -3px -3px 0 var(--dark), inset 3px 3px 0 #fff; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .lk-txt { font-family: var(--ui); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-app { background: var(--face); color: var(--text); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-bar { color: #fff; border-bottom: 0; text-shadow: 2px 2px 0 rgba(0,0,0,.4); box-shadow: 0 3px 0 var(--a5);
+  background: linear-gradient(var(--a1) 0 2px, var(--a2) 2px 6px, var(--a3) 6px 75%, var(--a4) 75%); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-bar strong { font: 700 1.05rem var(--ui); }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone .m-back { border-radius: 0; border: 0; color: var(--text); text-shadow: none; background: var(--face); box-shadow: inset -2px -2px 0 var(--dark), inset 2px 2px 0 #fff; }
+:root:is([data-tema="pixel"], [data-tema="estrada"]) .phone.em-app .status { color: #fff; }

@@ -15,13 +15,14 @@
 :root[data-tema="aero"] .peep, :root[data-tema="metro"] .peep, :root[data-tema="aero"] .peep *, :root[data-tema="metro"] .peep * { font-size-adjust: none; }
 :root[data-tema="aero"] .peep-code .CodeMirror, :root[data-tema="metro"] .peep-code .CodeMirror,
 :root[data-tema="aero"] .term, :root[data-tema="metro"] .term { font-family: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace; font-size: 15px; line-height: 20px; }
-:root[data-tema="aero"] .wallpaper, :root[data-tema="metro"] .wallpaper { image-rendering: auto; }
+.wallpaper.wp-aero, .wallpaper.wp-metro { image-rendering: auto; }
 
 /* =====================================================================
    FRUTIGER AERO: céu, bolhas, vidro, brilho e verde
    ===================================================================== */
 :root[data-tema="aero"] { --face: #f4f9fd; --face2: #ffffff; --line: #b9d3e8; --dark: #8fb1cc; --muted: #4f6b82; --bg: #0b5fa5; }
-:root[data-tema="aero"] .wallpaper {
+/* papel de parede do Aero (escolhido junto com o tema, mas vale em qualquer um) */
+.wp-aero {
   background:
     radial-gradient(circle at 18% 30%, rgba(255,255,255,.55) 0 2.2%, rgba(255,255,255,.12) 2.4% 3.4%, transparent 3.6%),
     radial-gradient(circle at 72% 22%, rgba(255,255,255,.5) 0 1.4%, rgba(255,255,255,.1) 1.6% 2.4%, transparent 2.6%),
@@ -34,7 +35,7 @@
     linear-gradient(180deg, #2b9be8 0%, #6cc6f5 45%, #bfe9ff 72%, #e9fbff 100%) !important;
   background-size: cover !important;
 }
-:root[data-tema="aero"] .wallpaper::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 25% at 70% 80%, rgba(255,255,255,.35), transparent 70%); pointer-events: none; }
+.wallpaper.wp-aero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 25% at 70% 80%, rgba(255,255,255,.35), transparent 70%); pointer-events: none; }
 
 /* janelas de vidro */
 :root[data-tema="aero"] .win { clip-path: none; padding: 0 6px 6px; border-radius: 9px; background: linear-gradient(180deg, rgba(190,226,255,.62), rgba(120,180,230,.5));
@@ -89,7 +90,7 @@
    FRUTIGER METRO: chapado, tipografia grande, blocos de cor, zero brilho
    ===================================================================== */
 :root[data-tema="metro"] { --face: #ffffff; --face2: #ffffff; --line: #d6d6d6; --dark: #9a9a9a; --muted: #5c5c5c; --bg: #1d1d1d; }
-:root[data-tema="metro"] .wallpaper {
+.wp-metro {
   background:
     linear-gradient(115deg, transparent 0 58%, rgba(255,255,255,.07) 58% 70%, transparent 70%),
     linear-gradient(115deg, transparent 0 74%, rgba(255,255,255,.05) 74% 82%, transparent 82%),
@@ -144,7 +145,10 @@
    ===================================================================== */
 :root[data-tema="estrada"] { --bg: #1d0b3d; --face: #fff4ec; --face2: #fffaf6; --line: #d9a9bd; --dark: #8a4f7d; --muted: #7a4f6c;
   --a1: #ffb3d1; --a2: #ff7fb0; --a3: #d63c8f; --a4: #9c2a85; --a5: #5e1a6e; }
-:root[data-tema="estrada"] .wallpaper { background: #1d0b3d !important; }
+/* o papel de parede é animado em canvas; este degradê serve de prévia e de fundo enquanto carrega */
+.wp-estrada { background: radial-gradient(circle at 50% 52%, #ffe27a 0 9%, #ff7f64 9.5% 12%, transparent 12.5%) 0 0 / 100% 52% no-repeat,
+  linear-gradient(112deg, #f0956f 0 46%, transparent 46%) 0 100% / 50% 48% no-repeat, linear-gradient(-112deg, #f0956f 0 46%, transparent 46%) 100% 100% / 50% 48% no-repeat,
+  linear-gradient(#1d0b3d, #6c1a7e 22%, #e8458a 40%, #ffbd5a 52%, #4b3566 52%) !important; }
 .estrada-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 :root[data-tema="estrada"] .win-bar { background: linear-gradient(#ffd27a 0 2px, #ff9a5a 2px 6px, #ff5f86 6px 20px, #d63c8f 20px 30px, #8e2a8a 30px); }
 :root[data-tema="estrada"] .win:not(.focus) .win-bar { background: linear-gradient(#c7a8d6 0 2px, #b293c6 2px 6px, #9a7bb6 6px 20px, #866aa5 20px 30px, #6f5590 30px); color: #f1e6f7; }
@@ -158,20 +162,6 @@
 :root[data-tema="estrada"] .la-head { background: linear-gradient(90deg, #8e2a8a, #d63c8f 55%, #ff8a5c); }
 :root[data-tema="estrada"] legend { color: #b02d7f; }
 :root[data-tema="estrada"] .d-icon .lbl { text-shadow: 1px 1px 0 #2c0d4e, 2px 2px 0 rgba(44,13,78,.6); }
-
-/* aluPhone: a cena aparece atrás do vidro, que fica rosado */
-:root[data-tema="estrada"] .phone { background: transparent; }
-:root[data-tema="estrada"] .ph-fundo { display: none; }
-:root[data-tema="estrada"] .phone .status { text-shadow: 0 1px 2px rgba(44,13,78,.8); }
-:root[data-tema="estrada"] .phone .widget { background: linear-gradient(rgba(255,180,215,.42), rgba(214,60,143,.18) 50%, rgba(94,26,110,.3)); border-color: rgba(255,210,235,.7);
-  box-shadow: inset 0 1px 0 rgba(255,230,245,.9), 0 8px 24px rgba(44,13,78,.35); text-shadow: 0 1px 3px rgba(60,10,70,.7); }
-:root[data-tema="estrada"] .phone .w-card { background: rgba(255,220,240,.22); border-color: rgba(255,210,235,.55); }
-:root[data-tema="estrada"] .w-av { background: radial-gradient(circle at 35% 30%, #a6fff3, #2ec4b6 60%, #0d6660); }
-:root[data-tema="estrada"] .phone .m-dock { background: rgba(44,13,78,.45); border-color: rgba(255,170,215,.45); }
-:root[data-tema="estrada"] .phone .m-nome { text-shadow: 0 1px 2px #2c0d4e, 0 0 4px rgba(44,13,78,.8); }
-:root[data-tema="estrada"] .phone .lock { background: linear-gradient(rgba(29,11,61,.45), rgba(29,11,61,0) 38%, rgba(29,11,61,0) 70%, rgba(29,11,61,.35)); text-shadow: 0 2px 6px rgba(44,13,78,.7); }
-:root[data-tema="estrada"] .phone .m-bar { color: #5e1a6e; border-bottom-color: #f2b6d2; background: linear-gradient(#ffffff, #ffe9f2 50%, #ffd6e8 51%, #ffeaf3); }
-:root[data-tema="estrada"] .phone .m-back { color: #c42f8c; border-color: #f2b6d2; background: linear-gradient(#fff, #ffe3ef); }
 
 /* seletor de tema no Painel de controle */
 .temas { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
