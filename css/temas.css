@@ -35,7 +35,6 @@
     linear-gradient(180deg, #2b9be8 0%, #6cc6f5 45%, #bfe9ff 72%, #e9fbff 100%) !important;
   background-size: cover !important;
 }
-.wallpaper.wp-aero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 25% at 70% 80%, rgba(255,255,255,.35), transparent 70%); pointer-events: none; }
 
 /* janelas de vidro */
 :root[data-tema="aero"] .win { clip-path: none; padding: 0 6px 6px; border-radius: 9px; background: linear-gradient(180deg, rgba(190,226,255,.62), rgba(120,180,230,.5));
@@ -149,7 +148,9 @@
 .wp-estrada { background: radial-gradient(circle at 50% 52%, #ffe27a 0 9%, #ff7f64 9.5% 12%, transparent 12.5%) 0 0 / 100% 52% no-repeat,
   linear-gradient(112deg, #f0956f 0 46%, transparent 46%) 0 100% / 50% 48% no-repeat, linear-gradient(-112deg, #f0956f 0 46%, transparent 46%) 100% 100% / 50% 48% no-repeat,
   linear-gradient(#1d0b3d, #6c1a7e 22%, #e8458a 40%, #ffbd5a 52%, #4b3566 52%) !important; }
-.estrada-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+/* os fundos desenhados por código (js/fundos.js e js/estrada.js): pixelados nos temas de pixel, lisos nos outros */
+.estrada-cv, .fundo-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.estrada-cv.liso, .fundo-cv.liso { image-rendering: auto; }
 :root[data-tema="estrada"] .win-bar { background: linear-gradient(#ffd27a 0 2px, #ff9a5a 2px 6px, #ff5f86 6px 20px, #d63c8f 20px 30px, #8e2a8a 30px); }
 :root[data-tema="estrada"] .win:not(.focus) .win-bar { background: linear-gradient(#c7a8d6 0 2px, #b293c6 2px 6px, #9a7bb6 6px 20px, #866aa5 20px 30px, #6f5590 30px); color: #f1e6f7; }
 :root[data-tema="estrada"] .win:not(.focus) { background: #866aa5; }
