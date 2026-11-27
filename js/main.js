@@ -7,20 +7,29 @@
     { nome: "Aurora", cls: "wp-aurora" },
     { nome: "Savana", cls: "wp-savana" },
     { nome: "Noite", cls: "wp-noite" },
+    { nome: "Céu Aero", cls: "wp-aero" },
+    { nome: "Metro", cls: "wp-metro" },
+    { nome: "Estrada 57", cls: "wp-estrada" },
   ];
   ALU.CORES = ["#2f6bff", "#7c3aed", "#0e9f6e", "#d9468f", "#e07b12", "#4b5563"];
-  ALU.estado = { wall: Math.min(+(ls.get("alu.v2.wall") || 0), 2), accent: ls.get("alu.v2.accent") || "#2f6bff" };
+  ALU.estado = { wall: Math.min(+(ls.get("alu.v2.wall") || 0), ALU.WALLPAPERS.length - 1) || 0, accent: ls.get("alu.v2.accent") || "#2f6bff" };
 
   ALU.setWall = (i) => {
     ALU.estado.wall = i; ls.set("alu.v2.wall", i);
     const wp = document.getElementById("wallpaper");
     wp.className = "wallpaper " + ALU.WALLPAPERS[i].cls;
+    document.documentElement.dataset.wall = ALU.WALLPAPERS[i].cls; // o celular e o js/estrada.js leem daqui
   };
-  // temas: pixel (padrão), aero (Frutiger Aero) e metro (Frutiger Metro)
-  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"]];
+  // temas: pixel (padrão), aero (Frutiger Aero), metro (Frutiger Metro) e estrada (Bel Air 57 ao pôr do sol, js/estrada.js)
+  ALU.TEMAS = [["pixel", "Pixel 2006"], ["aero", "Frutiger Aero"], ["metro", "Frutiger Metro"], ["estrada", "Estrada 57"]];
   ALU.estado.tema = ALU.TEMAS.some(([t]) => t === ls.get("alu.tema")) ? ls.get("alu.tema") : "pixel";
-  ALU.setTema = (t) => { ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; };
+  // cada tema vem com o seu papel de parede; depois dá pra trocar por qualquer outro
+  const WALL_DO_TEMA = { pixel: "wp-aurora", aero: "wp-aero", metro: "wp-metro", estrada: "wp-estrada" };
+  const wallDoTema = (t) => Math.max(0, ALU.WALLPAPERS.findIndex((w) => w.cls === WALL_DO_TEMA[t]));
+  ALU.setTema = (t) => { const mudou = t !== ALU.estado.tema; ALU.estado.tema = t; ls.set("alu.tema", t); document.documentElement.dataset.tema = t; if (mudou) ALU.setWall(wallDoTema(t)); };
   document.documentElement.dataset.tema = ALU.estado.tema;
+  // antes o Aero e o Metro ignoravam o papel de parede: quem já usava um deles continua vendo o fundo do tema
+  if (!ls.get("alu.v3.wall")) { ls.set("alu.v3.wall", "1"); if (ALU.estado.tema !== "pixel") ALU.estado.wall = wallDoTema(ALU.estado.tema); }
   ALU.setAccent = (c) => { ALU.estado.accent = c; ls.set("alu.v2.accent", c); document.documentElement.style.setProperty("--accent", c); };
 
   const isMobile = () => matchMedia("(max-width: 760px), (pointer: coarse) and (max-width: 1024px)").matches;
