@@ -78,12 +78,12 @@
   const fmt = (n) => n >= 1000 ? (ALU.lang === "en" ? (n / 1000).toFixed(1).replace(".0", "") + "k" : (n / 1000).toFixed(1).replace(".0", "").replace(".", ",") + " mil") : String(n);
   const linkPerfil = (n) => n === "aluisio.dev" || n === P.nome || n === P.nomeCompleto || n.endsWith(" e " + P.nomeCompleto) || n.endsWith(" and " + P.nomeCompleto);
 
-  function postHTML([id, autor, av, titulo, tempo, texto, reac, coments, cs], curt) {
+  function postHTML([id, autor, av, titulo, tempo, texto, reac, coments, cs, midia], curt) {
     const curto = texto.length > 260;
     const corpo = esc(texto).replace(/(^|[^&\w])#(\w+)/g, '$1<span class="lf-tag">#$2</span>').replace(/\n/g, "<br>");
     return `<article class="li-card lf-post" data-id="${esc(id)}">
       <header class="lf-autor"><span class="lf-av">${avatar(av)}</span><div>${linkPerfil(autor) ? `<button class="link" data-ir="ligadin.com/in/aluisio-alves"><b>${esc(autor)}</b></button>` : `<b>${esc(autor)}</b>`}<small>${esc(titulo)}</small><small>${esc(tempo)} · 🌐</small></div>${linkPerfil(autor) ? "" : `<button class="lf-seguir">${T("+ Seguir", "+ Follow")}</button>`}</header>
-      <div class="lf-txt${curto ? " corta" : ""}">${corpo}</div>${curto ? `<button class="link lf-mais">${T("…ver mais", "…see more")}</button>` : ""}
+      <div class="lf-txt${curto ? " corta" : ""}">${corpo}</div>${curto ? `<button class="link lf-mais">${T("…ver mais", "…see more")}</button>` : ""}${midia && midia.video ? `<video class="lf-midia" src="${esc(midia.video)}"${midia.capa ? ` poster="${esc(midia.capa)}"` : ""} controls playsinline preload="none"></video>` : ""}
       <div class="lf-cont"><span class="lf-n" data-b="${reac}">👍❤️👏 ${fmt(reac + (curt ? 1 : 0))}</span><span>${fmt(coments)} ${T("comentários", "comments")}</span></div>
       <div class="lf-acoes"><button class="lf-curtir${curt ? " on" : ""}">👍 ${curt ? T("Gostei!", "Liked!") : T("Gostei", "Like")}</button><button class="lf-com">💬 ${T("Comentar", "Comment")}</button><button class="lf-comp">🔁 ${T("Compartilhar", "Repost")}</button><button class="lf-env">✈️ ${T("Enviar", "Send")}</button></div>
       <div class="lf-coms" hidden>${(cs || []).map(([n, t]) => `<div class="lf-c"><b>${esc(n)}</b><p>${esc(t)}</p></div>`).join("")}</div>
@@ -93,7 +93,7 @@
   ALU.kezSites.push({
     re: /^ligadin\.com(?:\/feed)?\/?$/, titulo: () => "Feed | LigadIn",
     html: () => {
-      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, []]);
+      const meus = (window.POSTS_LIGADIN || []).map((p, i) => ["meu" + i, p.autor ? p.autor + (p.colab ? T(" e ", " and ") + p.colab : "") : P.nomeCompleto || P.nome, p.autor ? (p.autor.match(/\b\w/g) || []).slice(0, 2).join("") : "eu", p.titulo || P.headline || P.cargo, p.quando || "", p.texto, p.reacoes || 0, p.comentarios || 0, [], p.video ? { video: p.video, capa: p.capa } : null]);
       const curt = ler();
       const lista = [...meus, ...FEED];
       return `<div class="li-page">

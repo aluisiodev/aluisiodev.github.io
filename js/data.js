@@ -271,6 +271,44 @@ window.ALU = window.ALU || {};
 // Post de outra pessoa com você marcado: adicione autor, titulo e colab.
 window.POSTS_LIGADIN = [
   {
+    quando: "nov 2026", reacoes: 0, comentarios: 0,
+    video: "img/posts/portfolio-aluos.mp4", capa: "img/posts/portfolio-aluos.jpg",
+    texto: `Opa galera, tranquilo?
+
+Já tem um bom tempo que quero criar um portfólio onde possa atualizar e divulgar meus projetos. Tive um insight numa segunda a noite e decidi que iria fazer um portfólio com o máximo de funcionalidades e novidades que eu conseguisse pensar.
+
+O Portfólio conta com:
+- Pasta com meus projetos, skills, sobre mim e contatos
+- Terminal com (alguns) comandos funcionais
+- IDE Funcional
+- Um app de mensagens parecido com o MSN Messenger, onde você conversa "comigo". O "eu" do app de mensagens é um agente de IA
+- O Concord, um app com servidores (e onde você pode ver como eu fiz para dar vida à este projeto)
+- Um navegador com vários sites e redes sociais, incluíndo o LigadIn e o clicajogos (não aceitar imitações)
+- VÁRIOS Easter Eggs espalhados que geram conquistas ao encontrá-los
+
+O portfólio foi feito com desenvolvimento assistido por IA (eu não escrevi uma única linha de código) e a stack é apenas JavaScript, HTML e CSS. Fiz isso para provar que, com uma boa ideia, você pode criar coisas incríveis e originais e deixar todo o espaço para sua criatividade trabalhar.
+
+Pra quem quiser acessar e explorar meu portfolio, o link é esse: https://lnkd.in/dTHSkp2n`,
+    // o post original é bilíngue: aqui vai a parte [EN], escrita pelo próprio Aluísio
+    quandoEn: "Nov 2026",
+    textoEn: `Hey everyone, how's it going?
+
+I've wanted to build a portfolio where I could update and showcase my projects for a long time. One Monday night I had an insight and decided to make a portfolio with as many features and surprises as I could think.
+
+The portfolio includes:
+- Folders with my projects, skills, about me and contacts
+- A terminal with (some) working commands
+- A working IDE
+- A messaging app inspired by MSN Messenger, where you chat "with me". The "me" in the app is an AI agent
+- Concord, an app with servers (where you can also see how I brought this project to life)
+- A browser with several sites and social networks, including LigadIn and clicajogos (accept no imitations)
+- LOTS of hidden Easter eggs that unlock achievements when you find them
+
+The portfolio was built with AI-assisted development (I didn't write a single line of code), and the stack is just JavaScript, HTML and CSS. I did it to prove that with a good idea you can create amazing, original things and leave plenty of room for your creativity.
+
+If you want to check it out and explore my portfolio, here's the link: https://lnkd.in/dTHSkp2n`,
+  },
+  {
     autor: "Kayky Crespo", colab: "Aluísio Alves", titulo: "Estudante de tecnologia · UNIP", quando: "set 2025", reacoes: 87, comentarios: 9,
     texto: `🚀 Compartilhando conhecimento e promovendo a inovação na Jornada Tecnológica Integrada da UNIP!
 

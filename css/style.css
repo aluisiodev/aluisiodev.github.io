@@ -800,6 +800,7 @@ legend { padding: 0 4px; color: var(--a5); font-weight: 700; }
 .lf-seguir { color: #1d6fd1; font: 700 12px var(--ui); background: none; }
 .lf-txt { margin: 10px 0 4px; font: 19px/1.1 var(--txt); color: #222; white-space: normal; }
 .lf-txt.corta { max-height: 6.8em; overflow: hidden; -webkit-mask: linear-gradient(#000 70%, transparent); mask: linear-gradient(#000 70%, transparent); }
+.lf-midia { display: block; width: calc(100% + 36px); max-width: none; margin: 8px -18px 2px; aspect-ratio: 1; background: #111; }
 .lf-tag { color: #1d6fd1; } .lf-mais { color: #666; font-size: 12px; }
 .lf-cont { display: flex; justify-content: space-between; padding: 6px 0; font-size: 11px; color: #777; border-bottom: 2px solid #eee; }
 .lf-acoes { display: flex; justify-content: space-around; flex-wrap: wrap; padding-top: 4px; }
