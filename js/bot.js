@@ -110,7 +110,7 @@
         const corte = linhas.findIndex((l, i) => i > 0 && QUEM.test(l));
         if (corte > 0) linhas = linhas.slice(0, corte);
         linhas = linhas.map((l) => l.replace(QUEM, "").trim() ? l.replace(/^\s*(alu[ií]sio(\.dev)?|voc[eê])\s*:\s*/i, "") : l).filter((l) => l.trim());
-        if (linhas.length) { falhas = 0; return linhas.slice(0, 8); }
+        if (linhas.length) { falhas = 0; const fala = linhas.slice(0, 8); fala.original = String(j.resposta || ""); fala.sig = j.sig || ""; return fala; }
       }
     } catch {}
     cair();
@@ -118,7 +118,7 @@
   }
   async function responder(texto, historico) {
     const ia = await perguntarIA(texto, historico);
-    if (ia) { ia.ia = true; return ia; }
+    if (ia) { ia.ia = true; return ia; } // ia.original + ia.sig: a resposta inteira, assinada pelo servidor
     return regras(texto);
   }
   const INICIO = { pt: "(a pessoa acabou de abrir o MessagerTale no aluOS. puxe conversa você: cumprimente, se apresente em uma frase e pergunte no que pode ajudar)", en: "(the visitor just opened MessagerTale in aluOS. start the conversation: say hi, introduce yourself in one sentence and ask how you can help. answer in english)" };

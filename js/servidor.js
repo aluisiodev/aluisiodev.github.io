@@ -9,7 +9,10 @@
     const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);
     try {
       const r = await fetch(base() + rota, corpo ? { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) } : { signal: ctl.signal });
-      return r.ok ? await r.json() : null;
+      if (r.ok) return await r.json();
+      // 400/409 de propósito (nome de outra pessoa, pontuação impossível): devolve o motivo para o site mostrar
+      if (corpo && (r.status === 400 || r.status === 409)) { const j = await r.json().catch(() => null); if (j && j.erro) return { erro: j.erro, status: r.status }; }
+      return null;
     } catch { return null; } finally { clearTimeout(t); }
   }
   const online = () => !!base();
@@ -18,7 +21,7 @@
   async function placar() { return (await chamar("/placar")) || ls.get("alu.placar.local", { todos: 0, zizi: 0, velha: 0 }); }
   async function somarPlacar(vencedor) {
     const r = await chamar("/placar", { vencedor });
-    if (r) return r;
+    if (r && !r.erro) return r;
     const p = ls.get("alu.placar.local", { todos: 0, zizi: 0, velha: 0 }); p[vencedor] = (p[vencedor] || 0) + 1; ls.set("alu.placar.local", p); return p;
   }
 
@@ -27,7 +30,7 @@
   async function ranking(jogo) { return (await chamar("/ranking?jogo=" + jogo)) || ordenar(ls.get("alu.ranking." + jogo, [])); }
   async function enviarRanking(jogo, nome, pontos) {
     const r = await chamar("/ranking", { jogo, nome, pontos });
-    if (r) return r;
+    if (r) return r; // ranking novo ou { erro } quando o servidor recusa
     const l = ls.get("alu.ranking." + jogo, []), i = l.findIndex((x) => x.nome.toLowerCase() === nome.toLowerCase());
     if (i >= 0) l[i].pontos = Math.max(l[i].pontos, pontos); else l.push({ nome, pontos });
     ls.set("alu.ranking." + jogo, l); return ordenar(l);
@@ -39,7 +42,7 @@
     const r = await chamar("/visitas", { ...dados, idioma: ALU.lang });
     // o GoatCounter só conta que alguém assinou; o nome fica no servidor, protegido pela CHAVE_ADMIN
     evento("livro-de-visitas", "Assinou o livro de visitas");
-    return !!r;
+    return !!r && !r.erro;
   }
 
   // ---------- GoatCounter (estatística de visitas, sem cookies) ----------

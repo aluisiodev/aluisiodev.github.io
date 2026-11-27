@@ -16,6 +16,10 @@
 //   5. Settings > Variables and secrets:
 //        ORIGEM       = https://aluisiodev.github.io        (sites que podem usar o servidor; vários separados por vírgula, ou * para testar)
 //        CHAVE_ADMIN  = uma senha sua (Secret)              (para ler o livro de visitas)
+//        IP_SAL       = outro segredo longo e aleatório (Secret, recomendado): "pitada" do hash que identifica cada visitante
+//                       no livro de visitas e no ranking, sem guardar o IP. Sem ele, usa a CHAVE_ADMIN.
+//        HIST_SEGREDO = outro segredo longo e aleatório (Secret, recomendado): assina as respostas da IA para ninguém
+//                       inventar falas do bot no histórico. Sem ele, usa a CHAVE_ADMIN.
 //        GEMINI_API_KEY = sua chave do Gemini (Secret, opcional) (para o chat com IA)
 //        GEMINI_MODEL   = gemini-flash-latest (Text, opcional; é o padrão se você não criar)
 //      A chave do Gemini é grátis: https://aistudio.google.com/apikey > Create API key.
@@ -101,6 +105,8 @@ Pode mostrar um exemplo curto de código, uma instrução por linha, sem cercas 
 };
 
 const JOGOS = ["velha", "voador", "ritmo"];
+// pontuação máxima que dá para fazer em cada jogo (ritmo: 128 notas × 300 × 2,5 no difícil = 96.000)
+const TETO = { velha: 1000, voador: 2000, ritmo: 100000 };
 // a IA às vezes continua a conversa sozinha ("pessoa: ... você: ..."): corta isso
 const PARAR = ["\npessoa:", "\nvisitante:", "\nvocê:", "\nuser:", "\nPessoa:"];
 function so_minha_fala(txt) {
@@ -136,10 +142,47 @@ async function ehAdmin(req, url, env) {
   let dif = 0; for (let i = 0; i < a.length; i++) dif |= a[i] ^ b[i];
   return dif === 0;
 }
-// identifica a pessoa sem guardar o IP: um resumo (hash) do IP com uma "pitada" secreta
+// identifica a pessoa sem guardar o IP: um resumo (hash) do IP com uma "pitada" secreta.
+// A pitada é IP_SAL (ou, se não existir, a CHAVE_ADMIN). Sem nenhuma das duas não há pitada segura: devolve null
+// e as rotas que precisam identificar a pessoa respondem 503, em vez de usar um valor que está no código público.
 async function apelidoIP(ip, env) {
-  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode((env.CHAVE_ADMIN || "aluos") + ":" + ip));
+  const sal = env.IP_SAL || env.CHAVE_ADMIN;
+  if (!sal) return null;
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(sal + ":" + ip));
   return [...new Uint8Array(d).slice(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+// respostas da IA saem assinadas (HMAC). No histórico que o navegador manda de volta, só entram como fala do
+// Aluísio/Zizi/Peep as que têm a assinatura certa: ninguém consegue inventar o que o bot "disse antes".
+async function chaveHist(env) {
+  const seg = env.HIST_SEGREDO || env.CHAVE_ADMIN;
+  if (!seg) return null;
+  return crypto.subtle.importKey("raw", new TextEncoder().encode("hist:" + seg), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+}
+async function assinar(chave, texto) {
+  if (!chave) return "";
+  const s = await crypto.subtle.sign("HMAC", chave, new TextEncoder().encode(String(texto)));
+  return [...new Uint8Array(s)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function confere(chave, texto, sig) {
+  if (!chave || typeof sig !== "string" || sig.length !== 64) return false;
+  const certa = await assinar(chave, texto);
+  let dif = 0; for (let i = 0; i < 64; i++) dif |= certa.charCodeAt(i) ^ sig.charCodeAt(i);
+  return dif === 0;
+}
+// monta o histórico para a IA: falas do visitante como vieram, falas do bot só se a assinatura bater
+async function historico(lista, quemSouEu, max, tam, chave) {
+  const hist = [];
+  for (const m of (Array.isArray(lista) ? lista : []).slice(-max)) {
+    if (!m || typeof m !== "object") continue;
+    if (m.de === quemSouEu) hist.push({ de: "user", texto: limpa(m.texto, tam) });
+    else if (await confere(chave, String(m.texto ?? ""), m.sig)) hist.push({ de: "model", texto: limpa(m.texto, tam) });
+  }
+  const h = hist.filter((m) => m.texto);
+  while (h.length && h[0].de !== "user") h.shift();
+  // o site manda uma entrada por linha; a IA entende melhor uma mensagem por vez de cada lado
+  for (let i = h.length - 1; i > 0; i--) if (h[i].de === h[i - 1].de) { h[i - 1].texto += "\n" + h[i].texto; h.splice(i, 1); }
+  if (h.length && h[h.length - 1].de === "user") h.pop();
+  return h;
 }
 
 // Pergunta à IA. Ordem: o modelo do Gemini que você escolheu, depois modelos "lite" (cota grátis maior),
@@ -241,14 +284,19 @@ export default {
       const jogo = JOGOS.includes(url.searchParams.get("jogo") || corpo.jogo) ? (url.searchParams.get("jogo") || corpo.jogo) : "velha";
       let r = await ler("ranking:" + jogo, []);
       if (req.method === "POST") {
-        const nome = limpa(corpo.nome, 20), pontos = Math.max(0, Math.min(1e6, Math.floor(Number(corpo.pontos) || 0)));
+        const nome = limpa(corpo.nome, 20), pontos = Math.floor(Number(corpo.pontos) || 0);
         if (!nome) return json({ erro: "nome vazio" }, 400);
+        if (pontos < 0 || pontos > TETO[jogo]) return json({ erro: "pontuação impossível" }, 400);
+        const dono = await apelidoIP(ip, env);
+        if (!dono) return json({ erro: "servidor sem IP_SAL/CHAVE_ADMIN configurada" }, 503);
+        // cada nome é de quem o publicou primeiro (pelo hash do IP); entradas antigas, sem dono, ficam como estão
         const i = r.findIndex((x) => x.nome.toLowerCase() === nome.toLowerCase());
-        if (i >= 0) r[i].pontos = Math.max(r[i].pontos, pontos); else r.push({ nome, pontos, quando: Date.now() });
+        if (i >= 0 && r[i].dono !== dono) return json({ erro: "esse nome já é de outra pessoa no ranking" }, 409);
+        if (i >= 0) r[i].pontos = Math.max(r[i].pontos, pontos); else r.push({ nome, pontos, quando: Date.now(), dono });
         r = r.sort((a, b) => b.pontos - a.pontos).slice(0, 50);
         await gravar("ranking:" + jogo, r);
       }
-      return json(r.slice(0, 20));
+      return json(r.slice(0, 20).map(({ dono: _, ...x }) => x));
     }
 
     // ---------- livro de visitas ----------
@@ -256,10 +304,11 @@ export default {
       if (req.method === "POST") {
         const v = { nome: limpa(corpo.nome, 60), contato: limpa(corpo.contato, 120), recado: limpa(corpo.recado, 500), commit: limpa(corpo.commit, 120), idioma: limpa(corpo.idioma, 5), quando: new Date().toISOString(), quem: await apelidoIP(ip, env) };
         if (!v.nome) return json({ erro: "nome vazio" }, 400);
+        if (!v.quem) return json({ erro: "servidor sem IP_SAL/CHAVE_ADMIN configurada" }, 503);
         const lista = await ler("visitas", []), hoje = v.quando.slice(0, 10), deHoje = lista.filter((x) => String(x.quando).startsWith(hoje));
-        // anti-spam sem gastar escrita extra: cada pessoa (IP) assina até 3 vezes por dia, e o livro aceita até 100 assinaturas por dia
+        // anti-spam sem gastar escrita extra: cada pessoa (IP) assina até 3 vezes por dia. Não existe mais um teto
+        // global por dia: antes ~34 IPs lotavam o livro e ninguém mais conseguia assinar até o dia seguinte.
         if (deHoje.filter((x) => x.quem === v.quem).length >= 3) return json({ ok: true, repetido: true });
-        if (deHoje.length >= 100) return json({ erro: "o livro de visitas encheu hoje. volte amanhã 🙂" }, 429);
         // a mesma pessoa assinando de novo com o mesmo nome só atualiza a assinatura
         const i = lista.findIndex((x) => x.quem === v.quem && x.nome.toLowerCase() === v.nome.toLowerCase());
         if (i >= 0) lista.splice(i, 1);
@@ -272,19 +321,14 @@ export default {
 
     // ---------- chat com IA: Gemini primeiro, Groq de reserva ----------
     if ((rota === "/" || rota === "/chat") && req.method === "POST") {
-      const msg = limpa(corpo.mensagem, 800);
-      const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-12)
-        .map((m) => ({ de: m.de === "visitante" ? "user" : "model", texto: limpa(m.texto, 800) })).filter((m) => m.texto);
-      while (hist.length && hist[0].de !== "user") hist.shift();
-      // o site manda uma entrada por linha; a IA entende melhor uma mensagem por vez de cada lado
-      for (let i = hist.length - 1; i > 0; i--) if (hist[i].de === hist[i - 1].de) { hist[i - 1].texto += "\n" + hist[i].texto; hist.splice(i, 1); }
-      if (hist.length && hist[hist.length - 1].de === "user") hist.pop();
+      const msg = limpa(corpo.mensagem, 800), chave = await chaveHist(env);
+      const hist = await historico(corpo.historico, "visitante", 12, 800, chave);
       const extra = db ? (await db.get("conhecimento")) || "" : "";
       const sistema = PERSONA + (extra ? "\n\nBase de conhecimento (escrita pelo Aluísio, use como verdade):\n" + extra.slice(0, 12000) : "")
         + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
       const { resposta: bruta, via } = await perguntarIA(env, sistema, hist, msg);
       const resposta = so_minha_fala(bruta);
-      return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);
+      return resposta ? json({ resposta, via, sig: await assinar(chave, resposta) }) : json({ resposta: "" }, 502);
     }
 
     // ---------- Concord: bots Zizi e Peep, com a mesma IA do chat ----------
@@ -292,15 +336,12 @@ export default {
       const bot = BOTS[corpo.bot] ? corpo.bot : "zizi";
       const msg = limpa(corpo.mensagem, 600);
       if (!msg) return json({ erro: "mensagem vazia" }, 400);
-      const hist = (Array.isArray(corpo.historico) ? corpo.historico : []).slice(-8)
-        .map((m) => ({ de: m.de === "eu" ? "user" : "model", texto: limpa(m.texto, 600) })).filter((m) => m.texto);
-      while (hist.length && hist[0].de !== "user") hist.shift();
-      for (let i = hist.length - 1; i > 0; i--) if (hist[i].de === hist[i - 1].de) { hist[i - 1].texto += "\n" + hist[i].texto; hist.splice(i, 1); }
-      if (hist.length && hist[hist.length - 1].de === "user") hist.pop();
+      const chave = await chaveHist(env);
+      const hist = await historico(corpo.historico, "eu", 8, 600, chave);
       const sistema = BOTS[bot] + (corpo.idioma === "en" ? "\n\nThe visitor is using the English version: answer in English." : "");
       const { resposta: bruta, via } = await perguntarIA(env, sistema, hist, msg);
       const resposta = so_minha_fala(bruta);
-      return resposta ? json({ resposta, via }) : json({ resposta: "" }, 502);
+      return resposta ? json({ resposta, via, sig: await assinar(chave, resposta) }) : json({ resposta: "" }, 502);
     }
 
     // ---------- Peep Studio: compila C# no Wandbox quando o navegador não alcança direto ----------
