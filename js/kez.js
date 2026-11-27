@@ -4,6 +4,18 @@
   const ALU = window.ALU, esc = (s) => ALU.esc(s), T = (pt, en) => (ALU.lang === "en" ? en : pt);
   const P = window.PERFIL, PROJ = window.PROJETOS;
   const repoDe = (p) => p.repo.split("/").pop();
+  // texto do "Sobre" do LigadIn: blocos separados por linha em branco, "## " = subtítulo, "- " = item
+  const sobreHTML = (txt) => txt.split(/\n\s*\n/).map((bloco) => {
+    let h = "", lista = [];
+    const fecha = () => { if (lista.length) h += `<ul>${lista.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`; lista = []; };
+    bloco.split("\n").forEach((l) => {
+      if (l.startsWith("- ")) return lista.push(l.slice(2));
+      fecha();
+      h += l.startsWith("## ") ? `<h3>${esc(l.slice(3))}</h3>` : `<p>${esc(l)}</p>`;
+    });
+    fecha();
+    return h;
+  }).join("");
   const real = (href, txt) => `<a class="btn real" href="${esc(href)}" target="_blank" rel="noopener">${esc(txt)} ↗</a>`;
 
   const PAGINAS = [
@@ -35,7 +47,7 @@
             <p class="muted">${esc(P.local)} · ${T("500+ conexões (na savana)", "500+ connections (in the savanna)")}</p>
             <div class="row">${real(P.contatos.linkedin, T("Sair da savana: abrir perfil real", "Leave the savanna: open real profile"))}<button class="btn sec" data-ir="chat">${T("Mandar mensagem", "Message")}</button></div>
           </div>
-          <div class="li-card"><h2>${T("Sobre", "About")}</h2>${P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
+          <div class="li-card li-sobre"><h2>${T("Sobre", "About")}</h2>${window.SOBRE_LIGADIN ? sobreHTML(window.SOBRE_LIGADIN) : P.bio.map((b) => `<p>${esc(b)}</p>`).join("")}</div>
           ${(window.POSTS_LIGADIN || []).length ? `<div class="li-card"><h2>${T("Atividade", "Activity")}</h2>${window.POSTS_LIGADIN.map((p) => `<div class="li-post"><small class="muted">${esc(p.autor || P.nomeCompleto || P.nome)}${p.colab ? T(" · com ", " · with ") + esc(p.colab) : ""} · ${esc(p.quando || "")}</small><p class="li-post-txt">${esc(p.texto).replace(/\n/g, "<br>")}</p></div>`).join("")}<button class="link" data-ir="ligadin.com/feed">${T("Ver no feed →", "See on feed →")}</button></div>` : ""}
           ${(window.EXPERIENCIAS || []).length ? `<div class="li-card"><h2>${T("Experiência", "Experience")}</h2>${window.EXPERIENCIAS.map((x) => `<div class="li-item"><span class="li-emp">💼</span><div><strong>${esc(x.cargo)}</strong><small>${esc(x.empresa)}${x.tipo ? " · " + esc(x.tipo) : ""}</small><small>${esc(x.periodo)}</small></div></div>`).join("")}</div>` : ""}
           <div class="li-card" id="certs"><h2>${T("Licenças e certificações", "Licenses & certifications")}</h2>

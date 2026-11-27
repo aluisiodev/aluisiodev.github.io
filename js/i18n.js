@@ -24,6 +24,24 @@
       "In my projects you'll find sites with 3D, AI agents for customer support, headless CMS integrations and shops that talk straight through WhatsApp.",
     ],
   });
+  window.SOBRE_LIGADIN = `I build backend systems with C#, .NET and ASP.NET Core: REST APIs, integrations and services that run in production.
+
+## Experience
+At Intervalor, I maintained and evolved .NET applications running in production for multiple enterprise clients:
+- Built REST APIs and integrations in a microservices and middleware architecture, including integration with LLM APIs
+- Improved performance with Redis caching and decoupled services with RabbitMQ for asynchronous processing
+- Debugged production issues with Kibana and Grafana, reducing incident recurrence and resolution time
+- Supported releases of containerized services on Docker and Kubernetes, and took part in code reviews
+
+## Projects
+Deskmate – open-source AI agent for IT service desks. ASP.NET Core, PostgreSQL, EF Core and React, with a custom agent loop, adapters for LLM providers (Gemini, Groq, Ollama) and service desks, unit-tested business rules and CI with GitHub Actions.
+
+Low-cost wearable fall detection system for older adults (undergraduate thesis) – IoT belt with ESP32, BLE and MQTT. A Random Forest model detected 98.8% of falls with 95.3% specificity and sends real-time alerts.
+
+## Education
+Bachelor's in Computer Science – Universidade Paulista (UNIP)
+
+Stack: C# · .NET · ASP.NET Core · REST APIs · PostgreSQL · Redis · EF Core · RabbitMQ · Docker · Kubernetes · Microservices · xUnit · GitHub Actions · React · TypeScript · LLM Integration`;
   const SK = {
     csharp: "The language I use on the back end with .NET and ASP.NET Core. Example in this portfolio: Contentstack Delivery App (Razor Pages, dependency injection, API consumption).",
     typescript: "JavaScript with types. I use it on the front end with React and Next.js and in Node APIs. Example in this portfolio: Mirav (Next.js 16 + three.js).",
