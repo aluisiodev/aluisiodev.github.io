@@ -49,6 +49,20 @@ async function rodarCSharp(codigo, stdin) {
   catch (e) { e.traduzido = js; throw e; }
 }
 
+// Tira do traceback os quadros internos do Pyodide (cada quadro é a linha "File ..." mais as linhas de código
+// e de ^^^ embaixo dela) e troca o "<exec>" pelo nome do arquivo, para o erro ficar igual ao do Python normal.
+function limparTraceback(msg, arquivo) {
+  const ls = msg.split("\n"), res = [];
+  let pulando = false;
+  for (const l of ls) {
+    const quadro = /^\s+File "/.test(l);
+    if (quadro) pulando = !/^\s+File "<exec>"/.test(l);
+    else if (!/^\s{4}/.test(l)) pulando = false;      // linha sem recuo: "Traceback…" ou "TipoDeErro: …"
+    if (!pulando && !/_pyodide|pyodide\.ffi/.test(l)) res.push(l);
+  }
+  return res.join("\n").replace(/File "<exec>"/g, `File "${arquivo || "main.py"}"`);
+}
+
 onmessage = async (e) => {
   const { lang, codigo, stdin } = e.data;
   const t0 = performance.now();
@@ -59,7 +73,7 @@ onmessage = async (e) => {
     postMessage({ tipo: "fim", ok: true, ms: Math.round(performance.now() - t0) });
   } catch (err) {
     let msg = String(err && err.message || err);
-    if (lang === "py") msg = msg.split("\n").filter((l) => !/^\s*File "\/lib\/|_pyodide|pyodide\.ffi/.test(l)).join("\n");
+    if (lang === "py") msg = limparTraceback(msg, e.data.arquivo);
     out(msg.trim() + "\n", "erro");
     if (/EOFError|EOF when reading/.test(msg)) out("Dica: o input() leu tudo que tinha em ENTRADA (stdin). Escreva uma resposta por linha lá do lado. →\n", "aviso");
     postMessage({ tipo: "fim", ok: false, ms: Math.round(performance.now() - t0), traduzido: err && err.traduzido });

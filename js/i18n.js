@@ -128,7 +128,7 @@
     "Arquivo": "File", "Editar": "Edit", "Exibir": "View", "Favoritos": "Favorites", "Ajuda": "Help", "Endereço": "Address", "Formatar": "Format",
     "Tarefas": "Tasks", "Outros locais": "Other places", "Clique duas vezes para abrir.": "Double-click to open.",
     "Minimizar": "Minimize", "Maximizar": "Maximize", "Fechar": "Close", "Voltar": "Back", "Avançar": "Forward", "Ir": "Go", "Pronto": "Done",
-    "Papel de parede": "Wallpaper", "Tema": "Theme", "Cor das janelas": "Window color", "Sistema": "System", "Conquistas": "Achievements", "Noite": "Night", "Savana": "Savanna",
+    "Papel de parede": "Wallpaper", "Tema": "Theme", "Cor das janelas": "Window color", "Sistema": "System", "Conquistas": "Achievements", "Noite": "Night", "Savana": "Savanna", "Estrada 57": "Road '57", "Céu Aero": "Aero sky",
     "aluOS 2.0 · pixel por pixel, em HTML, CSS e JavaScript.": "aluOS 2.0 · pixel by pixel, in HTML, CSS and JavaScript.",
     "4 itens · clique para espiar": "4 items · click to peek", "Esvaziar? Melhor não. Eles me ensinaram muito.": "Empty it? Better not. They taught me a lot.",
     "quarto_360.png - Visualizador 360°": "quarto_360.png - 360° Viewer", "sobre_mim.txt - Bloco de notas": "sobre_mim.txt - Notepad",

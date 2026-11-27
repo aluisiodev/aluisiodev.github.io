@@ -185,26 +185,65 @@ class Program
   let worker = null;
   function novoWorker() { if (worker) worker.terminate(); worker = new Worker("js/peep-worker.js"); return worker; }
 
-  // C# de verdade: compila no Wandbox (.NET 8, grátis e sem chave). Se o navegador não alcançar o Wandbox,
-  // tenta pelo servidor do aluOS (rota /csharp). Se nada responder, o C# de bolso assume.
-  const WANDBOX = "https://wandbox.org/api/compile.json", COMPILADOR = "dotnetcore-8.0.402";
-  const errosCS = (txt) => [...new Set(String(txt || "").split("\n").filter((l) => /error CS\d+/.test(l)).map((l) => l.replace(/^.*?prog\.cs/, "Program.cs").replace(/\s*\[[^\]]*\.csproj\]\s*$/, "")))].join("\n");
-  async function csharpServidor(codigo, stdin) {
-    const corpo = JSON.stringify({ compiler: COMPILADOR, code: codigo, stdin: stdin || "", save: false });
-    const tentar = async (url) => {
+  // C# de verdade: compila no Wandbox (grátis e sem chave). Tenta primeiro o .NET 8; se o .NET do Wandbox
+  // estiver quebrado (já aconteceu: o "dotnet new" estoura o limite de arquivo deles e não compila nada),
+  // cai no Mono (C# 7). Se o navegador não alcançar o Wandbox, tenta pelo servidor do aluOS (rota /csharp).
+  // Se nada responder, o C# de bolso assume.
+  const WANDBOX = "https://wandbox.org/api/compile.json";
+  const MOTORES = [{ id: "dotnetcore-8.0.402", nome: ".NET 8" }, { id: "mono-6.12.0.199", nome: "Mono · C# 7" }];
+  let motorQuebrado = {}; // motores que falharam por problema do Wandbox nesta visita
+  const linhasCS = (txt) => String(txt || "").split("\n").filter((l) => /error CS\d+/.test(l));
+  const limparErro = (txt, arq) => [...new Set(String(txt || "").split("\n").filter((l) => l.trim() && !/^Compilation failed:/.test(l))
+    .map((l) => l.replace(/^.*?prog\.cs/, arq).replace(/\s*\[[^\]]*\.csproj\]\s*$/, "")))].join("\n");
+  // o Mono repete a exceção num bloco "[ERROR] FATAL…" e põe lixo tipo "[0x00011] in <hash>:0" na pilha
+  const limparRun = (txt) => String(txt || "").split(/^\[ERROR\] FATAL UNHANDLED EXCEPTION/m)[0]
+    .replace(/ \[0x[0-9a-f]+\] in <[0-9a-f]+>:0/g, "").replace(/^\n+/, "").replace(/\s+$/, "");
+  async function csharpServidor(codigo, stdin, arq, aviso) {
+    arq = arq || "Program.cs";
+    const proprio = ALU.CONFIG && ALU.CONFIG.csharpApi, api = ALU.CONFIG && ALU.CONFIG.api;
+    const urls = [proprio, WANDBOX, api && String(api).replace(/\/+$/, "") + "/csharp"].filter(Boolean);
+    // devolve: resultado | "quebrado" (o Wandbox respondeu, mas o compilador deles falhou) | null (não alcançou)
+    const tentar = async (url, motor) => {
       const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 30000);
       try {
-        const r = await fetch(url, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" }, body: corpo });
+        const r = await fetch(url, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ compiler: motor.id, code: codigo, stdin: stdin || "", save: false }) });
         if (!r.ok) return null;
         const w = await r.json();
         if (!w || w.status === undefined) return null;
-        const comp = errosCS([w.compiler_error, w.compiler_output, w.compiler_message].join("\n"));
-        if (comp && !w.program_output) return { compile: { code: 1, stderr: comp }, run: { stdout: "", stderr: "", code: 1 } };
-        return { compile: { code: 0 }, run: { stdout: w.program_output || "", stderr: w.program_error || "", code: Number(w.status) || 0 } };
+        if (w.compiler && w.compiler !== motor.id) return null; // servidor antigo que ignora o compilador pedido
+        const status = Number(w.status) || 0, textoComp = [w.compiler_error, w.compiler_output].join("\n");
+        if (status && !w.program_output && !w.program_error) {
+          // não rodou nada: ou é erro de compilação do aluno (error CSxxxx), ou é o Wandbox que quebrou,
+          // ou o programa só saiu com código diferente de 0 (Environment.Exit) sem escrever nada
+          if (linhasCS(textoComp).length) return { motor, compile: { code: 1, stderr: limparErro(linhasCS(textoComp).join("\n"), arq) }, run: { stdout: "", stderr: "", code: 1 } };
+          const resto = String(w.compiler_error || "").split("\n").filter((l) => l.trim() && !/warning CS\d+|^Compilation succeeded/.test(l));
+          if (resto.length || w.signal) return { quebrado: true, motivo: limparErro(resto.join("\n") || w.signal, arq) };
+        }
+        return { motor, compile: { code: 0 }, run: { stdout: w.program_output || "", stderr: limparRun(w.program_error), code: status } };
       } catch { return null; } finally { clearTimeout(t); }
     };
-    const proprio = ALU.CONFIG && ALU.CONFIG.csharpApi, api = ALU.CONFIG && ALU.CONFIG.api;
-    return (proprio && (await tentar(proprio))) || (await tentar(WANDBOX)) || (api && (await tentar(String(api).replace(/\/+$/, "") + "/csharp"))) || null;
+    let ultimaFalha = "";
+    for (const motor of MOTORES) {
+      if (motorQuebrado[motor.id]) continue;
+      let alcancou = false;
+      for (const url of urls) {
+        const r = await tentar(url, motor);
+        if (!r) continue;               // não alcançou: tenta a próxima rota
+        alcancou = true;
+        if (r.quebrado) {               // alcançou, mas o compilador do Wandbox está com defeito: troca de motor
+          motorQuebrado[motor.id] = true; ultimaFalha = r.motivo;
+          const prox = MOTORES[MOTORES.indexOf(motor) + 1];
+          if (prox && aviso) aviso(T(`O ${motor.nome} do Wandbox está com defeito agora. Tentando com ${prox.nome}…\n`, `Wandbox's ${motor.nome} is broken right now. Trying ${prox.nome}…\n`));
+          break;
+        }
+        return r;
+      }
+      if (!alcancou) return null;       // nenhuma rota respondeu: é rede, não compilador. O C# de bolso assume.
+    }
+    // todos os motores quebrados: mostra o que o Wandbox disse em vez de falhar calado
+    if (ultimaFalha) { motorQuebrado = {}; return { motor: { nome: "Wandbox" }, compile: { code: 1, stderr: T("O Wandbox não conseguiu compilar (problema do lado deles):\n", "Wandbox couldn't compile (a problem on their side):\n") + ultimaFalha }, run: { stdout: "", stderr: "", code: 1 } }; }
+    return null;
   }
 
   ALU.peep = function (el, ctx, inicial) {
@@ -435,14 +474,20 @@ class Program
       escrever(`▶ ${atual.split("/").pop()} · ${LINGUAS[ext].nome}\n`, "info");
 
       if (ext === "cs") {
-        escrever(T("Compilando com .NET 8 no Wandbox… (a primeira vez demora uns segundos)\n", "Compiling with .NET 8 on Wandbox… (the first run takes a few seconds)\n"), "info");
-        const t0 = performance.now(), r = await csharpServidor(codigo, stdin);
+        escrever(T("Compilando C# no Wandbox… (a primeira vez demora uns segundos)\n", "Compiling C# on Wandbox… (the first run takes a few seconds)\n"), "info");
+        const t0 = performance.now(), r = await csharpServidor(codigo, stdin, atual.split("/").pop(), (m) => rodando && escrever(m, "aviso"));
         if (!rodando) return;
         if (r) {
-          if (r.compile && r.compile.code) { escrever((r.compile.stderr || r.compile.output || "") + "\n", "erro"); return terminou(false, Math.round(performance.now() - t0), "C# real (.NET)"); }
+          const rotulo = "C# real (" + r.motor.nome + ")";
+          if (r.compile && r.compile.code) {
+            let msg = r.compile.stderr || r.compile.output || T("Erro de compilação sem mensagem.", "Compile error with no message.");
+            if (r.motor.id && r.motor.id.startsWith("mono") && /CS1525|CS1519|CS1002|CS8025/.test(msg)) msg += T("\n\n(dica: o Mono só entende até C# 7. Sem records, switch expression, top-level statements ou new() sem tipo.)", "\n\n(tip: Mono only understands up to C# 7. No records, switch expressions, top-level statements or target-typed new().)");
+            escrever(msg + "\n", "erro"); return terminou(false, Math.round(performance.now() - t0), rotulo);
+          }
           if (r.run.stdout) escrever(r.run.stdout);
-          if (r.run.stderr) escrever(r.run.stderr, "erro");
-          return terminou(!r.run.code, Math.round(performance.now() - t0), "C# real (.NET)");
+          if (r.run.stderr) escrever((r.run.stdout && !r.run.stdout.endsWith("\n") ? "\n" : "") + r.run.stderr + "\n", "erro");
+          else if (r.run.code) escrever(T(`O programa saiu com código ${r.run.code}.\n`, `The program exited with code ${r.run.code}.\n`), "erro");
+          return terminou(!r.run.code, Math.round(performance.now() - t0), rotulo);
         }
         escrever(T("Servidor indisponível. Usando o C# de bolso (tradução para JS, só o básico).\n\n", "Server unavailable. Using pocket C# (translated to JS, basics only).\n\n"), "aviso");
       }
@@ -459,7 +504,7 @@ class Program
       };
       w.onerror = (e) => { escrever((e.message || "Erro ao iniciar o executor.") + "\n", "erro"); worker = null; terminou(false, 0); };
       if (ext === "py") setTimeout(() => { if (rodando && !jaCarregou) { jaCarregou = true; iniciarTimer(); } }, 15000);
-      w.postMessage({ lang: ext, codigo, stdin });
+      w.postMessage({ lang: ext, codigo, stdin, arquivo: atual.split("/").pop() });
     }
     btnRun.onclick = executar;
 

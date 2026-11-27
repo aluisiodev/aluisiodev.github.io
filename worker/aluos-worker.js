@@ -307,10 +307,11 @@ export default {
     if (rota === "/csharp" && req.method === "POST") {
       const code = String(corpo.code || "").slice(0, 20000), stdin = String(corpo.stdin || "").slice(0, 2000);
       if (!code.trim()) return json({ erro: "código vazio" }, 400);
+      const compiler = ["dotnetcore-8.0.402", "mono-6.12.0.199"].includes(corpo.compiler) ? corpo.compiler : "dotnetcore-8.0.402";
       try {
         const r = await fetch("https://wandbox.org/api/compile.json", { method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ compiler: "dotnetcore-8.0.402", code, stdin, save: false }) });
-        return r.ok ? json(await r.json()) : json({ erro: "Wandbox respondeu " + r.status }, 502);
+          body: JSON.stringify({ compiler, code, stdin, save: false }) });
+        return r.ok ? json({ ...(await r.json()), compiler }) : json({ erro: "Wandbox respondeu " + r.status }, 502);
       } catch { return json({ erro: "Wandbox fora do ar" }, 502); }
     }
 
