@@ -199,6 +199,8 @@ async function historico(lista, quemSouEu, max, tam, chave) {
 
 // Pergunta à IA. Ordem: o modelo do Gemini que você escolheu, depois modelos "lite" (cota grátis maior),
 // e por fim a Groq. Erros 429 (cota), 404 (modelo aposentado) e 5xx (sobrecarga) passam para o próximo.
+// cada chamada à IA espera no máximo 15 s: se o modelo travar, passa para o próximo (antes o visitante chegava a esperar mais de 1 minuto)
+const TEMPO_IA = 15000;
 async function perguntarIA(env, sistema, hist, msg, diagnostico = false) {
   const log = [];
   const nota = (quem, status, txt) => { const l = `${quem}: ${status}${txt ? " · " + String(txt).replace(/\s+/g, " ").slice(0, 220) : ""}`; log.push(l); console.log("[chat] " + l); };
@@ -211,7 +213,7 @@ async function perguntarIA(env, sistema, hist, msg, diagnostico = false) {
       for (let tentativa = 0; tentativa < 2; tentativa++) {
         try {
           const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
-            method: "POST", headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" },
+            method: "POST", headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" }, signal: AbortSignal.timeout(TEMPO_IA),
             body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: [...hist.map((m) => ({ role: m.de, parts: [{ text: m.texto }] })), { role: "user", parts: [{ text: msg }] }], generationConfig: config }),
           });
           if (r.ok) {
@@ -225,7 +227,7 @@ async function perguntarIA(env, sistema, hist, msg, diagnostico = false) {
           if (r.status === 400 || r.status === 401 || r.status === 403) return groq(env, sistema, hist, msg, log); // chave errada: não adianta trocar de modelo
           if (r.status >= 500 && tentativa === 0) { await new Promise((ok) => setTimeout(ok, 700)); continue; } // sobrecarga: tenta mais uma vez
           break;
-        } catch (e) { nota("gemini " + modelo, "erro de rede", e.message); break; }
+        } catch (e) { nota("gemini " + modelo, e.name === "TimeoutError" ? "demorou mais de 15 s" : "erro de rede", e.message); break; }
       }
     }
   } else nota("gemini", "sem GEMINI_API_KEY");
@@ -235,13 +237,13 @@ async function groq(env, sistema, hist, msg, log) {
   if (!env.GROQ_API_KEY) { log.push("groq: sem GROQ_API_KEY"); return { resposta: "", via: "", log }; }
   try {
     const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" }, signal: AbortSignal.timeout(TEMPO_IA),
       body: JSON.stringify({ model: env.GROQ_MODEL || "llama-3.3-70b-versatile", max_tokens: 350, temperature: 0.6, stop: PARAR.slice(0, 4),
         messages: [{ role: "system", content: sistema }, ...hist.map((m) => ({ role: m.de === "user" ? "user" : "assistant", content: m.texto })), { role: "user", content: msg }] }),
     });
     if (r.ok) { const j = await r.json(); const txt = j.choices?.[0]?.message?.content?.trim() || ""; log.push("groq: 200"); return { resposta: txt, via: txt ? "groq" : "", log }; }
     log.push(`groq: ${r.status} · ${(await r.text()).replace(/\s+/g, " ").slice(0, 220)}`);
-  } catch (e) { log.push("groq: erro de rede · " + e.message); }
+  } catch (e) { log.push((e.name === "TimeoutError" ? "groq: demorou mais de 15 s · " : "groq: erro de rede · ") + e.message); }
   console.log("[chat] " + log.join(" | "));
   return { resposta: "", via: "", log };
 }
